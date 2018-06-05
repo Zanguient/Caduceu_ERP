@@ -1,0 +1,233 @@
+unit modDadosInclusaoNFE;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.DBCtrls,
+  Vcl.Imaging.pngimage, Vcl.ExtCtrls;
+
+type
+  TfrmDadosInclusaoNFE = class(TForm)
+    GroupBox1: TGroupBox;
+    lblNumeroNF: TLabel;
+    lblModeloNF: TLabel;
+    lblSerieNF: TLabel;
+    lblCNPJ: TLabel;
+    edtNumeroNF: TEdit;
+    edtSerieNF: TEdit;
+    edtCNPJ: TEdit;
+    cboModeloDoc: TDBLookupComboBox;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    imgOk: TImage;
+    procedure FormCreate(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+    procedure imgOkClick(Sender: TObject);
+    procedure edtNumeroNFKeyPress(Sender: TObject; var Key: Char);
+    procedure edtNumeroNFEnter(Sender: TObject);
+    procedure cboModeloDocKeyPress(Sender: TObject; var Key: Char);
+    procedure edtNumeroNFKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtCNPJExit(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmDadosInclusaoNFE: TfrmDadosInclusaoNFE;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure, modNFEntrada,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmDadosInclusaoNFE.cboModeloDocKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmDadosInclusaoNFE.edtCNPJExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  LimparMSG_ERRO;
+
+  if not ValidarCnpjCpf(edtCNPJ.Text) then
+  begin
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CNPJ_INVALIDO + edtCNPJ.Text;
+    Application.ProcessMessages;
+
+    TocarSomAlerta(ord(SystemHand));
+
+    edtCNPJ.SetFocus;
+    edtCNPJ.SelectAll;
+
+  end;
+
+end;
+
+procedure TfrmDadosInclusaoNFE.edtNumeroNFEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmDadosInclusaoNFE.edtNumeroNFKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmDadosInclusaoNFE.edtNumeroNFKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+  else if not (Key in['0'..'9',Chr(8)]) then
+    Key:= #0;
+
+end;
+
+procedure TfrmDadosInclusaoNFE.FormCreate(Sender: TObject);
+begin
+
+  Color := COR_PADRAO_DIALOGOS;
+  DesabilitarBotaoFecharForm(Handle);
+
+  dmMProvider.cdsModelo_Doc.Open;
+
+  cboModeloDoc.KeyValue := dmMProvider.cdsConfiguracoesMODELO.Value;
+
+end;
+
+procedure TfrmDadosInclusaoNFE.imgOkClick(Sender: TObject);
+begin
+
+  dmDBEXMaster.iFornecedor := -1;
+
+  if not ValidarCnpjCpf(edtCNPJ.Text) then
+  begin
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CNPJ_INVALIDO + edtCNPJ.Text;
+    Application.ProcessMessages;
+
+    TocarSomAlerta(ord(SystemHand));
+
+    edtCNPJ.SetFocus;
+    edtCNPJ.SelectAll;
+
+  end
+  else
+  begin
+
+    dmDBEXMaster.fdqFornecedor.Close;
+    dmDBEXMaster.fdqFornecedor.SQL.Clear;
+    dmDBEXMaster.fdqFornecedor.SQL.Add('SELECT * FROM FORNECEDOR');
+    dmDBEXMaster.fdqFornecedor.SQL.Add('WHERE CNPJ = ' + QuotedStr(Trim(edtCNPJ.Text)));
+    dmDBEXMaster.fdqFornecedor.Open;
+
+    if dmDBEXMaster.fdqFornecedor.IsEmpty then
+    begin
+
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + FormatarCNPJCPF(edtCNPJ.Text);
+      TocarSomAlerta(ord(SystemHand));
+      ModalResult     := mrNone;
+      dmDBEXMaster.fdqFornecedor.Close;
+      edtCNPJ.SetFocus;
+
+    end
+    else
+    begin
+
+      dmDBEXMaster.iFornecedor            := dmDBEXMaster.fdqFornecedor.FieldByName('FORNECEDOR').Value;
+      dmDBEXMaster.bFornecedorSIMPLES_NAC := (dmDBEXMaster.fdqFornecedor.FieldByName('OPTANTE_SIMPLES').Value = 1);
+
+      dmMProvider.cdsNFEntrada.Close;
+      dmMProvider.cdsNFEntrada.ProviderName := 'dspNFEntrada';
+
+      dmDBEXMaster.fdqNFEntrada.SQL.Clear;
+      dmDBEXMaster.fdqNFEntrada.SQL.Add('SELECT * FROM NFENTRADA');
+      dmDBEXMaster.fdqNFEntrada.SQL.Add('WHERE NOTAFISCAL = ' + QuotedStr(Trim(edtNumeroNF.Text)));
+      dmDBEXMaster.fdqNFEntrada.SQL.Add('AND MODELO = ' + QuotedStr(Trim(cboModeloDoc.KeyValue)));
+
+      if Length(Trim(edtSerieNF.Text)) > 0 then
+        dmDBEXMaster.fdqNFEntrada.SQL.Add('AND SERIENF = ' + QuotedStr(Trim(edtSerieNF.Text)));
+
+      dmDBEXMaster.fdqNFEntrada.SQL.Add('AND FORNECEDOR = ' + IntToStr(dmDBEXMaster.fdqFornecedor.FieldByName('FORNECEDOR').Value));
+
+      dmMProvider.cdsNFEntrada.Open;
+      dmMProvider.cdsNFEntrada.ProviderName := '';
+
+      if dmMProvider.cdsNFEntrada.IsEmpty then
+        ModalResult := mrOk;
+      else
+        Close;
+
+    end;
+  end;
+
+end;
+
+procedure TfrmDadosInclusaoNFE.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+procedure TfrmDadosInclusaoNFE.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+end.

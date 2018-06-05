@@ -1,0 +1,66 @@
+unit modFechaCaixa;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls, Vcl.DBCtrls;
+
+type
+  TfrmFecha_Caixa = class(TForm)
+    imgConfirmar: TImage;
+    imgCancelar: TImage;
+    grpInfoCaixa: TGroupBox;
+    txtDataAbertura: TDBText;
+    txtHoraAbertura: TDBText;
+    txtFuncionario: TDBText;
+    txtValorAbertura: TDBText;
+    txtValorMovimento: TDBText;
+    lblDataAbertura: TLabel;
+    lblHoraAbertura: TLabel;
+    lblValorAbertura: TLabel;
+    lblValorMovimento: TLabel;
+    grpTotais: TGroupBox;
+    lblEspecie: TLabel;
+    lblCheques: TLabel;
+    lblCartoes: TLabel;
+    lblOutros: TLabel;
+    txtEmEspecie: TDBText;
+    txtEmCheques: TDBText;
+    txtEmCartoes: TDBText;
+    txtOutros: TDBText;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    procedure imgCancelarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmFecha_Caixa: TfrmFecha_Caixa;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes;
+
+procedure TfrmFecha_Caixa.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(handle);
+
+end;
+
+procedure TfrmFecha_Caixa.imgCancelarClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

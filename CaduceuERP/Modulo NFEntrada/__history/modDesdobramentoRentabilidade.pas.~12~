@@ -1,0 +1,72 @@
+unit modDesdobramentoRentabilidade;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids;
+
+type
+  TfrmDesdobramentoRentabilidade = class(TForm)
+    grpItensDesdobramento: TGroupBox;
+    grdDesdobramento: TDBGrid;
+    grpDetalhesItem: TGroupBox;
+    lblQtdNF: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure grdDesdobramentoDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmDesdobramentoRentabilidade: TfrmDesdobramentoRentabilidade;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmDesdobramentoRentabilidade.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(handle);
+
+  for i := 0 to grdDesdobramento.Columns.Count-1 do
+    grdDesdobramento.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+end;
+
+procedure TfrmDesdobramentoRentabilidade.grdDesdobramentoDrawColumnCell(
+  Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+begin
+
+  if not odd(dmMProvider.cdsDesdobRentabil.RecNo) then
+  begin
+
+    grdDesdobramento.Canvas.Font.Color   := clBlack;
+    grdDesdobramento.Canvas.Brush.Color  := COR_ZEBRA_GRADE
+
+  end
+
+  else
+  begin
+
+    grdDesdobramento.Canvas.Font.Color   := clBlack;
+    grdDesdobramento.Canvas.Brush.Color  := clWhite;
+
+  end;
+
+  grdDesdobramento.DefaultDrawColumnCell(rect, DataCol, Column, State)
+
+
+end;
+
+end.

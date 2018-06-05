@@ -1,0 +1,26 @@
+unit modAvisoCCe;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TfrmAvisoUsoCCe = class(TForm)
+    memAvisoUsoCCe: TMemo;
+    chkLiAvisoUsoCCe: TCheckBox;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmAvisoUsoCCe: TfrmAvisoUsoCCe;
+
+implementation
+
+{$R *.dfm}
+
+end.

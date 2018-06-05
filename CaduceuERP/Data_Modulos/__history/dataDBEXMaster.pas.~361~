@@ -1,0 +1,873 @@
+unit dataDBEXMaster;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait,
+  FireDAC.Comp.Client, FireDAC.Comp.UI, Data.DB, FireDAC.Phys.IBBase,
+  FireDAC.Phys.FB, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf,
+  FireDAC.DApt, FireDAC.Comp.DataSet, Datasnap.DBClient, System.IniFiles, Vcl.Forms,
+  Vcl.Controls, Vcl.ImgList, FireDAC.Comp.ScriptCommands, FireDAC.Stan.Util,
+  FireDAC.Comp.Script, FireDAC.Phys.MSSQL, Data.DBXMSSQL, Data.SqlExpr,
+  FireDAC.Phys.ODBCBase, Datasnap.Provider, FireDAC.Phys.FBDef,
+  FireDAC.Phys.IBWrapper, System.ImageList, JvComponentBase, JvBalloonHint,
+  FireDAC.Phys.SQLiteVDataSet;
+
+
+type
+  TdmDBEXMaster = class(TDataModule)
+    fddFBMaster: TFDPhysFBDriverLink;
+    fdcMaster: TFDConnection;
+    fdwMaster: TFDGUIxWaitCursor;
+    fdqEstados: TFDQuery;
+    fdqCidades: TFDQuery;
+    fdqFilial: TFDQuery;
+    fdqUsuarios: TFDQuery;
+    fdqConfiguracoes: TFDQuery;
+    FDIBSecurity1: TFDIBSecurity;
+    fdqCFOP_CFPS: TFDQuery;
+    fdqTabela_4_3_7: TFDQuery;
+    fdqMasterPesquisa: TFDQuery;
+    fdqFuncionarios: TFDQuery;
+    fdqModelo_doc: TFDQuery;
+    imgMenuConfiguracoes: TImageList;
+    fdqConfigECF: TFDQuery;
+    fdqModeloEtiqGond: TFDQuery;
+    fdqAdministradoras: TFDQuery;
+    fdqContaCorrente: TFDQuery;
+    fdqCtrlCartoes: TFDQuery;
+    fdqTotaisCtrlCartoes: TFDQuery;
+    fdqTotaisCtrlCartoesOP_TOTAL_CR_ABERTO: TBCDField;
+    fdqTotaisCtrlCartoesOP_TOTAL_CR_BAIXADO: TBCDField;
+    fdqTotaisCtrlCartoesOP_TOTAL_DEB_ABERTO: TBCDField;
+    fdqTotaisCtrlCartoesOP_TOTAL_DEB_BAIXADO: TBCDField;
+    fdqSelBaixaCartao: TFDQuery;
+    fdqTabelas_SPED: TFDQuery;
+    fdqNFEntrada: TFDQuery;
+    fdqFornecedor: TFDQuery;
+    fdqRegistro70Sintegra: TFDQuery;
+    fdqParcelasNFE: TFDQuery;
+    fdqCFOP_NF_Entrada: TFDQuery;
+    fdqSituacao_Doc: TFDQuery;
+    fdqItem_NFEntrada: TFDQuery;
+    fdqConhecimentoFrete: TFDQuery;
+    fdqTipo_CTE: TFDQuery;
+    fdqReferenciaFornecedor: TFDQuery;
+    fdqBarras: TFDQuery;
+    fdqProdutos: TFDQuery;
+    fdqProdutoFilial: TFDQuery;
+    fdqCST_PIS: TFDQuery;
+    fdqCST_COFINS: TFDQuery;
+    fdqCST_CSOSN: TFDQuery;
+    fdqOrdemCompra: TFDQuery;
+    fdqItem_NFEntradaITEMNFENTRADA: TIntegerField;
+    fdqItem_NFEntradaNFENTRADA: TIntegerField;
+    fdqItem_NFEntradaEAN: TStringField;
+    fdqItem_NFEntradaPRODUTO: TIntegerField;
+    fdqItem_NFEntradaCST: TSmallintField;
+    fdqItem_NFEntradaQUANTIDADE: TBCDField;
+    fdqItem_NFEntradaUNIDADEEMBALAGEM: TBCDField;
+    fdqItem_NFEntradaVALORUNITARIO: TBCDField;
+    fdqItem_NFEntradaDESCONTO: TCurrencyField;
+    fdqItem_NFEntradaIPI: TCurrencyField;
+    fdqItem_NFEntradaICMSENTRADA: TCurrencyField;
+    fdqItem_NFEntradaICMSSAIDA: TCurrencyField;
+    fdqItem_NFEntradaCFOP: TStringField;
+    fdqItem_NFEntradaBASE_ICMS: TBCDField;
+    fdqItem_NFEntradaBASE_SUBSTITUICAO: TBCDField;
+    fdqItem_NFEntradaVALOR_DESCONTO: TBCDField;
+    fdqItem_NFEntradaVALOR_ICMS: TBCDField;
+    fdqItem_NFEntradaVALOR_IPI: TBCDField;
+    fdqItem_NFEntradaVALOR_SUBSTITUICAO: TBCDField;
+    fdqItem_NFEntradaTIPO_DESCONTO: TSmallintField;
+    fdqItem_NFEntradaSUB_TOTAL: TBCDField;
+    fdqItem_NFEntradaISENTO_NAOTRIBUTADO: TBCDField;
+    fdqItem_NFEntradaENCARGOS: TBCDField;
+    fdqItem_NFEntradaNCM: TStringField;
+    fdqItem_NFEntradaREDUCAO_BASE: TFMTBCDField;
+    fdqItem_NFEntradaDESCONTO_RATEADO: TBCDField;
+    fdqItem_NFEntradaDESPESA_RATEADA: TBCDField;
+    fdqItem_NFEntradaFRETE_RATEADO: TBCDField;
+    fdqItem_NFEntradaBASE_ICMS_SIMPLES: TBCDField;
+    fdqItem_NFEntradaVALOR_ICMS_SIMPLES: TBCDField;
+    fdqItem_NFEntradaALIQUOTA_ST: TCurrencyField;
+    fdqItem_NFEntradaIND_APURACAO_IPI: TIntegerField;
+    fdqItem_NFEntradaCOD_ENQUADRAMENTO_IPI: TStringField;
+    fdqItem_NFEntradaBASE_CALCULO_IPI: TBCDField;
+    fdqItem_NFEntradaALIQUOTA_IPI: TCurrencyField;
+    fdqItem_NFEntradaCST_PIS: TStringField;
+    fdqItem_NFEntradaVALOR_BASE_PIS: TBCDField;
+    fdqItem_NFEntradaP_ALIQUOTA_PIS: TBCDField;
+    fdqItem_NFEntradaQUANT_BC_PIS: TBCDField;
+    fdqItem_NFEntradaV_ALIQUOTA_PIS: TBCDField;
+    fdqItem_NFEntradaVALOR_PIS: TBCDField;
+    fdqItem_NFEntradaCST_COFINS: TStringField;
+    fdqItem_NFEntradaVALOR_BC_COFINS: TBCDField;
+    fdqItem_NFEntradaP_ALIQUOTA_COFINS: TBCDField;
+    fdqItem_NFEntradaQUANTIDADE_BC_COFINS: TBCDField;
+    fdqItem_NFEntradaV_ALIQUOTA_COFINS: TBCDField;
+    fdqItem_NFEntradaVALOR_COFINS: TBCDField;
+    fdqItem_NFEntradaCST_IPI: TStringField;
+    fdqItem_NFEntradaNUMERO_ITEM: TIntegerField;
+    fdqCpa: TFDQuery;
+    fdqItemOrdemCompra: TFDQuery;
+    fdqPlanoContas: TFDQuery;
+    fdqItemPlanoContas: TFDQuery;
+    fdqLancamentos: TFDQuery;
+    fdqTributacao: TFDQuery;
+    fdqSelRentabilidade: TFDQuery;
+    fdqSelItemRentabilidade: TFDQuery;
+    fdqDesdob_Rentabil: TFDQuery;
+    fdqSubGrupo: TFDQuery;
+    fdqGrupo: TFDQuery;
+    fdqSecao: TFDQuery;
+    fdqSetorBalanca: TFDQuery;
+    fdqBancos: TFDQuery;
+    imgRelatorios16: TImageList;
+    fdqTipoItem: TFDQuery;
+    fdqRegistro50: TFDQuery;
+    fdqRegistro54: TFDQuery;
+    fdqCLD_NFE: TFDQuery;
+    fdqSituacoesOS: TFDQuery;
+    fdqEquipamentos: TFDQuery;
+    fdqClientes: TFDQuery;
+    fdqOrdemServico: TFDQuery;
+    fdqItens_OS_Servicos: TFDQuery;
+    fdqItens_OS_Pecas: TFDQuery;
+    fdqAgenda: TFDQuery;
+    fdqServicos: TFDQuery;
+    fdqHistorico_OS: TFDQuery;
+    fdqFormasPagamento: TFDQuery;
+    fdqPlContas: TFDQuery;
+    fdqSubConta: TFDQuery;
+    fdqPerdas: TFDQuery;
+    fdqItensPerdas: TFDQuery;
+    fdqRControlePerda: TFDQuery;
+    fdqParcelasOrdemServico: TFDQuery;
+    fdqNcmNbs: TFDQuery;
+    fdqDiasFormaPagto: TFDQuery;
+    fdqProducao: TFDQuery;
+    fdqItemProducao: TFDQuery;
+    fdqTotalizarItemProduc: TFDQuery;
+    fdqPesqProdutos: TFDQuery;
+    fdqPaises: TFDQuery;
+    imgIntegracaoFiscal: TImageList;
+    fdqUnidadeMedida: TFDQuery;
+    fdscMaster: TFDScript;
+    fdqMenuAtalhos: TFDQuery;
+    imgStatusBar: TImageList;
+    imgMenu: TImageList;
+    fdqAlmoxarifado: TFDQuery;
+    fdqItemAlmoxarifado: TFDQuery;
+    fdqPedidos: TFDQuery;
+    fdqCfgConexaoZeusRetail: TFDQuery;
+    fdqPedidoZeus: TFDQuery;
+    fdqItemPedZeus: TFDQuery;
+    fdqEndEntregaPedZeus: TFDQuery;
+    fdqFinalizPedZeus: TFDQuery;
+    fdqParcelasPedZeus: TFDQuery;
+    fdqCaixaLoja: TFDQuery;
+    fdqItemCaixaLoja: TFDQuery;
+    fdqValorPrazoPedido: TFDQuery;
+    fdqParcelamentoCX: TFDQuery;
+    fdqValorPrazoPedidoTOTAL_PRAZO: TBCDField;
+    fdqCst: TFDQuery;
+    fdqConfBuscaCep: TFDQuery;
+    fdqOrdemProducao: TFDQuery;
+    fdqItemOrdemProducao: TFDQuery;
+    fdqProdutosFT: TFDQuery;
+    fdqProdutosItemFT: TFDQuery;
+    JvBalloonHint1: TJvBalloonHint;
+    fdcmMaster: TFDCommand;
+    fdqCliente_Entrega: TFDQuery;
+    fdqSomaDesItemPedZeus: TFDQuery;
+    fdqNFSaida: TFDQuery;
+    fdqItemNFSaida: TFDQuery;
+    fdqCFOP_NFSaida: TFDQuery;
+    fdqParcelasNFS: TFDQuery;
+    fdqTransportadoraNFS: TFDQuery;
+    fdqExportacaoNFS: TFDQuery;
+    fdqDocumentoRef_NFS: TFDQuery;
+    fdqEndRetiradaNFS: TFDQuery;
+    fdqEndEntregaNFS: TFDQuery;
+    fdqOrigemMercadoria: TFDQuery;
+    fdqSelecionaItensNFSaida_LS: TFDQuery;
+    fdqMVA: TFDQuery;
+    fdqPesqCliente: TFDQuery;
+    fdqPesqCFOP: TFDQuery;
+    fdqConsisteCFOP_ITNFS: TFDQuery;
+    fdqParametros_NFE: TFDQuery;
+    fdqInventario: TFDQuery;
+    fdqInventarioINVENTARIO: TIntegerField;
+    fdqInventarioFILIAL: TSmallintField;
+    fdqInventarioDATA: TDateField;
+    fdqInventarioANODEREFERENCIA: TIntegerField;
+    fdqInventarioVALORDOINVENTARIO: TBCDField;
+    fdqInventarioTIPOCUSTOINVENTARIO: TSmallintField;
+    fdqInventarioSTATUS: TSmallintField;
+    fdqInventarioVALORLIQUIDODOINVENTARIO: TBCDField;
+    fdqInventarioNUMERO_ORDEM: TIntegerField;
+    fdqInventarioMOTIVO_INVENTARIO: TSmallintField;
+    fdqInventarioTRIBUTACAO: TIntegerField;
+    fdqInventarioCODIGO_AJUSTE_APURACAO: TStringField;
+    fdqCCe: TFDQuery;
+    fdqRetorna_Gnr_ItemNFS: TFDQuery;
+    fdqRetorna_Gnr_ItemNFSOP_GNR_ITEM_NFS: TIntegerField;
+    fdqRetorna_Ngr_CFOPNFS: TFDQuery;
+    fdqRetorna_Ngr_CFOPNFSIDCFOP_NFSAIDA: TIntegerField;
+    fdtMaster: TFDTransaction;
+    fdqFCP_Estados: TFDQuery;
+    fdqCre: TFDQuery;
+    fdqNFSaidaRefer: TFDQuery;
+    fdqVersaoBanco: TFDQuery;
+    fdcAtualiza: TFDConnection;
+    fdtAtualiza: TFDTransaction;
+    imgHot: TImageList;
+    fdqLivroFiscalEntrada: TFDQuery;
+    fdqSomar_VContabLFE: TFDQuery;
+    fdqSomar_BCalculoLFE: TFDQuery;
+    fdqSomar_ImpostoCredLFE: TFDQuery;
+    fdqSomar_IsentasNT_LFE: TFDQuery;
+    fdqSomar_OutrasLFE: TFDQuery;
+    fdqLivroFiscalSaida: TFDQuery;
+    fdqPermissao: TFDQuery;
+    fdqPrecoQuantidade: TFDQuery;
+    fdqSimilar: TFDQuery;
+    fdqIOS_Produto: TFDQuery;
+    fdqOS_Produto: TFDQuery;
+    fdqUltimaNFEntradaProduto: TFDQuery;
+    fdqItemUltimaNF: TFDQuery;
+    fdqFCP_NCM: TFDQuery;
+    fdqInfoNutricional: TFDQuery;
+    fdqReceitaProdutos: TFDQuery;
+    fdqTeclado_Balanca: TFDQuery;
+    fdqProduto_Origem: TFDQuery;
+    fdqSel_Prod_E_S_Promo: TFDQuery;
+    fdqUsuario_Conectado: TFDQuery;
+    fdqConsultaAgenda: TFDQuery;
+    fdqFretePedidoVenda: TFDQuery;
+    fdqSomaAcresItemPedZeus: TFDQuery;
+    fdqDeslocamentoOS: TFDQuery;
+    fdqConfig_financeiro: TFDQuery;
+    fdqTotalizaVContabilE: TFDQuery;
+    fdqTotalizaVContabilS: TFDQuery;
+    fdqSelProdExpBalanca: TFDQuery;
+    fdqSelSetorExpBalanca: TFDQuery;
+    fdqSelReceitaExpBalanca: TFDQuery;
+    fdqSelInfNutriExpBal: TFDQuery;
+    fdqSelTecladoExpBalanca: TFDQuery;
+    fdqSelProdExpPdv: TFDQuery;
+    fdqSelCliExportacao: TFDQuery;
+    fdqSelPrecoQtdExp: TFDQuery;
+    fdqValidarImportacao: TFDQuery;
+    fdqRegistro60_Mestre: TFDQuery;
+    fdqCST_PIS_ENT: TFDQuery;
+    fdqCST_PIS_SAI: TFDQuery;
+    fdqCST_COFINS_ENT: TFDQuery;
+    fdqCST_COFINS_SAI: TFDQuery;
+    fdqCtrlNotas: TFDQuery;
+    fdqPesqFornecedor: TFDQuery;
+    fdqTipoUtilCtrlNotas: TFDQuery;
+    fdqSetorCtrlNotas: TFDQuery;
+    fdqCtrlModulos: TFDQuery;
+    fdqParamIntegraPDV: TFDQuery;
+    fdqSped_R0500: TFDQuery;
+    fdqParticipantes: TFDQuery;
+    fdqTipoLogradouro: TFDQuery;
+    fdqRegimeTributario: TFDQuery;
+    fdqParametrosNFCe: TFDQuery;
+    fdqTabelaCEST: TFDQuery;
+    fdcLogSys: TFDConnection;
+    fdtLogSys: TFDTransaction;
+    fdqSelecionaTabelaLOG: TFDQuery;
+    fdqLogSys: TFDQuery;
+    procedure DataModuleCreate(Sender: TObject);
+    procedure AbritTotaizControleCartao(pDataIni, pDataFin:TDateTime);
+    procedure DataModuleDestroy(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    sNomeUsuario, sSenha, sMSG_Erro, sIP_Servidor, sFlag_Permissao, sNome_Computador, sIP_Local,
+    sRSocialFilial, sPath_Atualizacao, sNome_Computador_Comp, sUsuario_Comp, sSenha_Comp,
+    sServidorBD, sPathArquivoBD: string;
+    iIdFilial, iIdUsuario, iFornecedor, iTipo_Acesso:integer;
+    bFornecedorSIMPLES_NAC,bNovoEquip, bCodigoGerado:boolean;
+    ifArqConfig: TIniFile;
+    dDataLicença, dDataHoraServidor:TDateTime;
+    function ValidarPesquisaCfopCorrelata(pCfop, pUF: string): boolean;
+    function ValidarPesquisaReferencia(pReferencia: string; pFornecedor: integer): boolean;
+    function ValidarPesquisaProduto_Filial(pProduto: integer): boolean;
+    function ValidarPesquisaProduto(pProduto: integer): boolean;
+    function ValidarPesquisaBarras(pBarras: string): boolean;
+    function VerificarCodigoIBGE(pCidade, pCodigoMunicipio:integer):boolean;
+    function Montar_SQL_Pesquisa_Estados(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Cidades(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Filial(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Usuarios(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Funcionario(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Administradoras(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_CtrlCartoes(pOpcao:smallint; pDataIni, pDataFin:TDateTime):string;
+    function Montar_SQL_Pesquisa_NFEntrada(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_ConhecimentoFrete(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Situacoes_OS(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Equipamentos(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_Servicos(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_Produtos(pOpcao,pModulo: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_Perdas(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_NCM_NBS(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_Producao(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_Fornecedor(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_Almoxarifado(pOpcao: smallint; pConteudo: string): string;
+    function RetornarSenhaFuncionario(pFuncionario: integer): string;
+    function Montar_SQL_Pesquisa_PedidoZeus(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_UndMedida(pOpcao:smallint; pConteudo:string):string;
+    function Montar_SQL_Pesquisa_Ordem_Producao(pOpcao: smallint; pConteudo: string): string;
+    function Montar_SQL_Pesquisa_NFSaida(pOpcao: smallint; pConteudo: string): string;
+    function Conectar:boolean;
+  end;
+
+var
+  dmDBEXMaster: TdmDBEXMaster;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+uses uFuncoes, datamZeus, uConstantes_Padrao;
+
+{$R *.dfm}
+
+{ TdmDBEXMaster }
+
+procedure TdmDBEXMaster.AbritTotaizControleCartao(pDataIni, pDataFin:TDateTime);
+begin
+
+  fdqTotaisCtrlCartoes.Close;
+  fdqTotaisCtrlCartoes.Params[0].Value := 0;
+  fdqTotaisCtrlCartoes.Params[1].Value := pDataIni;
+  fdqTotaisCtrlCartoes.Params[2].Value := pDataFin;
+  fdqTotaisCtrlCartoes.Params[3].Value := 0;
+  fdqTotaisCtrlCartoes.Open;
+
+end;
+
+function TdmDBEXMaster.Conectar: boolean;
+begin
+
+  ForceDirectories(ExtractFilePath(Application.ExeName)+'Log\');
+
+  try
+
+    fdcMaster.Close;
+
+    ifArqConfig := TIniFile.Create((ExtractFilePath(Application.ExeName)+'Config.ini'));
+
+    fdcMaster.Params.Clear;
+    fdcMaster.Params.Values['SERVER'      ]   := ifArqConfig.ReadString('SERVIDOR','TCPIP','LOCALHOST');
+    fdcMaster.Params.Values['DATABASE'    ]   := ifArqConfig.ReadString('SERVIDOR','PATH',ExtractFilePath(Application.ExeName)+'BD\GENESIS.FDB');
+    fdcMaster.Params.Values['USER_NAME'   ]   := 'SYSDBA';
+    fdcMaster.Params.Values['PASSWORD'    ]   := 'masterkey';
+    fdcMaster.Params.Values['CHARACTERSET']   := 'ISO8859_1';
+
+    if  UpperCase(ifArqConfig.ReadString('SERVIDOR','TCPIP','LOCALHOST')) <> 'LOCALHOST'then
+      fdcMaster.Params.Values['PROTOCOL'  ]   := 'TCPIP'
+    else
+      fdcMaster.Params.Values['PROTOCOL'  ]   := 'LOCAL';
+    fdcMaster.Params.Values['PAGESIZE'    ]   := '16384';
+    fdcMaster.Params.Values['DRIVERID'    ]   := 'FB';
+
+    //banco para log do sistema
+    fdcLogSys.Params.Clear;
+    fdcLogSys.Params.Values['SERVER'      ]   := fdcMaster.Params.Values['SERVER'      ];
+    fdcLogSys.Params.Values['DATABASE'    ]   := ExtractFilePath(fdcMaster.Params.Values['DATABASE'    ])+'LOG_SYS.FDB';
+    fdcLogSys.Params.Values['USER_NAME'   ]   := fdcMaster.Params.Values['USER_NAME'   ];
+    fdcLogSys.Params.Values['PASSWORD'    ]   := fdcMaster.Params.Values['PASSWORD'    ];
+    fdcLogSys.Params.Values['CHARACTERSET']   := fdcMaster.Params.Values['CHARACTERSET'];
+    fdcLogSys.Params.Values['PROTOCOL'    ]   := fdcMaster.Params.Values['PROTOCOL'    ];
+    fdcLogSys.Params.Values['PAGESIZE'    ]   := fdcMaster.Params.Values['PAGESIZE'    ];
+    fdcLogSys.Params.Values['DRIVERID'    ]   := fdcMaster.Params.Values['DRIVERID'    ];
+
+    FDIBSecurity1.DriverLink := fddFBMaster;;
+    FDIBSecurity1.Host       := dmDBEXMaster.fdcMaster.Params.Values['SERVER'];
+
+    Result := true;
+
+  except
+    on E: exception do
+    begin
+
+      Gravar_log_processo(e.Message,  ExtractFilePath(Application.ExeName)+'Log\' + 'Log_erro_conexao.log');
+      Result := true;
+
+    end;
+
+  end;
+
+end;
+
+procedure TdmDBEXMaster.DataModuleCreate(Sender: TObject);
+begin
+
+  Conectar;
+
+end;
+
+procedure TdmDBEXMaster.DataModuleDestroy(Sender: TObject);
+begin
+
+  FreeAndNil(ifArqConfig);
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Fornecedor(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE FORNECEDOR = ' + pConteudo;
+    1:Result := 'WHERE CNPJ = ' + QuotedStr(pConteudo);
+    2:Result := 'WHERE RAZAOSOCIAL LIKE ' + QuotedStr('%' + pConteudo + '%');
+    3:Result := 'WHERE FANTASIA LIKE ' + QuotedStr('%' + pConteudo + '%');
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Administradoras(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE ADMINISTRADORA = ' + pConteudo;
+    1:Result := 'WHERE CNPJ = ' + QuotedStr(pConteudo);
+    2:Result := 'WHERE NOME LIKE ' + QuotedStr('%' + pConteudo + '%');
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Almoxarifado(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE ALMOXARIFADO = ' + pConteudo;
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Cidades(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE CIDADE = ' + pConteudo;
+    1:Result := 'WHERE NOME LIKE ' + QuotedStr('%' + pConteudo + '%');
+    2:Result := 'WHERE ESTADO = ' + QuotedStr(pConteudo);
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_ConhecimentoFrete(pOpcao: smallint;  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE ' + pConteudo;
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_CtrlCartoes(pOpcao: smallint; pDataIni, pDataFin:TDateTime):string;
+var
+  dDataIni, dDataFin:string;
+begin
+
+  dDataIni := FormatDateTime('mm/dd/yy',pDataIni);
+  dDataFin := FormatDateTime('mm/dd/yy',pDataFin);
+
+  case pOpcao of
+    0:Result := 'WHERE EMISSAO BETWEEN  ' + QuotedStr(dDataIni) + ' and ' + QuotedStr(dDataFin);
+    1:Result := 'WHERE DEPOSITO BETWEEN  ' + QuotedStr(dDataIni) + ' and ' + QuotedStr(dDataFin);
+    2:Result := 'WHERE BAIXA BETWEEN  ' + QuotedStr(dDataIni) + ' and ' + QuotedStr(dDataFin);
+    3:Result := 'WHERE CONTROLECARTAOTICKET = -1';
+  end;
+
+  AbritTotaizControleCartao(pDataIni, pDataFin);
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Equipamentos(pOpcao: smallint; pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE CODIGO_EQUIPAMENTO = ' + QuotedStr(pConteudo);
+    1:Result := 'WHERE MODELO LIKE ' + QuotedStr('%' + pConteudo + '%');
+    2:Result := 'WHERE MARCA = ' + QuotedStr(pConteudo);
+    3:Result := 'WHERE OPERADORA = ' + QuotedStr(pConteudo);
+    4:Result := 'WHERE NUMERO_SERIE = ' + QuotedStr(pConteudo);
+    5:Result := 'WHERE ETQ_PATRIMONIO = ' + QuotedStr(pConteudo);
+    6:Result := 'WHERE CODIGO_CLIENTE = ' + pConteudo ;
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Estados(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE SIGLA = ' + QuotedStr(pConteudo);
+    1:Result := 'WHERE NOME LIKE ' + QuotedStr('%' + pConteudo + '%');
+    2:Result := '';
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Filial(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE filial.FILIAL = ' + pConteudo;
+    1:Result := 'WHERE filial.CNPJ = ' + QuotedStr(pConteudo);
+    2:Result := 'WHERE filial.RAZAOSOCIAL LIKE ' + QuotedStr('%' + pConteudo + '%');
+    3:Result := 'WHERE filial.FANTASIA LIKE ' + QuotedStr('%' + pConteudo + '%');
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Funcionario(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE FUNCIONARIO = ' + pConteudo;
+    1:Result := 'WHERE NOME LIKE ' + QuotedStr('%' + pConteudo + '%');
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_NCM_NBS(pOpcao: smallint; pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE COD_NCM = ' + QuotedStr(pConteudo);
+    1:Result := 'WHERE NOME_NCM LIKE ' + QuotedStr('%' + pConteudo + '%');
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_NFEntrada(pOpcao: smallint; pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE NOTAFISCAL = ' + QuotedStr(pConteudo);
+    1:Result := 'WHERE FORNECEDOR ' + pConteudo;
+    2:Result := 'WHERE STATUS = 0';
+    3:Result := 'WHERE STATUS = 1';
+    4:Result := ' ';
+    5:Result := 'WHERE ' + pConteudo;
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_NFSaida(pOpcao: smallint; pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE NFSAIDA = ' + pConteudo;
+    1:Result := 'WHERE DESTINATARIO = '+ pConteudo;
+    2:Result := 'WHERE STATUS = 0';   // a confirmar
+    3:Result := 'WHERE STATUS = 1';   // confirmadas
+    4:Result := 'WHERE STATUS = 2';   // canceladas
+    5:Result := 'WHERE STATUS = 3';   // denegadas
+    7:Result := 'WHERE NFSAIDA = -1'; // inclusão
+  999:Result := 'WHERE NFSAIDA >= 4757'; // inclusão
+  end
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Ordem_Producao(pOpcao: smallint; pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE OP.ORDEM_DE_PRODUCAO = ' + pConteudo + ' and op.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+    1:Result := 'WHERE OP.DATA_INICIO = ' + FormatDateTime('mm/dd/yyyy',StrTodate(Trim(pConteudo))) + ' and op.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+    2:Result := 'WHERE OP.DATA_PREVISTA = ' + FormatDateTime('mm/dd/yyyy',StrTodate(Trim(pConteudo))) + ' and op.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+    3:Result := 'WHERE OP.DATA_TERMINO = ' + FormatDateTime('mm/dd/yyyy',StrTodate(Trim(pConteudo))) + ' and op.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+    4:Result := 'WHERE OP.FUNCIONARIO_RESPONSAVEL = ' + pConteudo + ' and op.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+  end
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_PedidoZeus(pOpcao: smallint; pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE PED.PEDIDO = ' + pConteudo + ' and ped.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+    1:Result := 'WHERE PED.PEDIDO_ORCAMENTO = 0 and ped.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+    2:Result := 'WHERE PED.PEDIDO_ORCAMENTO = 1 and ped.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+  else
+    Result := 'WHERE PED.CLIENTE = ' + IntToStr(pOpcao)  +' and ped.filial = ' +InttoStr(dmDBEXMaster.iIdFilial) ;
+  end
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Perdas(pOpcao: smallint; pConteudo: string): string;
+var
+  sWhere:string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE PERDAS = ' + pConteudo;
+    1:Result := 'WHERE FORNECEDOR = ' + pConteudo;
+    2:begin
+
+        dmDBEXMaster.fdqMasterPesquisa.Close;
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('select perda from itens_perdas');
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('where produto = ' + Trim(pConteudo));
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('order by perda asc');
+        dmDBEXMaster.fdqMasterPesquisa.Open;
+
+        sWhere := 'WHERE PERDAS BETWEEN ' + IntToStr(dmDBEXMaster.fdqMasterPesquisa.FieldByName('PERDA').Value);
+
+
+        dmDBEXMaster.fdqMasterPesquisa.Close;
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('select perda from itens_perdas');
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('where produto = ' + Trim(pConteudo));
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('order by perda desc');
+        dmDBEXMaster.fdqMasterPesquisa.Open;
+
+        sWhere := sWhere + ' AND ' + IntToStr(dmDBEXMaster.fdqMasterPesquisa.FieldByName('PERDA').Value);
+
+        dmDBEXMaster.fdqMasterPesquisa.Close;
+
+        Result := sWhere;
+
+      end;
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Producao(pOpcao: smallint; pConteudo: string): string;
+var
+  sWhere, sProduto, sBarras:string;
+
+begin
+
+  case pOpcao of
+    0:Result := 'where producao = ' + pConteudo;
+    1:Result := 'where produto =  ' + pConteudo;
+    2:begin
+
+        dmDBEXMaster.fdqMasterPesquisa.Close;
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('SELECT PRODUTO FROM PRODUCAO WHERE PRODUTO IN (SELECT PRODUTO FROM PRODUTO WHERE DESCRICAO LIKE ' + QuotedStr('%' + pConteudo + '%') + ')' );
+        dmDBEXMaster.fdqMasterPesquisa.SQL.Add('ORDER BY PRODUTO');
+        dmDBEXMaster.fdqMasterPesquisa.Open;
+
+        dmDBEXMaster.fdqMasterPesquisa.First;
+
+        sProduto  := IntToStr(dmDBEXMaster.fdqMasterPesquisa.FieldByName('PRODUTO').AsInteger);
+
+        sWhere    := 'where produto >=  ' + sProduto;
+
+        dmDBEXMaster.fdqMasterPesquisa.Last;
+
+        sProduto  := IntToStr(dmDBEXMaster.fdqMasterPesquisa.FieldByName('PRODUTO').AsInteger);
+
+        sWhere    := sWhere + ' and produto <= ' + sProduto;
+
+
+        Result    := sWhere;
+
+      end;
+
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Produtos(pOpcao,pModulo: smallint; pConteudo: string): string;
+begin
+
+  if pModulo = 0 then //produto
+  begin
+
+  end
+  else if pModulo = 1 then //ordem de servico
+  begin
+
+    case pOpcao of
+      0:Result := 'WHERE PRO.PRODUTO = ' + pConteudo;
+      1:Result := 'WHERE PRO.COMPLEMENTO = ' + pConteudo ;
+      2:Result := 'WHERE PRO.DESCRICAO LIKE' + QuotedStr('%' + pConteudo + '%');
+    end;
+
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Servicos(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE SERVICO = ' + pConteudo;
+    1:Result := 'WHERE DESCRICAO_1 LIKE ' + QuotedStr('%' + pConteudo + '%');
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Situacoes_OS(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE CODIGO_SITUACAO = ' + pConteudo;
+    1:Result := 'WHERE DESCRICAO LIKE ' + QuotedStr('%' + pConteudo + '%');
+    2:Result := '';
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_UndMedida(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE UNIDADE = ' + QuotedStr(pConteudo);
+    1:Result := 'WHERE DESCRICAO LIKE ' + QuotedStr('%' + pConteudo + '%');
+    2:Result := '';
+  end;
+
+end;
+
+function TdmDBEXMaster.Montar_SQL_Pesquisa_Usuarios(pOpcao: smallint;
+  pConteudo: string): string;
+begin
+
+  case pOpcao of
+    0:Result := 'WHERE USUARIO = ' + QuotedStr(pConteudo);
+    1:Result := 'WHERE NOME LIKE ' + QuotedStr('%' + pConteudo + '%');
+    2:Result := '';
+    3:Result := 'WHERE USUARIO= -1';
+    4:Result := 'WHERE LOGIN = ' + QuotedStr(pConteudo);
+  end;
+
+end;
+
+function TdmDBEXMaster.RetornarSenhaFuncionario(pFuncionario: integer): string;
+begin
+
+  fdqFuncionarios.Close;
+  fdqFuncionarios.SQL.Clear;
+  fdqFuncionarios.SQL.Add('SELECT SENHA FROM FUNCIONARIO');
+
+  fdqFuncionarios.SQL.Add('WHERE FUNCIONARIO = ' + IntToStr(pFuncionario));
+
+  fdqFuncionarios.Open;
+
+  Result := fdqFuncionarios.FieldByName('SENHA').AsString;
+
+  fdqFuncionarios.Close;
+
+end;
+
+function TdmDBEXMaster.ValidarPesquisaBarras(pBarras: string): boolean;
+begin
+
+  fdqBarras.Close;
+  fdqBarras.SQL.Clear;
+  fdqBarras.SQL.Add('SELECT * FROM BARRAS');
+  if Length(pBarras) > 13 then
+    fdqBarras.SQL.Add('WHERE BARRAS = ' + QuotedStr(pBarras))
+  else
+    fdqBarras.SQL.Add('WHERE BARRAS = ' + QuotedStr(FormatFloat('0000000000000',StrToFloat(pBarras))));
+  fdqBarras.Open;
+
+  Result := not fdqBarras.IsEmpty;
+
+end;
+
+function TdmDBEXMaster.ValidarPesquisaCfopCorrelata(pCfop,
+  pUF: string): boolean;
+begin
+
+  fdqFilial.Close;
+  fdqFilial.SQL.Clear;
+  fdqFilial.SQL.Add('SELECT * FROM FILIAL');
+  fdqFilial.SQL.Add('WHERE FILIAL = ' + IntToStr(dmDBEXMaster.iIdFilial));
+  fdqFilial.OPen;
+
+  fdqCFOP_CFPS.Close;
+  fdqCFOP_CFPS.SQL.Clear;
+  fdqCFOP_CFPS.SQL.Add('SELECT * FROM CFOP');
+  fdqCFOP_CFPS.SQL.Add('WHERE CFOP = ' + pCfop);
+  fdqCFOP_CFPS.Open;
+
+  if fdqFilial.FieldByName('ESTADO').AsString <> pUF then
+    Result := not (fdqCFOP_CFPS.FieldByName('CFOP_ENTRADA_INTERESTADUAL').AsString = '')
+  else
+    Result := not (fdqCFOP_CFPS.FieldByName('CFOP_ENTRADA_ESTADUAL').AsString = '');
+
+end;
+
+function TdmDBEXMaster.ValidarPesquisaProduto(pProduto: integer): boolean;
+begin
+
+  fdqProdutos.Close;
+  fdqProdutos.SQL.Clear;
+  fdqProdutos.SQL.Add('SELECT * FROM PRODUTO');
+  fdqProdutos.SQL.Add('WHERE PRODUTO = ' + IntToStr(pProduto));
+  fdqProdutos.Open;
+
+  Result := not fdqProdutos.IsEmpty;
+
+end;
+
+function TdmDBEXMaster.ValidarPesquisaProduto_Filial( pProduto: integer): boolean;
+begin
+
+  fdqProdutoFilial.Close;
+  fdqProdutoFilial.SQL.Clear;
+  fdqProdutoFilial.SQL.Add('SELECT * FROM PRODUTOFILIAL');
+  fdqProdutoFilial.SQL.Add('WHERE PRODUTO = ' + IntToStr(pProduto));
+  fdqProdutoFilial.SQL.Add(' AND FILIAL = ' + IntToStr(dmDBEXMaster.iIdFilial));
+  fdqProdutoFilial.Open;
+
+  Result := not fdqProdutoFilial.IsEmpty;
+
+end;
+
+function TdmDBEXMaster.ValidarPesquisaReferencia(pReferencia: string;  pFornecedor: integer): boolean;
+begin
+
+  fdqReferenciaFornecedor.Close;
+  fdqReferenciaFornecedor.SQL.Clear;
+  fdqReferenciaFornecedor.SQL.Add('select * from REFERENCIAFORNECEDOR');
+  fdqReferenciaFornecedor.SQL.Add('where fornecedor = '+ IntToStr(pFornecedor));
+  fdqReferenciaFornecedor.SQL.Add('and referencia = '+ QuotedStr(RetirarPonto(pReferencia)));
+  fdqReferenciaFornecedor.Open;
+
+  Result := not fdqReferenciaFornecedor.IsEmpty;
+
+end;
+
+function TdmDBEXMaster.VerificarCodigoIBGE(pCidade,  pCodigoMunicipio: integer): boolean;
+begin
+
+  fdqMasterPesquisa.Close;
+  fdqMasterPesquisa.SQL.Clear;
+  fdqMasterPesquisa.SQL.Add('SELECT * FROM CIDADES');
+  fdqMasterPesquisa.SQL.Add('WHERE CIDADE = ' + InttoStr(pCidade));
+  fdqMasterPesquisa.SQL.Add('AND CODIGO_MUNICIPIO > 0');
+  fdqMasterPesquisa.Open;
+
+  Result := not fdqMasterPesquisa.IsEmpty;
+
+end;
+
+end.

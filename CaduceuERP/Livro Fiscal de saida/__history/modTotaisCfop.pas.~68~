@@ -1,0 +1,536 @@
+unit modTotaisCfop;
+
+interface
+
+uses Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, Vcl.Graphics, Vcl.Forms,
+    FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, Vcl.StdCtrls, Vcl.ExtCtrls, System.Classes, Vcl.Controls,
+  Vcl.Grids;
+
+type
+  TfrmTotaisCFOP = class(TForm)
+    stgTotaisCfopEstadual: TStringGrid;
+    Panel1: TPanel;
+    edtTVContalbilEST: TEdit;
+    edtTBCalculoEst: TEdit;
+    edtCreditoEst: TEdit;
+    edtIsentasNTEst: TEdit;
+    edtOutrasEst: TEdit;
+    stgTotaisCfopInter: TStringGrid;
+    Panel2: TPanel;
+    edtTVContalbilinter: TEdit;
+    edtTBCalculoInter: TEdit;
+    edtCreditoInter: TEdit;
+    edtIsentasNTInter: TEdit;
+    edtOutrasInter: TEdit;
+    btnSair: TButton;
+    fdqTotalizaImpCreditado: TFDQuery;
+    fdqTotalizaValorContabil: TFDQuery;
+    fdqTotalizaOutras: TFDQuery;
+    fdqTotalizaBase: TFDQuery;
+    fdqTotalizaIsentasNT: TFDQuery;
+    procedure btnSairClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+    sWhere:string;
+    procedure ValoresEstaduais;
+    procedure ValoresInterEstaduais;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmTotaisCFOP: TfrmTotaisCFOP;
+
+implementation
+
+uses modLivroFiscalSaida, dataDBEXMaster, dataMProvider, uFuncoes;
+
+{$R *.dfm}
+
+procedure TfrmTotaisCFOP.btnSairClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmTotaisCFOP.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(handle);
+
+  ValoresEstaduais;
+
+  ValoresInterEstaduais;
+
+end;
+
+procedure TfrmTotaisCFOP.ValoresEstaduais;
+begin
+
+  stgTotaisCfopEstadual.Cols[0].Text := 'Cfop';
+  stgTotaisCfopEstadual.Cols[1].Text := 'Descrição CFOP';
+  stgTotaisCfopEstadual.Cols[2].Text := 'Valor Contábil';
+  stgTotaisCfopEstadual.Cols[3].Text := 'Base Cálculo';
+  stgTotaisCfopEstadual.Cols[4].Text := 'Débito';
+  stgTotaisCfopEstadual.Cols[5].Text := 'Isentas/N.Trib.';
+  stgTotaisCfopEstadual.Cols[6].Text := 'Outras';
+
+  if not dmMProvider.cdsLivroFiscalSaida.IsEmpty then
+  begin
+
+    fdqTotalizaValorContabil.Close;
+    fdqTotalizaValorContabil.SQL.Clear;
+    fdqTotalizaValorContabil.SQL.Add('SELECT LIVRO_SAIDA.CFOP, CFOP.DESCRICAO, COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS VC FROM LIVRO_SAIDA LIVRO_SAIDA');
+    fdqTotalizaValorContabil.SQL.Add('JOIN CFOP CFOP');
+    fdqTotalizaValorContabil.SQL.Add('ON CFOP.CFOP = LIVRO_SAIDA.CFOP');
+    fdqTotalizaValorContabil.SQL.Add('WHERE LIVRO_SAIDA.UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaValorContabil.SQL.Add(sWhere);
+
+    fdqTotalizaValorContabil.SQL.Add('GROUP BY LIVRO_SAIDA.CFOP, CFOP.DESCRICAO');
+    fdqTotalizaValorContabil.Open;
+
+    while not fdqTotalizaValorContabil.Eof do
+    begin
+
+      stgTotaisCfopEstadual.Cells[0,stgTotaisCfopEstadual.RowCount-1] := Format('%5.5s',[fdqTotalizaValorContabil.FieldByName('CFOP').AsString]);
+      stgTotaisCfopEstadual.Cells[1,stgTotaisCfopEstadual.RowCount-1] := Format('%-30.30s',[fdqTotalizaValorContabil.FieldByName('DESCRICAO').AsString]);
+      stgTotaisCfopEstadual.Cells[2,stgTotaisCfopEstadual.RowCount-1] := Format('%13.13s',[FormatFloat('#,##0.00',fdqTotalizaValorContabil.FieldByName('VC').AsCurrency)]);
+
+      fdqTotalizaBase.Close;
+      fdqTotalizaBase.SQL.Clear;
+      fdqTotalizaBase.SQL.Add('SELECT CFOP, COALESCE(SUM(BASE_CALCULO),0) AS TBC FROM LIVRO_SAIDA WHERE ALIQUOTA > 0 ');
+      fdqTotalizaBase.SQL.Add(' AND UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaBase.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' +  QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaBase.SQL.Add(sWhere);
+
+      fdqTotalizaBase.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaBase.Open;
+
+      stgTotaisCfopEstadual.Cells[3,stgTotaisCfopEstadual.RowCount-1] := Format('%11.11s',[FormatFloat('#,##0.00',fdqTotalizaBase.FieldByName('TBC').AsCurrency)]);
+
+      fdqTotalizaImpCreditado.Close;
+      fdqTotalizaImpCreditado.SQL.Clear;
+      fdqTotalizaImpCreditado.SQL.Add('SELECT CFOP, COALESCE(SUM(IMPOSTO_DEBITADO),0) AS DEBITO FROM LIVRO_SAIDA WHERE ALIQUOTA > 0 ');
+      fdqTotalizaImpCreditado.SQL.Add(' AND UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaImpCreditado.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaImpCreditado.SQL.Add(sWhere);
+
+      fdqTotalizaImpCreditado.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaImpCreditado.Open;
+
+      stgTotaisCfopEstadual.Cells[4,stgTotaisCfopEstadual.RowCount-1] := Format('%11.11s',[FormatFloat('#,##0.00',fdqTotalizaImpCreditado.FieldByName('DEBITO').AsCurrency)]);
+
+      fdqTotalizaIsentasNT.Close;
+      fdqTotalizaIsentasNT.SQL.Clear;
+      fdqTotalizaIsentasNT.SQL.Add('SELECT CFOP, COALESCE(SUM(ISENTAS_NAO_TRIBUTADAS),0) AS ISENTAS FROM LIVRO_SAIDA');
+      fdqTotalizaIsentasNT.SQL.Add(' WHERE UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaIsentasNT.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaIsentasNT.SQL.Add(sWhere);
+
+      fdqTotalizaIsentasNT.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaIsentasNT.Open;
+
+      stgTotaisCfopEstadual.Cells[5,stgTotaisCfopEstadual.RowCount-1] := Format('%13.13s',[FormatFloat('#,##0.00',fdqTotalizaIsentasNT.FieldByName('ISENTAS').AsCurrency)]);
+
+      fdqTotalizaOutras.Close;
+      fdqTotalizaOutras.SQL.Clear;
+      fdqTotalizaOutras.SQL.Add('SELECT CFOP, COALESCE(SUM(OUTRAS),0) AS OUTRAS FROM LIVRO_SAIDA');
+      fdqTotalizaOutras.SQL.Add(' WHERE UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaOutras.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaOutras.SQL.Add(sWhere);
+
+      fdqTotalizaOutras.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaOutras.Open;
+
+      stgTotaisCfopEstadual.Cells[6,stgTotaisCfopEstadual.RowCount-1] := Format('%11.11s',[FormatFloat('#,##0.00',fdqTotalizaOutras.FieldByName('OUTRAS').AsCurrency)]);
+
+      if not fdqTotalizaValorContabil.Eof then
+        stgTotaisCfopEstadual.RowCount := stgTotaisCfopEstadual.RowCount + 1;
+
+      fdqTotalizaBase.Close;
+      fdqTotalizaIsentasNT.Close;
+      fdqTotalizaImpCreditado.Close;
+      fdqTotalizaValorContabil.Next;
+
+    end;
+
+    fdqTotalizaValorContabil.Close;
+
+    fdqTotalizaValorContabil.Close;
+    fdqTotalizaValorContabil.SQL.Clear;
+    fdqTotalizaValorContabil.SQL.Add('SELECT COALESCE(SUM(VALOR_CONTABIL),0) AS VC FROM LIVRO_SAIDA');
+    fdqTotalizaValorContabil.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaValorContabil.SQL.Add(sWhere);
+
+    fdqTotalizaValorContabil.Open;
+
+    edtTVContalbilEST.Text := FormatFloat('#,##0.00',fdqTotalizaValorContabil.FieldByName('VC').AsCurrency);
+    fdqTotalizaValorContabil.Close;
+
+
+    fdqTotalizaBase.Close;
+    fdqTotalizaBase.SQL.Clear;
+    fdqTotalizaBase.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO),0) AS TBC FROM LIVRO_SAIDA');
+    fdqTotalizaBase.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+    fdqTotalizaBase.SQL.Add('AND ALIQUOTA > 0');
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaBase.SQL.Add(sWhere);
+
+    fdqTotalizaBase.Open;
+
+    edtTBCalculoEst.Text := FormatFloat('#,##0.00',fdqTotalizaBase.FieldByName('TBC').AsCurrency);
+    fdqTotalizaBase.Close;
+
+    fdqTotalizaImpCreditado.Close;
+    fdqTotalizaImpCreditado.SQL.Clear;
+    fdqTotalizaImpCreditado.SQL.Add('SELECT COALESCE(SUM(IMPOSTO_DEBITADO),0) AS DEBITO FROM LIVRO_SAIDA');
+    fdqTotalizaImpCreditado.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+    fdqTotalizaImpCreditado.SQL.Add('AND ALIQUOTA > 0');
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaImpCreditado.SQL.Add(sWhere);
+
+    fdqTotalizaImpCreditado.Open;
+
+    edtCreditoEst.Text := FormatFloat('#,##0.00',fdqTotalizaImpCreditado.FieldByName('DEBITO').AsCurrency);
+    fdqTotalizaImpCreditado.Close;
+
+    fdqTotalizaIsentasNT.Close;
+    fdqTotalizaIsentasNT.SQL.Clear;
+    fdqTotalizaIsentasNT.SQL.Add('SELECT COALESCE(SUM(ISENTAS_NAO_TRIBUTADAS),0) AS ISENTAS FROM LIVRO_SAIDA');
+    fdqTotalizaIsentasNT.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaIsentasNT.SQL.Add(sWhere);
+
+    fdqTotalizaIsentasNT.Open;
+
+    edtIsentasNTEst.Text := FormatFloat('#,##0.00',fdqTotalizaIsentasNT.FieldByName('ISENTAS').AsCurrency);
+    fdqTotalizaIsentasNT.Close;
+
+    fdqTotalizaOutras.Close;
+    fdqTotalizaOutras.SQL.Clear;
+    fdqTotalizaOutras.SQL.Add('SELECT COALESCE(SUM(OUTRAS),0) AS OUTRAS FROM LIVRO_SAIDA');
+    fdqTotalizaOutras.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaOutras.SQL.Add(sWhere);
+
+    fdqTotalizaOutras.Open;
+
+    edtOutrasEst.Text := FormatFloat('#,##0.00',fdqTotalizaOutras.FieldByName('OUTRAS').AsCurrency);
+    fdqTotalizaOutras.Close;
+  end;
+
+end;
+
+procedure TfrmTotaisCFOP.ValoresInterEstaduais;
+begin
+
+  stgTotaisCfopInter.Cols[0].Text := 'Cfop';
+  stgTotaisCfopInter.Cols[1].Text := 'Descrição CFOP';
+  stgTotaisCfopInter.Cols[2].Text := 'Valor Contábil';
+  stgTotaisCfopInter.Cols[3].Text := 'Base Cálculo';
+  stgTotaisCfopInter.Cols[4].Text := 'Débito';
+  stgTotaisCfopInter.Cols[5].Text := 'Isentas/N.Trib.';
+  stgTotaisCfopInter.Cols[6].Text := 'Outras';
+
+  if not dmMProvider.cdsLivroFiscalSaida.IsEmpty then
+  begin
+
+    fdqTotalizaValorContabil.Close;
+    fdqTotalizaValorContabil.SQL.Clear;
+    fdqTotalizaValorContabil.SQL.Add('SELECT LIVRO_SAIDA.CFOP, CFOP.DESCRICAO, COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS VC FROM LIVRO_SAIDA LIVRO_SAIDA');
+    fdqTotalizaValorContabil.SQL.Add('JOIN CFOP CFOP');
+    fdqTotalizaValorContabil.SQL.Add('ON CFOP.CFOP = LIVRO_SAIDA.CFOP');
+    fdqTotalizaValorContabil.SQL.Add('WHERE LIVRO_SAIDA.UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND LIVRO_SAIDA.DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND LIVRO_SAIDA.MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND LIVRO_SAIDA.NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaValorContabil.SQL.Add(sWhere);
+
+    fdqTotalizaValorContabil.SQL.Add('GROUP BY LIVRO_SAIDA.CFOP, CFOP.DESCRICAO');
+    fdqTotalizaValorContabil.Open;
+
+    while not fdqTotalizaValorContabil.Eof do
+    begin
+
+      stgTotaisCfopInter.Cells[0,stgTotaisCfopInter.RowCount-1] := Format('%5.5s',[fdqTotalizaValorContabil.FieldByName('CFOP').AsString]);
+      stgTotaisCfopInter.Cells[1,stgTotaisCfopInter.RowCount-1] := Format('%-30.30s',[fdqTotalizaValorContabil.FieldByName('DESCRICAO').AsString]);
+      stgTotaisCfopInter.Cells[2,stgTotaisCfopInter.RowCount-1] := Format('%13.13s',[FormatFloat('#,##0.00',fdqTotalizaValorContabil.FieldByName('VC').AsCurrency)]);
+
+      fdqTotalizaBase.Close;
+      fdqTotalizaBase.SQL.Clear;
+      fdqTotalizaBase.SQL.Add('SELECT CFOP, COALESCE(SUM(BASE_CALCULO),0) AS TBC FROM LIVRO_SAIDA WHERE ALIQUOTA > 0 ');
+      fdqTotalizaBase.SQL.Add(' AND UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaBase.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaBase.SQL.Add(sWhere);
+
+      fdqTotalizaBase.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaBase.Open;
+
+      stgTotaisCfopInter.Cells[3,stgTotaisCfopInter.RowCount-1] := Format('%11.11s',[FormatFloat('#,##0.00',fdqTotalizaBase.FieldByName('TBC').AsCurrency)]);
+
+      fdqTotalizaImpCreditado.Close;
+      fdqTotalizaImpCreditado.SQL.Clear;
+      fdqTotalizaImpCreditado.SQL.Add('SELECT CFOP, COALESCE(SUM(IMPOSTO_DEBITADO),0) AS DEBITO FROM LIVRO_SAIDA WHERE ALIQUOTA > 0 ');
+      fdqTotalizaImpCreditado.SQL.Add(' AND UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaImpCreditado.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaImpCreditado.SQL.Add(sWhere);
+
+      fdqTotalizaImpCreditado.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaImpCreditado.Open;
+
+      stgTotaisCfopInter.Cells[4,stgTotaisCfopInter.RowCount-1] := Format('%11.11s',[FormatFloat('#,##0.00',fdqTotalizaImpCreditado.FieldByName('DEBITO').AsCurrency)]);
+
+      fdqTotalizaIsentasNT.Close;
+      fdqTotalizaIsentasNT.SQL.Clear;
+      fdqTotalizaIsentasNT.SQL.Add('SELECT CFOP, COALESCE(SUM(ISENTAS_NAO_TRIBUTADAS),0) AS ISENTAS FROM LIVRO_SAIDA');
+      fdqTotalizaIsentasNT.SQL.Add(' WHERE UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaIsentasNT.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaIsentasNT.SQL.Add(sWhere);
+
+      fdqTotalizaIsentasNT.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaIsentasNT.Open;
+
+      stgTotaisCfopInter.Cells[5,stgTotaisCfopInter.RowCount-1] := Format('%13.13s',[FormatFloat('#,##0.00',fdqTotalizaIsentasNT.FieldByName('ISENTAS').AsCurrency)]);
+
+      fdqTotalizaOutras.Close;
+      fdqTotalizaOutras.SQL.Clear;
+      fdqTotalizaOutras.SQL.Add('SELECT CFOP, COALESCE(SUM(OUTRAS),0) AS OUTRAS FROM LIVRO_SAIDA');
+      fdqTotalizaOutras.SQL.Add(' WHERE UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+      fdqTotalizaOutras.SQL.Add(' AND CFOP = ' + QuotedStr(fdqTotalizaValorContabil.FieldByName('CFOP').AsString));
+
+      if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+        sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+      else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+        sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+      else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+        sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+      fdqTotalizaOutras.SQL.Add(sWhere);
+
+      fdqTotalizaOutras.SQL.Add('GROUP BY CFOP');
+      fdqTotalizaOutras.Open;
+
+      stgTotaisCfopInter.Cells[6,stgTotaisCfopInter.RowCount-1] := Format('%11.11s',[FormatFloat('#,##0.00',fdqTotalizaOutras.FieldByName('OUTRAS').AsCurrency)]);
+
+      if not fdqTotalizaValorContabil.Eof then
+        stgTotaisCfopInter.RowCount := stgTotaisCfopInter.RowCount + 1;
+
+      fdqTotalizaBase.Close;
+      fdqTotalizaIsentasNT.Close;
+      fdqTotalizaImpCreditado.Close;
+      fdqTotalizaValorContabil.Next;
+
+    end;
+
+
+    fdqTotalizaValorContabil.Close;
+
+    fdqTotalizaValorContabil.Close;
+    fdqTotalizaValorContabil.SQL.Clear;
+    fdqTotalizaValorContabil.SQL.Add('SELECT COALESCE(SUM(VALOR_CONTABIL),0) AS VC FROM LIVRO_SAIDA');
+    fdqTotalizaValorContabil.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaValorContabil.SQL.Add(sWhere);
+
+    fdqTotalizaValorContabil.Open;
+
+    edtTVContalbilEST.Text := FormatFloat('#,##0.00',fdqTotalizaValorContabil.FieldByName('VC').AsCurrency);
+    fdqTotalizaValorContabil.Close;
+
+    fdqTotalizaBase.Close;
+    fdqTotalizaBase.SQL.Clear;
+    fdqTotalizaBase.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO),0) AS TBC FROM LIVRO_SAIDA');
+    fdqTotalizaBase.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+    fdqTotalizaBase.SQL.Add('AND ALIQUOTA > 0');
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaBase.SQL.Add(sWhere);
+
+    fdqTotalizaBase.Open;
+
+    edtTBCalculoEst.Text := FormatFloat('#,##0.00',fdqTotalizaBase.FieldByName('TBC').AsCurrency);
+    fdqTotalizaBase.Close;
+
+    fdqTotalizaImpCreditado.Close;
+    fdqTotalizaImpCreditado.SQL.Clear;
+    fdqTotalizaImpCreditado.SQL.Add('SELECT COALESCE(SUM(IMPOSTO_DEBITADO),0) AS DEBITO FROM LIVRO_SAIDA');
+    fdqTotalizaImpCreditado.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+    fdqTotalizaImpCreditado.SQL.Add('AND ALIQUOTA > 0');
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + IntToStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaImpCreditado.SQL.Add(sWhere);
+
+    fdqTotalizaImpCreditado.Open;
+
+    edtCreditoEst.Text := FormatFloat('#,##0.00',fdqTotalizaImpCreditado.FieldByName('DEBITO').AsCurrency);
+    fdqTotalizaImpCreditado.Close;
+
+    fdqTotalizaIsentasNT.Close;
+    fdqTotalizaIsentasNT.SQL.Clear;
+    fdqTotalizaIsentasNT.SQL.Add('SELECT COALESCE(SUM(ISENTAS_NAO_TRIBUTADAS),0) AS ISENTAS FROM LIVRO_SAIDA');
+    fdqTotalizaIsentasNT.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaIsentasNT.SQL.Add(sWhere);
+
+    fdqTotalizaIsentasNT.Open;
+
+    edtIsentasNTEst.Text := FormatFloat('#,##0.00',fdqTotalizaIsentasNT.FieldByName('ISENTAS').AsCurrency);
+    fdqTotalizaIsentasNT.Close;
+
+    fdqTotalizaOutras.Close;
+    fdqTotalizaOutras.SQL.Clear;
+    fdqTotalizaOutras.SQL.Add('SELECT COALESCE(SUM(OUTRAS),0) AS OUTRAS FROM LIVRO_SAIDA');
+    fdqTotalizaOutras.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND MES_ANO = ' + IntToStr(dmMProvider.cdsLivroFiscalSaidaMES_ANO.Value)
+    else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+      sWhere :=' AND NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+    fdqTotalizaOutras.SQL.Add(sWhere);
+
+    fdqTotalizaOutras.Open;
+
+    edtOutrasEst.Text := FormatFloat('#,##0.00',fdqTotalizaOutras.FieldByName('OUTRAS').AsCurrency);
+    fdqTotalizaOutras.Close;
+  end;
+
+end;
+
+end.

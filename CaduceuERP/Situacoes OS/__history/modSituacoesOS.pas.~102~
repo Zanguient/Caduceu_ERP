@@ -1,0 +1,693 @@
+unit modSituacoesOS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdActns, System.Actions,
+  Vcl.ActnList, Vcl.Mask, Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls,
+  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Imaging.pngimage, db;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+
+  TfrmSituacoesOS = class(TForm)
+    imgNovo: TImage;
+    lblF2: TLabel;
+    imgDesfazer: TImage;
+    imgSalvar: TImage;
+    imgExcluir: TImage;
+    imgEditar: TImage;
+    imgSair: TImage;
+    lblF3: TLabel;
+    lblF4: TLabel;
+    lblF5: TLabel;
+    lblF6: TLabel;
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    pgcSituacoesOS: TPageControl;
+    tbsTabela: TTabSheet;
+    grdTabela: TDBGrid;
+    tdsCadastro: TTabSheet;
+    grpCadastro: TGroupBox;
+    lblCodigo: TLabel;
+    lblDescricao: TLabel;
+    edtCodigo: TDBEdit;
+    edtDescricao: TDBEdit;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    ActionList1: TActionList;
+    actEditar: TAction;
+    actDesfazer: TAction;
+    WindowClose1: TWindowClose;
+    actMinimizar: TAction;
+    actIncluir: TAction;
+    actSalvar: TAction;
+    actExcluir: TAction;
+    chkAbertura_OS: TDBCheckBox;
+    chkOficina: TDBCheckBox;
+    chkFechamento_OS: TDBCheckBox;
+    chkPronto: TDBCheckBox;
+    chkCondicao_Fecham_OS: TDBCheckBox;
+    procedure FormCreate(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;  Shift: TShiftState);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure chkAbertura_OSClick(Sender: TObject);
+    procedure chkFechamento_OSClick(Sender: TObject);
+    procedure actEditarExecute(Sender: TObject);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure actIncluirExecute(Sender: TObject);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure imgExcluirClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    procedure edtDescricaoEnter(Sender: TObject);
+    procedure edtDescricaoExit(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+    function AbrirTabelaSituacoes_OS(pOpcao:smallint; pConteudo:string):boolean;
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmSituacoesOS: TfrmSituacoesOS;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMRelatorios, dataMSource,
+  dataMSProcedure, uConstantes_Padrao, uFuncoes;
+
+function TfrmSituacoesOS.AbrirTabelaSituacoes_OS(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsSituacoes_OS.Close;
+  dmMProvider.cdsSituacoes_OS.ProviderName := 'dspSituacoes_OS';
+  dmDBEXMaster.fdqSituacoesOS.SQL.Clear;
+  dmDBEXMaster.fdqSituacoesOS.SQL.Add('SELECT * FROM SITUACOES_OS');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Situacoes_OS(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqSituacoesOS.SQL.Add(sWhere);
+  dmDBEXMaster.fdqSituacoesOS.SQL.Add('ORDER BY DESCRICAO');
+
+  try
+
+    dmMProvider.cdsSituacoes_OS.Open;
+    dmMProvider.cdsSituacoes_OS.ProviderName := '';
+
+    if dmMProvider.cdsSituacoes_OS.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsSituacoes_OS.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+procedure TfrmSituacoesOS.actDesfazerExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsSituacoes_OS.Active then
+    if dmMProvider.cdsSituacoes_OS.State in [dsEdit, dsInsert] then
+    begin
+      dmMProvider.cdsSituacoes_OS.Cancel;
+
+      HabilitaDesabilitaControles(False);
+
+      pgcSituacoesOS.Pages[1].TabVisible  := false;
+
+      pgcSituacoesOS.ActivePageIndex      := 0;
+
+      edtConteudoPesquisa.Clear;
+      edtConteudoPesquisa.SetFocus;
+
+    end;
+
+end;
+
+procedure TfrmSituacoesOS.actEditarExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsSituacoes_OS.Active then
+  begin
+
+    if not (dmMProvider.cdsSituacoes_OS.State in [dsEdit, dsInsert]) then
+    begin
+
+      dmMSProcedure.fdspVerificarRelCodSituacaoOS.Params[0].Value := dmMProvider.cdsSituacoes_OSCODIGO_SITUACAO.Value;
+      dmMSProcedure.fdspVerificarRelCodSituacaoOS.ExecProc;
+
+      if dmMSProcedure.fdspVerificarRelCodSituacaoOS.Params[1].Value <= 0 then
+      begin
+
+        pgcSituacoesOS.Pages[1].TabVisible  := true;
+        pgcSituacoesOS.ActivePageIndex      := 1;
+
+        HabilitaDesabilitaControles(True);
+        edtDescricao.SetFocus;
+
+      end
+      else
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CONSITE_SITUACAO_OS;
+        TocarSomAlerta(ord(SystemHand));
+
+      end;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.actExcluirExecute(Sender: TObject);
+begin
+
+  try
+
+    dmDBEXMaster.fdtMaster.StartTransaction;
+    dmMSProcedure.fdspSituacoes_OS.Params[0].Value    := 1;
+    dmMSProcedure.fdspSituacoes_OS.Params[1].Value    := dmMProvider.cdsSituacoes_OSCODIGO_SITUACAO.Value;
+    dmMSProcedure.fdspSituacoes_OS.Params[2].Value    := dmMProvider.cdsSituacoes_OSDESCRICAO.Value;
+    dmMSProcedure.fdspSituacoes_OS.Params[3].Value    := dmMProvider.cdsSituacoes_OSABERTURA_OS.Value;
+    dmMSProcedure.fdspSituacoes_OS.Params[4].Value    := dmMProvider.cdsSituacoes_OSOFICINA.Value;
+    dmMSProcedure.fdspSituacoes_OS.Params[5].Value    := dmMProvider.cdsSituacoes_OSFECHAMENTO_OS.Value;
+    dmMSProcedure.fdspSituacoes_OS.Params[6].Value    := dmMProvider.cdsSituacoes_OSCONDICAO_FECHAMENTO_OS.Value;
+    dmMSProcedure.fdspSituacoes_OS.Params[7].Value    := dmMProvider.cdsSituacoes_OSPRONTO.Value;
+    dmMSProcedure.fdspSituacoes_OS.Params[8].Value    := Date;
+    dmMSProcedure.fdspSituacoes_OS.Params[9].Value    := Time;
+    dmMSProcedure.fdspSituacoes_OS.Params[10].Value   := dmDBEXMaster.iIdUsuario;
+    dmMSProcedure.fdspSituacoes_OS.Params[11].Value   := pubNomeComputador;
+    dmMSProcedure.fdspSituacoes_OS.Params[12].Value   := RetornarIP;
+
+    dmMSProcedure.fdspSituacoes_OS.ExecProc;
+
+    dmMProvider.cdsSituacoes_OS.Delete;
+
+    dmDBEXMaster.fdtMaster.Commit;
+    dmDBEXMaster.fdcMaster.Close;;
+
+    LimparMSG_ERRO;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+
+end;
+
+procedure TfrmSituacoesOS.actIncluirExecute(Sender: TObject);
+begin
+
+  if not (dmMProvider.cdsSituacoes_OS.State in [dsEdit, dsInsert]) then
+  begin
+
+    LimparMSG_ERRO;
+
+    try
+
+      edtConteudoPesquisa.Clear;
+
+      AbrirTabelaSituacoes_OS(0,'-1');
+
+      pgcSituacoesOS.Pages[1].TabVisible  := True;
+
+      HabilitaDesabilitaControles(True);
+
+      pgcSituacoesOS.ActivePageIndex      := 1;
+
+      dmMProvider.cdsSituacoes_OS.Append;
+
+      edtDescricao.SetFocus;
+
+    except
+      on E: exception do
+        Tratar_Erro_Conexao(E);
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.actSalvarExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    ActiveControl := nil;
+
+    if dmMProvider.cdsSituacoes_OS.State in [dsEdit, dsInsert] then
+    begin
+
+      dmDBEXMaster.fdtMaster.StartTransaction;
+      dmMSProcedure.fdspSituacoes_OS.Params[0].Value    := 0;
+      dmMSProcedure.fdspSituacoes_OS.Params[1].Value    := dmMProvider.cdsSituacoes_OSCODIGO_SITUACAO.Value;
+      dmMSProcedure.fdspSituacoes_OS.Params[2].Value    := dmMProvider.cdsSituacoes_OSDESCRICAO.Value;
+      dmMSProcedure.fdspSituacoes_OS.Params[3].Value    := dmMProvider.cdsSituacoes_OSABERTURA_OS.Value;
+      dmMSProcedure.fdspSituacoes_OS.Params[4].Value    := dmMProvider.cdsSituacoes_OSOFICINA.Value;
+      dmMSProcedure.fdspSituacoes_OS.Params[5].Value    := dmMProvider.cdsSituacoes_OSFECHAMENTO_OS.Value;
+      dmMSProcedure.fdspSituacoes_OS.Params[6].Value    := dmMProvider.cdsSituacoes_OSCONDICAO_FECHAMENTO_OS.Value;
+      dmMSProcedure.fdspSituacoes_OS.Params[7].Value    := dmMProvider.cdsSituacoes_OSPRONTO.Value;
+      dmMSProcedure.fdspSituacoes_OS.Params[8].Value    := Date;
+      dmMSProcedure.fdspSituacoes_OS.Params[9].Value    := Time;
+      dmMSProcedure.fdspSituacoes_OS.Params[10].Value   := dmDBEXMaster.iIdUsuario;
+      dmMSProcedure.fdspSituacoes_OS.Params[11].Value   := pubNomeComputador;
+      dmMSProcedure.fdspSituacoes_OS.Params[12].Value   := RetornarIP;
+
+      dmMSProcedure.fdspSituacoes_OS.ExecProc;
+
+      if dmMSProcedure.fdspSituacoes_OS.Params[13].Value > 0 then
+        dmMProvider.cdsSituacoes_OSCODIGO_SITUACAO.Value := dmMSProcedure.fdspSituacoes_OS.Params[13].Value;
+
+      dmMProvider.cdsSituacoes_OS.Post;
+
+      dmDBEXMaster.fdtMaster.Commit;
+      dmDBEXMaster.fdcMaster.Close;;
+
+    end;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+      exit;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+
+
+end;
+
+procedure TfrmSituacoesOS.chkAbertura_OSClick(Sender: TObject);
+begin
+
+  chkFechamento_OS.Enabled := (not chkAbertura_OS.Checked) and (not chkOficina.Checked);
+
+end;
+
+procedure TfrmSituacoesOS.chkFechamento_OSClick(Sender: TObject);
+begin
+
+  chkAbertura_OS.Enabled        := (not chkFechamento_OS.Checked);
+  chkOficina.Enabled            := chkAbertura_OS.Enabled;
+  chkCondicao_Fecham_OS.Visible := chkFechamento_OS.Checked;
+
+  if not chkFechamento_OS.Checked then
+    chkCondicao_Fecham_OS.Checked := false;
+
+end;
+
+procedure TfrmSituacoesOS.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+   pgcSituacoesOS.Pages[1].TabVisible := false;
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmSituacoesOS.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    if AbrirTabelaSituacoes_OS(rdpOpcoesPesquisa.ItemIndex, edtConteudoPesquisa.Text) then
+      grdTabela.SetFocus;
+
+    edtConteudoPesquisa.Clear;
+    MudarCorEdit(Sender);
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.edtConteudoPesquisaKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+
+end;
+
+procedure TfrmSituacoesOS.edtDescricaoEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmSituacoesOS.edtDescricaoExit(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmSituacoesOS.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                           := COR_PADRAO_TELAS;
+  Caption                         := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario       := ParamStr(1);
+  dmDBEXMaster.sSenha             := paramstr(2);
+  dmDBEXMaster.iIdUsuario         := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial          := StrToInt(ParamStr(4));
+
+  for i := 0 to grdTabela.Columns.Count - 1 do
+    grdTabela.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  dmMProvider.cdsSituacoes_OS.Open;
+  dmMProvider.cdsSituacoes_OS.ProviderName := '';
+
+end;
+
+procedure TfrmSituacoesOS.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    imgExcluirClick(self);
+
+end;
+
+procedure TfrmSituacoesOS.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    actExcluirExecute(self);
+
+  end
+  else   if (UpperCase(key) = 'N') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    LimparMSG_ERRO;
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsSituacoes_OS.IsEmpty then
+  begin
+
+    pgcSituacoesOS.Pages[1].TabVisible  := True;
+    pgcSituacoesOS.ActivePageIndex      := 1;
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.grdTabelaDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+var
+  Check: Integer;
+  R: TRect;
+begin
+
+  if not dmMProvider.cdsSituacoes_OS.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsSituacoes_OS.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+  //Desenha um checkbox no dbgrid
+  if Column.FieldName = 'ABERTURA_OS' then
+  begin
+
+    grdTabela.Canvas.FillRect(Rect);
+    Check := 0;
+
+    if dmMProvider.cdsSituacoes_OSABERTURA_OS.Value = 1 then
+      Check := DFCS_CHECKED
+    else
+      Check := 0;
+    R:=Rect;
+    InflateRect(R,-2,-2); {Diminue o tamanho do CheckBox}
+    DrawFrameControl(grdTabela.Canvas.Handle,R,DFC_BUTTON, DFCS_BUTTONCHECK or Check);
+
+  end;
+
+  //Desenha um checkbox no dbgrid
+  if Column.FieldName = 'OFICINA' then
+  begin
+
+    grdTabela.Canvas.FillRect(Rect);
+    Check := 0;
+
+    if dmMProvider.cdsSituacoes_OSOFICINA.Value = 1 then
+      Check := DFCS_CHECKED
+    else
+      Check := 0;
+    R:=Rect;
+    InflateRect(R,-2,-2); {Diminue o tamanho do CheckBox}
+    DrawFrameControl(grdTabela.Canvas.Handle,R,DFC_BUTTON, DFCS_BUTTONCHECK or Check);
+
+  end;
+
+  //Desenha um checkbox no dbgrid
+  if Column.FieldName = 'FECHAMENTO_OS' then
+  begin
+
+    grdTabela.Canvas.FillRect(Rect);
+    Check := 0;
+
+    if dmMProvider.cdsSituacoes_OSFECHAMENTO_OS.Value = 1 then
+      Check := DFCS_CHECKED
+    else
+      Check := 0;
+    R:=Rect;
+    InflateRect(R,-2,-2); {Diminue o tamanho do CheckBox}
+    DrawFrameControl(grdTabela.Canvas.Handle,R,DFC_BUTTON, DFCS_BUTTONCHECK or Check);
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+procedure TfrmSituacoesOS.imgExcluirClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsSituacoes_OS.Active then
+  begin
+
+    if not (dmMProvider.cdsSituacoes_OS.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmSituacoesOS.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+procedure TfrmSituacoesOS.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+  if rdpOpcoesPesquisa.ItemIndex = 2 then
+  begin
+
+    edtConteudoPesquisa.Text := '0';
+    edtConteudoPesquisaExit(self);
+
+  end;
+
+end;
+
+procedure TfrmSituacoesOS.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang:string;
+begin
+
+  if Pos('Unable',pE.Message) > 0then
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO
+  else if Pos('FOREIGN',pE.Message) > 0then
+  begin
+
+    sChave_Extrang := Trim(Copy(pE.Message,pos('ON TABLE',Uppercase(pE.Message))+ 10,Length(pE.Message)));
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_ERRO_CHAVE_ESTRANGEIRA
+                      + Copy(sChave_Extrang,1,pos('"',sChave_Extrang)-1);
+
+  end
+  else
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + pE.Message;
+
+  TocarSomAlerta(ord(SystemHand));
+
+end;
+
+procedure TfrmSituacoesOS.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+end.
+
+
+
+
+

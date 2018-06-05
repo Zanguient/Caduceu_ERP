@@ -1,0 +1,1328 @@
+unit modFilial;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage, Vcl.ComCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.Mask,
+  Vcl.DBCtrls, db, System.Actions, Vcl.ActnList, Vcl.StdActns, ACBrBase,
+  ACBrValidador, midaslib, ACBrSocket, ACBrCEP, Vcl.Imaging.jpeg;
+
+type
+  TfrmFilial = class(TForm)
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    imgSair: TImage;
+    imgEditar: TImage;
+    imgExcluir: TImage;
+    imgSalvar: TImage;
+    imgDesfazer: TImage;
+    imgNovo: TImage;
+    lblF6: TLabel;
+    lblF5: TLabel;
+    lblF4: TLabel;
+    lblF3: TLabel;
+    lblF2: TLabel;
+    pgcFilial: TPageControl;
+    tbsTabela: TTabSheet;
+    tbsCadastro: TTabSheet;
+    grdTabela: TDBGrid;
+    tbsFiscal: TTabSheet;
+    grpCadastro: TGroupBox;
+    lblCodigo: TLabel;
+    lblRSocial: TLabel;
+    lblFantasia: TLabel;
+    lblCnpj: TLabel;
+    lblInscEst: TLabel;
+    lblInscMun: TLabel;
+    lblSUFRAMA: TLabel;
+    lblRegJuntaCom: TLabel;
+    lblCodigoPais: TLabel;
+    lblEndereco: TLabel;
+    lblNumero: TLabel;
+    lblCEP: TLabel;
+    lblBairro: TLabel;
+    lblUF: TLabel;
+    lblCidade: TLabel;
+    lblComplemento: TLabel;
+    lblContato: TLabel;
+    lblDDD: TLabel;
+    lblTelefone1: TLabel;
+    lblTelefone2: TLabel;
+    lblFAX: TLabel;
+    lblWWW: TLabel;
+    lblEmail: TLabel;
+    edtFilial: TDBEdit;
+    edtRSocial: TDBEdit;
+    edtNFantasia: TDBEdit;
+    edtCNPJ: TDBEdit;
+    edtInscEst: TDBEdit;
+    edtRJuntaCom: TDBEdit;
+    edtInsMun: TDBEdit;
+    edtSuframa: TDBEdit;
+    edtCodigoPais: TDBEdit;
+    edtEndereco: TDBEdit;
+    edtNumero: TDBEdit;
+    edtCEP: TDBEdit;
+    edtBairro: TDBEdit;
+    edtComplemento: TDBEdit;
+    edtContato: TDBEdit;
+    edtDDD: TDBEdit;
+    edtTelefone1: TDBEdit;
+    edtTelefone2: TDBEdit;
+    edtFAX: TDBEdit;
+    cboEstado: TDBLookupComboBox;
+    cboCidade: TDBLookupComboBox;
+    edtWWW: TDBEdit;
+    edtEmail: TDBEdit;
+    pgcInfoComplementar: TPageControl;
+    tbsInfoEntrega: TTabSheet;
+    lblEnderecoEntrega: TLabel;
+    lblNumeroEntrega: TLabel;
+    lblBairroEntrega: TLabel;
+    lblEstadoEntrega: TLabel;
+    lblCidadeEntrega: TLabel;
+    lblCEPEntrega: TLabel;
+    edtEnderecoEntrega: TDBEdit;
+    edtNumeroEntrega: TDBEdit;
+    edtBairroEntrega: TDBEdit;
+    edtCEPEntrega: TDBEdit;
+    cboEstatoEntrega: TDBLookupComboBox;
+    cboCidadeentrega: TDBLookupComboBox;
+    tbsInfoCobranca: TTabSheet;
+    lblEnderecoCobranca: TLabel;
+    lblNumeroCobranca: TLabel;
+    lblBairroCobranca: TLabel;
+    lblEstadoCobranca: TLabel;
+    lblCidadeCobranca: TLabel;
+    lblCEPCobranca: TLabel;
+    edtEnderecoCobranca: TDBEdit;
+    edtNumeroCobranca: TDBEdit;
+    edtBairroCobranca: TDBEdit;
+    edtCEPCobranca: TDBEdit;
+    cboEstadoCobranca: TDBLookupComboBox;
+    cboCidadeCobranca: TDBLookupComboBox;
+    grpAreaLoja: TGroupBox;
+    edtAreaLoja: TDBEdit;
+    grpFiscal: TGroupBox;
+    rdgRamoAtividade: TDBRadioGroup;
+    rdgRegimeTributario: TDBRadioGroup;
+    rdgNaturezaJuridica: TDBRadioGroup;
+    rdgPerfilSped: TDBRadioGroup;
+    rdgContribuinteIPI: TDBRadioGroup;
+    grpObservacaoNFS: TGroupBox;
+    memObservacaoNFS: TDBMemo;
+    lblCRT: TLabel;
+    lblPercCredICMS_SN: TLabel;
+    edtCRT: TDBEdit;
+    edtPercCredCMS: TDBEdit;
+    edtTabelaSimples: TDBEdit;
+    lblTabelaSN: TLabel;
+    ActionList1: TActionList;
+    actEditar: TAction;
+    actDesfazer: TAction;
+    WindowClose1: TWindowClose;
+    actMinimizar: TAction;
+    actIncluir: TAction;
+    actSalvar: TAction;
+    actExcluir: TAction;
+    imgBuscaCEP_CEP: TImage;
+    imgBuscaCEP_LOGR: TImage;
+    ACBrCEP1: TACBrCEP;
+    actBuscaCEP_CEP: TAction;
+    ACBrValidador1: TACBrValidador;
+    imgBoleto: TImage;
+    OpenDialog1: TOpenDialog;
+    rdgUtilizaNFCE: TDBRadioGroup;
+    tbsNFCe: TTabSheet;
+    grpParametrosNFCe: TGroupBox;
+    actBaixarFatura: TAction;
+    procedure FormCreate(Sender: TObject);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    function AbrirTabelaFilial(pOpcao:smallint; pConteudo:string):boolean;
+    function AbrirTabelaEstados(pOpcao:smallint; pConteudo:string):boolean;
+    function AbrirTabelaCidades(pOpcao:smallint; pConteudo:string):boolean;
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure tbsCadastroShow(Sender: TObject);
+    procedure edtRSocialEnter(Sender: TObject);
+    procedure edtAreaLojaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtCNPJKeyPress(Sender: TObject; var Key: Char);
+    procedure edtRSocialExit(Sender: TObject);
+    procedure edtCNPJExit(Sender: TObject);
+    procedure edtRJuntaComExit(Sender: TObject);
+    procedure edtInscEstExit(Sender: TObject);
+    procedure edtEmailExit(Sender: TObject);
+    procedure actEditarExecute(Sender: TObject);
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure actIncluirExecute(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    function ValidarCampos:boolean;
+    procedure cboEstadoExit(Sender: TObject);
+    procedure edtNFantasiaExit(Sender: TObject);
+    procedure cboCidadeExit(Sender: TObject);
+    procedure lblF5Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure memObservacaoNFSExit(Sender: TObject);
+    procedure rdgRamoAtividadeClick(Sender: TObject);
+    procedure rdgRegimeTributarioClick(Sender: TObject);
+    procedure rdgNaturezaJuridicaClick(Sender: TObject);
+    procedure rdgPerfilSpedClick(Sender: TObject);
+    procedure rdgContribuinteIPIClick(Sender: TObject);
+    procedure ACBrCEP1AntesAbrirHTTP(var AURL: string);
+    procedure ACBrCEP1BuscaEfetuada(Sender: TObject);
+    procedure actBuscaCEP_CEPExecute(Sender: TObject);
+    procedure imgBoletoClick(Sender: TObject);
+    procedure MostrarOcultarAbas(pOpcao:boolean);
+    procedure actBaixarFaturaExecute(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+    procedure ConfigurarComponente;
+
+  public
+    { Public declarations }
+  end;
+
+var
+  frmFilial: TfrmFilial;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, uConstantes_Padrao, uFuncoes, dataMProvider, dataMSource,
+  dataMSProcedure, modPesqCnpj, modMesAnoFatura, uFuncoes_BD;
+
+function TfrmFilial.AbrirTabelaCidades(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsCidades.Close;
+  dmMProvider.cdsCidades.ProviderName := 'dspCidades';;
+  dmDBEXMaster.fdqCidades.SQL.Clear;
+  dmDBEXMaster.fdqCidades.SQL.Add('select cidade, nome, estado, codigo_municipio');
+  dmDBEXMaster.fdqCidades.SQL.Add('from cidades');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Cidades(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqCidades.SQL.Add(sWhere);
+  dmDBEXMaster.fdqCidades.SQL.Add('ORDER BY ESTADO, NOME');
+
+  try
+
+    dmMProvider.cdsCidades.Open;
+    dmMProvider.cdsCidades.ProviderName := '';
+
+    if dmMProvider.cdsCidades.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsCidades.IsEmpty;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+function TfrmFilial.AbrirTabelaEstados(pOpcao: smallint; pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsEstados.Close;
+  dmMProvider.cdsEstados.ProviderName := 'dspEstados';;
+  dmDBEXMaster.fdqEstados.SQL.Clear;
+  dmDBEXMaster.fdqEstados.SQL.Add('SELECT * FROM ESTADOS');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Estados(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqEstados.SQL.Add(sWhere);
+  dmDBEXMaster.fdqEstados.SQL.Add('ORDER BY NOME');
+
+  try
+
+    dmMProvider.cdsEstados.Open;
+    dmMProvider.cdsEstados.ProviderName := '';
+
+    if dmMProvider.cdsEstados.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsEstados.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+function TfrmFilial.AbrirTabelaFilial(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsFilial.Close;
+  dmMProvider.cdsFilial.ProviderName := 'dspFilial';;
+
+  dmDBEXMaster.fdqFilial.SQL.Clear;
+  dmDBEXMaster.fdqFilial.SQL.Add('SELECT FILIAL.*, CIDADES.NOME NOMECIDADE, ESTADOS.NOME NOMEESTADO,');
+  dmDBEXMaster.fdqFilial.SQL.Add('CIDADES.CODIGO_MUNICIPIO, ESTADOS.CODIGO_ESTADO_IBGE');
+  dmDBEXMaster.fdqFilial.SQL.Add('FROM FILIAL FILIAL');
+  dmDBEXMaster.fdqFilial.SQL.Add('JOIN CIDADES CIDADES');
+  dmDBEXMaster.fdqFilial.SQL.Add('ON(CIDADES.CIDADE = FILIAL.CIDADE)');
+  dmDBEXMaster.fdqFilial.SQL.Add('JOIN ESTADOS ESTADOS');
+  dmDBEXMaster.fdqFilial.SQL.Add('ON(ESTADOS.SIGLA = FILIAL.ESTADO)');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Filial(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqFilial.SQL.Add(sWhere);
+  dmDBEXMaster.fdqFilial.SQL.Add('ORDER BY RAZAOSOCIAL');
+
+  try
+
+    dmMProvider.cdsFilial.Open;
+    dmMProvider.cdsFilial.ProviderName := '';
+
+    if dmMProvider.cdsFilial.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsFilial.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmFilial.ACBrCEP1AntesAbrirHTTP(var AURL: string);
+begin
+
+  lblMsg.Caption :=  dmDBEXMaster.sNomeUsuario + MSG_EFETUANDO_CONS_CEP + AURL;
+  Application.ProcessMessages
+
+end;
+
+procedure TfrmFilial.ACBrCEP1BuscaEfetuada(Sender: TObject);
+var
+  i : Integer ;
+begin
+
+  LimparMSG_ERRO;
+
+  if ACBrCEP1.Enderecos.Count < 1 then
+    lblMsg.Caption :=  dmDBEXMaster.sNomeUsuario + ', nenhum Endereço encontrado!'
+  else
+  begin
+
+     For I := 0 to ACBrCEP1.Enderecos.Count-1 do
+     begin
+
+       with ACBrCEP1.Enderecos[I] do
+       begin
+
+          dmMProvider.cdsFilialCEP.Value                := CEP;
+          dmMProvider.cdsFilialCEPCOBRANCA.Value        := dmMProvider.cdsFilialCEP.Value;
+          dmMProvider.cdsFilialCEPENTREGA.Value         := dmMProvider.cdsFilialCEP.Value;
+
+          dmMProvider.cdsFilialENDERECO.Value           := Tipo_Logradouro + ' ' + Logradouro;
+          dmMProvider.cdsFilialENDERECOCOBRANCA.Value   := dmMProvider.cdsFilialENDERECO.Value;
+          dmMProvider.cdsFilialENDERECOENTREGA.Value    := dmMProvider.cdsFilialENDERECO.Value;
+
+          dmMProvider.cdsFilialCOMPLEMENTO.Value        := Complemento;
+
+          dmMProvider.cdsFilialBAIRRO.Value             := Bairro;
+          dmMProvider.cdsFilialBAIRROCOBRANCA.Value     := dmMProvider.cdsFilialBAIRRO.Value;
+          dmMProvider.cdsFilialBAIRROENTREGA.Value      := dmMProvider.cdsFilialBAIRRO.Value;
+
+          dmMProvider.cdsFilialESTADO.Value             := UF;
+          dmMProvider.cdsFilialESTADOCOBRANCA.Value     := dmMProvider.cdsFilialESTADO.Value;
+          dmMProvider.cdsFilialESTADOENTREGA.Value      := dmMProvider.cdsFilialESTADO.Value;
+
+          dmDBEXMaster.fdqCidades.SQL.Clear;
+          dmDBEXMaster.fdqCidades.SQL.Add('select cidade, nome, estado, codigo_municipio');
+          dmDBEXMaster.fdqCidades.SQL.Add('from cidades');
+          dmDBEXMaster.fdqCidades.SQL.Add('where codigo_municipio = ' + IBGE_Municipio);
+          dmDBEXMaster.fdqCidades.Open;
+
+          if dmDBEXMaster.fdqCidades.IsEmpty then
+          begin
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', verifique o código do IBGE no cadsatro da cidade: ' + Municipio + ', e tente novamente';
+            Application.ProcessMessages
+
+          end
+          else
+          begin
+
+            dmMProvider.cdsFilialCIDADE.Value         := dmDBEXMaster.fdqCidades.FieldByName('cidade').Value;
+            dmMProvider.cdsFilialCIDADEENTREGA.Value  := dmMProvider.cdsFilialCIDADE.Value;
+            dmMProvider.cdsFilialCIDADECOBRANCA.Value := dmMProvider.cdsFilialCIDADE.Value;
+
+          end;
+
+       end ;
+
+     end ;
+
+   end ;
+
+end;
+
+procedure TfrmFilial.actBaixarFaturaExecute(Sender: TObject);
+var
+  sUrl_WS_Fatura, sCNPJ, sArquivo, sDestino:string;
+begin
+
+  LimparMSG_ERRO;
+
+  sCNPJ           := dmMProvider.cdsFilialCNPJ.Value;
+
+  frmMesAnoFatura := TfrmMesAnoFatura.Create(self);
+
+  if frmMesAnoFatura.ShowModal = mrOk then
+  begin
+
+    sUrl_WS_Fatura  := dmDBEXMaster.ifArqConfig.ReadString('WS_Lic','Local','ws-genesis.duckdns.org')
+                        + ':' + dmDBEXMaster.ifArqConfig.ReadString('WS_Lic','Porta','11938')
+                        + '/ws/Faturas/' + sCNPJ + '/' + FormatDateTime('yyyy', frmMesAnoFatura.dtpMesAno.Date) + '/'
+                        + MesExtenso(frmMesAnoFatura.dtpMesAno.Date) + '/';
+
+    sArquivo        := sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.csv';
+
+    sDestino := ExtractFilePath(ParamStr(0)) + 'Fatura\';
+
+    ForceDirectories(sDestino);
+
+    lblMsg.Caption := 'Aguarde efetuando download do arquivo ' + sArquivo;
+    Application.ProcessMessages;
+
+    if DownloadArquivo(sUrl_WS_Fatura + sArquivo,sDestino + sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.pdf') then
+    begin
+
+      lblMsg.Caption := 'Arquivo ' + sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.pdf' + ' salvo em ' + sDestino;
+
+      OpenDialog1.InitialDir := sDestino;
+      OpenDialog1.Execute;
+
+
+    end
+    else
+      lblMsg.Caption := 'Erro ao baixar arquivo ' + sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.pdf';
+
+    Application.ProcessMessages;
+
+  end;
+
+  FreeAndNil(frmMesAnoFatura);
+
+end;
+
+procedure TfrmFilial.actBuscaCEP_CEPExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+  begin
+
+    try
+       ACBrCEP1.BuscarPorCEP(dmMProvider.cdsFilialCEP.Value);
+    except
+      On E : Exception do
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', consulta do CEP não realizada. ' + Tratar_Erro_Conexao(E);
+        Application.ProcessMessages;
+
+      end ;
+
+    end ;
+
+  end;
+
+end;
+
+procedure TfrmFilial.actDesfazerExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsFilial.Active then
+    if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    begin
+
+      dmMProvider.cdsFilial.Cancel;
+
+
+      pgcFilial.Pages[1].TabVisible  := false;
+      pgcFilial.Pages[2].TabVisible  := false;
+
+      pgcFilial.ActivePageIndex      := 0;
+
+      edtConteudoPesquisa.Clear;
+      edtConteudoPesquisa.SetFocus;
+
+    end;
+
+  HabilitaDesabilitaControles(False);
+
+end;
+
+procedure TfrmFilial.actEditarExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.Active then
+  begin
+
+    if not (dmMProvider.cdsFilial.State in [dsEdit, dsInsert]) then
+    begin
+
+      pgcFilial.ActivePageIndex := 1;
+      HabilitaDesabilitaControles(True);
+      dmMProvider.cdsFilial.Edit;
+      edtRSocial.SetFocus;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmFilial.actExcluirExecute(Sender: TObject);
+begin
+
+  try
+
+    Man_Tab_Filial(1);
+
+  except
+    on E: exception do
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + Tratar_Erro_Conexao(E);
+      Application.ProcessMessages;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+procedure TfrmFilial.actIncluirExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    if not (dmMProvider.cdsFilial.State in [dsEdit, dsInsert]) then
+    begin
+
+      edtConteudoPesquisa.Clear;
+
+      frmPesqCnpj               := TfrmPesqCnpj.Create(self);
+      frmPesqCnpj.sNome_Usuario := dmDBEXMaster.sNomeUsuario;
+
+      if frmPesqCnpj.ShowModal = mrOk then
+      begin
+
+        dmMProvider.cdsEstados.Close;
+        dmMProvider.cdsCidades.Close;
+
+        if not AbrirTabelaFilial(1,frmPesqCnpj.edtCNPJ.Text) then
+        begin
+
+          LimparMSG_ERRO;
+
+          pgcFilial.Pages[1].TabVisible  := True;
+          pgcFilial.Pages[2].TabVisible  := True;
+
+          HabilitaDesabilitaControles(True);
+
+          pgcFilial.ActivePageIndex      := 1;
+
+          dmMProvider.cdsFilial.Append;
+          dmMProvider.cdsFilialCNPJ.Value := frmPesqCnpj.edtCNPJ.Text;
+
+          edtRSocial.SetFocus;
+
+          AbrirTabelaEstados(2,'');
+
+        end
+        else
+        begin
+
+          pgcFilial.ActivePageIndex := 0;
+          grdTabela.SetFocus;
+
+        end;
+
+      end;
+
+    end;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmFilial.actSalvarExecute(Sender: TObject);
+var
+  sCodigo_IBGE:string;
+begin
+
+  try
+
+    if dmMProvider.cdsFilial.Active then
+    begin
+
+      if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+      begin
+
+        if ValidarCampos then
+        begin
+
+          ACBrValidador1.TipoDocto  := docInscEst;
+          ACBrValidador1.Documento  := dmMProvider.cdsFilialINSCRICAO.Value;
+          ACBrValidador1.Complemento:= dmMProvider.cdsFilialESTADO.Value;
+
+          if not ACBrValidador1.Validar then
+          begin
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_INSCRICAO_INVALIDA
+                              + dmMProvider.cdsFilialESTADO.Value;
+            edtInscEst.SetFocus;
+
+          end
+          else
+          begin
+
+            LimparMSG_ERRO;
+
+            Man_Tab_Filial(0);
+
+            dmMProvider.cdsFilial.Post;
+
+            edtConteudoPesquisa.Clear;
+
+            edtConteudoPesquisa.SetFocus;
+
+          end;
+
+        end
+        else
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PREENCHIMENTO_OBRIGATORIO;
+          TocarSomAlerta(ord(SystemHand));
+
+        end;
+
+      end;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdcMaster.Rollback;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+
+end;
+
+procedure TfrmFilial.cboCidadeExit(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+  begin
+
+    if dmMProvider.cdsFilialCIDADE.Value > 0 then
+    begin
+
+      if dmMProvider.cdsFilialCIDADEENTREGA.Value <= 0 then
+        dmMProvider.cdsFilialCIDADEENTREGA.Value  := dmMProvider.cdsFilialCIDADE.Value;
+
+      if dmMProvider.cdsFilialCIDADECOBRANCA.Value <= 0 then
+        dmMProvider.cdsFilialCIDADECOBRANCA.Value  := dmMProvider.cdsFilialCIDADE.Value;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFilial.cboEstadoExit(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+  begin
+
+    if Length(Trim(dmMProvider.cdsFilialESTADO.Value)) > 0 then
+    begin
+
+      if Length(Trim(dmMProvider.cdsFilialESTADOENTREGA.Value)) <= 0 then
+        dmMProvider.cdsFilialESTADOENTREGA.Value  := dmMProvider.cdsFilialESTADO.Value;
+
+      if Length(Trim(dmMProvider.cdsFilialESTADOCOBRANCA.Value)) <= 0 then
+        dmMProvider.cdsFilialESTADOCOBRANCA.Value := dmMProvider.cdsFilialESTADO.Value;
+
+      AbrirTabelaCidades(2,dmMProvider.cdsFilialESTADO.Value);
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFilial.ConfigurarComponente;
+begin
+
+  dmMProvider.cdsConfigBuscaCEP.Close;
+  dmMProvider.cdsConfigBuscaCEP.ProviderName := 'dspConfigBuscaCEP';
+
+  dmDBEXMaster.fdqConfBuscaCep.SQL.Clear;
+  dmDBEXMaster.fdqConfBuscaCep.SQL.Add('select * from config_busca_cep');
+
+  dmMProvider.cdsConfigBuscaCEP.Open;
+  dmMProvider.cdsConfigBuscaCEP.ProviderName := '';
+
+  ACBrCEP1.WebService := TACBrCEPWebService(dmMProvider.cdsConfigBuscaCEPWEB_SERVICE.Value) ;
+
+  ACBrCEP1.ProxyHost   := dmMProvider.cdsConfigBuscaCEPPROXY_HOST.Value;
+  ACBrCEP1.ProxyPort   := dmMProvider.cdsConfigBuscaCEPPROXY_PORT.Value;
+  ACBrCEP1.ProxyUser   := dmMProvider.cdsConfigBuscaCEPPROXY_USER.Value;
+  ACBrCEP1.ProxyPass   := dmMProvider.cdsConfigBuscaCEPPROXY_PASSWORD.Value;
+  ACBrCEP1.ChaveAcesso := dmMProvider.cdsConfigBuscaCEPCHAVE_ACESSO.Value;
+
+end;
+
+procedure TfrmFilial.edtAreaLojaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = FormatoUS.DecimalSeparator then
+    Key := FormatoBR.DecimalSeparator;
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmFilial.edtCNPJExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+  begin
+
+    if not ValidarCnpjCpf(edtCNPJ.Text) then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CNPJ_INVALIDO + edtCNPJ.Text;
+      Application.ProcessMessages;
+
+      TocarSomAlerta(ord(SystemHand));
+
+      edtCNPJ.SetFocus;
+      edtCNPJ.SelectAll;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFilial.edtCNPJKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+  else if not (Key in['0'..'9',Chr(8)]) then
+    Key:= #0;
+
+end;
+
+procedure TfrmFilial.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+  pgcFilial.Pages[1].TabVisible   := False;
+  pgcFilial.Pages[2].TabVisible   := False;
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmFilial.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    if rdpOpcoesPesquisa.ItemIndex = 1 then
+    begin
+
+      if not ValidarCnpjCpf(edtCNPJ.Text) then
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CNPJ_INVALIDO;
+        Application.ProcessMessages;
+
+        edtConteudoPesquisa.SetFocus;
+        TocarSomAlerta(ord(SystemHand));
+
+      end;
+
+    end
+    else
+    begin
+
+      if AbrirTabelaFilial(rdpOpcoesPesquisa.ItemIndex, edtConteudoPesquisa.Text) then
+        grdTabela.SetFocus;
+
+      edtConteudoPesquisa.Clear;
+      MudarCorEdit(Sender);
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFilial.edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmFilial.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmFilial.edtEmailExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsConfiguracoes.State in [dsEdit, dsInsert] then
+  begin
+
+    if not ValidarEmail(edtEmail.Text) then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_VALIDAR_EMAIL + ': ' + edtEmail.Text;
+      Application.ProcessMessages;
+
+      TocarSomAlerta(ord(SystemHand));
+
+      edtEmail.SetFocus;
+      edtEmail.SelectAll;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFilial.edtInscEstExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+  begin
+
+    ACBrValidador1.Documento  := dmMProvider.cdsFilialINSCRICAO.Value;
+    ACBrValidador1.Complemento:= dmMProvider.cdsFilialESTADO.Value;
+
+    if not ACBrValidador1.Validar then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_INSCRICAO_INVALIDA
+                        + dmMProvider.cdsFilialESTADO.Value;
+      edtInscEst.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFilial.edtNFantasiaExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    RetirarAcentuacao(sender);
+
+end;
+
+procedure TfrmFilial.edtRJuntaComExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmFilial.edtRSocialEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmFilial.edtRSocialExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+  begin
+
+    RetirarAcentuacao(sender);
+
+    if Length(Trim(dmMProvider.cdsFilialFANTASIA.Value)) <=0 then
+      dmMProvider.cdsFilialFANTASIA.Value     := AbreviaNome(dmMProvider.cdsFilialRAZAOSOCIAL.Value);
+
+  end;
+
+end;
+
+procedure TfrmFilial.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                               := COR_PADRAO_TELAS;
+  Caption                             := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario           := ParamStr(1);
+  dmDBEXMaster.sSenha                 := paramstr(2);
+  dmDBEXMaster.iIdUsuario             := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial              := StrToInt(ParamStr(4));
+
+  MostrarOcultarAbas(False);
+  pgcFilial.Pages[0].TabVisible       := False;
+
+  pgcFilial.ActivePageIndex           := 0;
+  pgcInfoComplementar.ActivePageIndex := 0;
+
+  ConfigurarComponente;
+
+  if dmDBEXMaster.sNomeUsuario <> 'SYSDBA' then
+  begin
+
+    dmMProvider.AbrirTabelaUsuarios;
+
+    imgBoleto.Visible := (dmMProvider.cdsUsuariosAUTORIZA_FAT.Value = 1);
+
+  end
+  else
+    imgBoleto.Visible := (dmDBEXMaster.sNomeUsuario = 'SYSDBA');
+
+end;
+
+procedure TfrmFilial.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmFilial.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    actExcluirExecute(self);
+
+  end
+  else   if (UpperCase(key) = 'N') and (lblMsg.Tag = -1) then
+  begin
+
+    key         := #0;
+    lblMsg.Tag  := 0;
+    LimparMSG_ERRO;
+
+  end;
+
+end;
+
+procedure TfrmFilial.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsFilial.IsEmpty then
+  begin
+
+    pgcFilial.Pages[1].TabVisible  := True;
+    pgcFilial.Pages[2].TabVisible  := True;
+    pgcFilial.ActivePageIndex      := 1;
+
+  end;
+
+end;
+
+procedure TfrmFilial.grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsFilial.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsFilial.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmFilial.grdTabelaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(Self);
+
+end;
+
+procedure TfrmFilial.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+  grpFiscal.Enabled   := grpCadastro.Enabled;
+
+end;
+
+procedure TfrmFilial.imgBoletoClick(Sender: TObject);
+var
+  sUrl_WS_Fatura, sCNPJ, sArquivo, sDestino:string;
+begin
+
+  LimparMSG_ERRO;
+
+  sCNPJ           := dmMProvider.cdsFilialCNPJ.Value;
+
+  frmMesAnoFatura := TfrmMesAnoFatura.Create(self);
+
+  if frmMesAnoFatura.ShowModal = mrOk then
+  begin
+
+    sUrl_WS_Fatura  := dmDBEXMaster.ifArqConfig.ReadString('WS_Lic','Local','ws-genesis.duckdns.org')
+                        + ':' + dmDBEXMaster.ifArqConfig.ReadString('WS_Lic','Porta','11938')
+                        + '/ws/Faturas/' + sCNPJ + '/' + FormatDateTime('yyyy', frmMesAnoFatura.dtpMesAno.Date) + '/'
+                        + MesExtenso(frmMesAnoFatura.dtpMesAno.Date) + '/';
+
+    sArquivo        := sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.csv';
+
+    sDestino := ExtractFilePath(ParamStr(0)) + 'Fatura\';
+
+    ForceDirectories(sDestino);
+
+    lblMsg.Caption := 'Aguarde efetuando download do arquivo ' + sArquivo;
+    Application.ProcessMessages;
+
+    if DownloadArquivo(sUrl_WS_Fatura + sArquivo,sDestino + sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.pdf') then
+    begin
+
+      lblMsg.Caption := 'Arquivo ' + sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.pdf' + ' salvo em ' + sDestino;
+
+      OpenDialog1.InitialDir := sDestino;
+      OpenDialog1.Execute;
+
+
+    end
+    else
+      lblMsg.Caption := 'Erro ao baixar arquivo ' + sCNPJ + '_' + FormatDateTime('mmyyyy', frmMesAnoFatura.dtpMesAno.Date) + '.pdf';
+
+    Application.ProcessMessages;
+
+  end;
+
+  FreeAndNil(frmMesAnoFatura);
+
+end;
+
+procedure TfrmFilial.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.Active then
+  begin
+
+    if not (dmMProvider.cdsFilial.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFilial.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+procedure TfrmFilial.memObservacaoNFSExit(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    RetirarAcentuacao(sender);
+
+end;
+
+procedure TfrmFilial.MostrarOcultarAbas(pOpcao: boolean);
+var
+  i:integer;
+begin
+
+  for i := 1 to pgcFilial.PageCount - 1 do
+    pgcFilial.Pages[i].TabVisible := pOpcao;
+
+  pgcFilial.Pages[8].TabVisible := (not dmMProvider.cdsConfigECF.IsEmpty);
+
+end;
+
+procedure TfrmFilial.rdgContribuinteIPIClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFilialCONTRIBUINTEDOIPI.Value := rdgContribuinteIPI.ItemIndex;
+
+end;
+
+procedure TfrmFilial.rdgNaturezaJuridicaClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFilialNATUREZA_PESSOA_JURIDICA.Value := rdgNaturezaJuridica.ItemIndex;
+
+end;
+
+procedure TfrmFilial.rdgPerfilSpedClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFilialPERFIL_SPED.Value := rdgPerfilSped.ItemIndex;
+
+end;
+
+procedure TfrmFilial.rdgRamoAtividadeClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFilialTIPO_EMPRESA.Value := rdgRamoAtividade.ItemIndex;
+
+end;
+
+procedure TfrmFilial.rdgRegimeTributarioClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFilialREGIME_TRIBUTARIO.Value := rdgRegimeTributario.ItemIndex;
+
+end;
+
+procedure TfrmFilial.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+procedure TfrmFilial.tbsCadastroShow(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFilial.Active then
+  begin
+
+    if not (dmMProvider.cdsFilial.IsEmpty) and not (dmMProvider.cdsFilial.State in [dsEdit, dsInsert]) then
+    begin
+
+      AbrirTabelaEstados(2,dmMProvider.cdsFilialESTADO.Value);
+      AbrirTabelaEstados(2,dmMProvider.cdsFilialESTADOENTREGA.Value);
+      AbrirTabelaEstados(2,dmMProvider.cdsFilialESTADOCOBRANCA.Value);
+      AbrirTabelaCidades(2,dmMProvider.cdsFilialESTADO.Value);
+      AbrirTabelaCidades(2,dmMProvider.cdsFilialESTADOENTREGA.Value);
+      AbrirTabelaCidades(2,dmMProvider.cdsFilialESTADOCOBRANCA.Value);
+
+    end;
+
+  end;
+
+end;
+
+function TfrmFilial.ValidarCampos: boolean;
+begin
+
+  Result := true;
+
+  if Length(Trim(dmMProvider.cdsFilialRAZAOSOCIAL.Value)) <= 0 then
+  begin
+
+    edtRSocial.SetFocus;
+    Result := false;
+
+  end
+  else if Length(Trim(dmMProvider.cdsFilialESTADO.Value)) <= 0 then
+  begin
+
+    cboEstado.SetFocus;
+    Result := false;
+
+  end
+  else if dmMProvider.cdsFilialCIDADE.Value <= 0 then
+  begin
+
+    cboCidade.SetFocus;
+    Result := false;
+
+  end
+  else if Length(Trim(dmMProvider.cdsFilialCEP.Value)) <= 0 then
+  begin
+
+    edtCEP.SetFocus;
+    Result := false;
+
+  end;
+
+end;
+
+procedure TfrmFilial.WindowClose1Execute(Sender: TObject);
+begin
+
+  close;
+
+end;
+
+end.

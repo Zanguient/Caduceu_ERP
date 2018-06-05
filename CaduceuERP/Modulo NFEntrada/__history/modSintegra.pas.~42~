@@ -1,0 +1,202 @@
+unit modSintegra;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.DBGrids,
+  Vcl.Imaging.pngimage, Vcl.ExtCtrls, Vcl.StdCtrls;
+
+type
+
+  TDBGrid = class (Vcl.DBGrids.TDBGrid)
+    protected
+      procedure DrawCellBackground(const ARect: TRect; AColor: TColor; AState: TGridDrawState; ACol, ARow: Integer); override;
+    end;
+
+  TfrmManutencaoRegSintegra = class(TForm)
+    grdReg50: TDBGrid;
+    imgOk: TImage;
+    pnlReg50: TPanel;
+    pnlReg54: TPanel;
+    grdReg54: TDBGrid;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure imgOkClick(Sender: TObject);
+  private
+    { Private declarations }
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure Mensagem(pAlerta:boolean;pMsg:string);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmManutencaoRegSintegra: TfrmManutencaoRegSintegra;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmManutencaoRegSintegra.FormCreate(Sender: TObject);
+var
+  i, nPos:integer;
+  sNotaFiscal:string;
+begin
+
+  DesabilitarBotaoFecharForm(handle);
+  color := COR_PADRAO_DIALOGOS;
+
+  for i := 0 to grdReg50.Columns.Count-1 do
+    grdReg50.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  for i := 0 to grdReg54.Columns.Count-1 do
+    grdReg54.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  try
+
+    dmMProvider.cdsRegistro50.Close;
+    dmMProvider.cdsRegistro50.ProviderName := 'dspRegistro50';
+
+    dmDBEXMaster.fdqRegistro50.SQL.Clear;
+    dmDBEXMaster.fdqRegistro50.SQL.Add('SELECT * FROM REGISTRO50');
+    dmDBEXMaster.fdqRegistro50.SQL.Add('SELECT * FROM REGISTRO50');
+
+    nPos := Length(FloatToStr(StrToFloat(dmMProvider.cdsNFEntradaNOTAFISCAL.Value)));
+    nPos := (nPos - 6) + 1;
+
+    sNotaFiscal := Copy(dmMProvider.cdsNFEntradaNOTAFISCAL.Value,nPos,Length(dmMProvider.cdsNFEntradaNOTAFISCAL.Value));
+
+    sNotaFiscal := FloatToStr(StrToFloat(sNotaFiscal));
+
+    if length(dmMProvider.cdsNFEntradaNOTAFISCAL.Value) <= 6 then
+
+      dmDBEXMaster.fdqRegistro50.SQL.Add('WHERE NOTAFISCAL = ' + QuotedStr(FloatToStr(StrToFloat(dmMProvider.cdsNFEntradaNOTAFISCAL.Value))))
+
+    else
+      dmDBEXMaster.fdqRegistro50.SQL.Add('WHERE NOTAFISCAL = ' + QuotedStr(sNotaFiscal));
+
+    dmDBEXMaster.fdqRegistro50.SQL.Add('AND CNPJ = ' + QuotedStr(dmMProvider.cdsNFEntradaCNPJ_EMITENTE.Value));
+    dmDBEXMaster.fdqRegistro50.SQL.Add('AND MODELO = ' + QuotedStr(dmMProvider.cdsNFEntradaMODELO.Value));
+    dmDBEXMaster.fdqRegistro50.SQL.Add('ORDER BY CFOP');
+
+    dmMProvider.cdsRegistro50.Open;
+    dmMProvider.cdsRegistro50.ProviderName := '';
+
+    dmMProvider.cdsRegistro54.Close;
+    dmMProvider.cdsRegistro54.ProviderName := 'dspRegistro54';
+
+    dmDBEXMaster.fdqRegistro54.SQL.Clear;
+    dmDBEXMaster.fdqRegistro54.SQL.Add('SELECT * FROM REGISTRO54');
+
+    if length(dmMProvider.cdsNFEntradaNOTAFISCAL.Value) <= 6 then
+      dmDBEXMaster.fdqRegistro54.SQL.Add('WHERE NOTAFISCAL = ' + QuotedStr(FloatToStr(StrToFloat(dmMProvider.cdsNFEntradaNOTAFISCAL.Value))))
+    else
+      dmDBEXMaster.fdqRegistro54.SQL.Add('WHERE NOTAFISCAL = ' + QuotedStr(sNotaFiscal));
+
+    dmDBEXMaster.fdqRegistro54.SQL.Add('AND CNPJ = ' + QuotedStr(dmMProvider.cdsNFEntradaCNPJ_EMITENTE.Value));
+    dmDBEXMaster.fdqRegistro54.SQL.Add('AND MODELO = ' + QuotedStr(dmMProvider.cdsNFEntradaMODELO.Value));
+
+    dmMProvider.cdsRegistro54.Open;
+    dmMProvider.cdsRegistro54.ProviderName := '';
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+  end;
+
+end;
+
+procedure TfrmManutencaoRegSintegra.imgOkClick(Sender: TObject);
+var
+  cValorUnitario:double;
+begin
+
+  cValorUnitario := 0;
+
+  FormatSettings.DecimalSeparator := '.';
+
+  dmMSProcedure.fdspMaster.StoredProcName := 'EXECUTA_SQL';
+  dmMSProcedure.fdspMaster.Prepare;
+
+  dmMProvider.cdsRegistro54.First;
+
+  while not dmMProvider.cdsRegistro54.Eof do
+  begin
+    if dmMProvider.cdsRegistro54QUANTIDADE.Value > 0 then
+      cValorUnitario := (dmMProvider.cdsRegistro54VALOR_UNITARIO.Value / dmMProvider.cdsRegistro54QUANTIDADE.Value);
+
+    dmMSProcedure.fdspMaster.ParamByName('I_SQL').Value :=
+      'UPDATE ITEMNFENTRADA SET CFOP = ' + QuotedStr(dmMProvider.cdsRegistro54CFOP.Value)
+      + ', CST = ' + IntToStr(StrToInt(dmMProvider.cdsRegistro54CST.Value))
+      + ' WHERE PRODUTO = ' + IntToStr(dmMProvider.cdsRegistro54PRODUTO.Value)
+      + ' AND NFENTRADA = ' + IntToStr(dmMProvider.cdsNFEntradaNFENTRADA.Value);
+
+    dmMSProcedure.fdspMaster.ExecProc;
+    dmMProvider.cdsRegistro54.Next;
+
+  end;
+
+  FormatSettings.DecimalSeparator := ',';
+
+//  frmNFEntrada.GravarEstornarLivro_Entrada(1);
+//  frmNFEntrada.GravarEstornarLivro_Entrada(0);
+
+  Close;
+
+
+end;
+
+procedure TfrmManutencaoRegSintegra.Mensagem(pAlerta: boolean; pMsg: string);
+begin
+
+  lblMsg.Caption := pMsg;
+  Application.ProcessMessages;
+
+  if pAlerta then
+    TocarSomAlerta(ord(SystemHand));
+
+end;
+
+procedure TfrmManutencaoRegSintegra.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang:string;
+begin
+
+  if Pos('Unable',pE.Message) > 0then
+    Mensagem(False,dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO)
+  else if Pos('FOREIGN',pE.Message) > 0then
+  begin
+
+    sChave_Extrang := Trim(Copy(pE.Message,pos('ON TABLE',Uppercase(pE.Message))+ 10,Length(pE.Message)));
+
+    Mensagem(False,dmDBEXMaster.sNomeUsuario + ', ' + MSG_ERRO_CHAVE_ESTRANGEIRA + Copy(sChave_Extrang,1,pos('"',sChave_Extrang)-1));
+
+  end
+  else
+    Mensagem(False,dmDBEXMaster.sNomeUsuario + ', ' + pE.Message);
+
+  TocarSomAlerta(ord(SystemHand));
+
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect,Columns[ACol].Title.Color, AState, ACol, ARow)
+
+end;
+
+end.

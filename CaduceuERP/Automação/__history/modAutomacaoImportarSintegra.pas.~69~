@@ -1,0 +1,147 @@
+unit modAutomacaoImportarSintegra;
+
+interface
+
+uses SysUtils, Windows, Forms, IniFiles, Classes, StrUtils, CheckLst, Db,
+  variants, Dialogs;
+
+function ImportarRegistros60_Sintegra_ECF(pArqquivo:string; pFilial:integer):boolean;
+
+implementation
+
+uses modAutomacao, dataDBEXMaster, dataMProvider, uConstantes_Padrao, uFuncoes;
+
+function ImportarRegistros60_Sintegra_ECF(pArqquivo:string; pFilial:integer):boolean;
+var
+  tsArquivo: TStringList;
+  i: integer;
+  sLinha, sBarras, sBarras_temp: string;
+begin
+
+  try
+
+    tsArquivo     := TStringList.Create;
+
+    tsArquivo.LoadFromFile(pArqquivo);
+
+    frmAutomacao.pgbProgressoImportacao.Max := tsArquivo.Count;
+
+    for i := 0 to tsArquivo.Count - 1 do
+    begin
+
+      sLinha        := tsArquivo[i];
+
+      if length(sLinha) <> 126 then
+      begin
+
+        frmAutomacao.lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_TAMANHO_REGISTRO_INVALIDO + 'esperado 126, encontrado ' + IntToStr(length(trim(sLinha)));
+        result := false;
+
+      end
+      else
+      begin
+
+        if i = 0  then
+        begin
+
+          if Copy(Trim(sLinha),1,2) <> '10' then
+          begin
+
+            frmAutomacao.lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_NAO_E_REGISTRO_10_SINT;
+            result := false;
+
+          end;
+
+        end
+        else
+        begin
+
+          if Copy(Trim(sLinha),1,3) = '60M' then
+          begin
+
+            dmMProvider.fdmImpReg60M.Append;
+            dmMProvider.fdmImpReg60MDATA_EMISSAO.Value      := StrToDate(Copy(sLinha, 10, 2) + '/' + Copy(sLinha, 8, 2) + '/' + Copy(sLinha, 4, 4));
+            dmMProvider.fdmImpReg60MSERIE_ECF.Value         := Copy(sLinha, 12, 20);
+            dmMProvider.fdmImpReg60MNUMERO_CAIXA.Value      := StrToIntDef(Copy(sLinha, 32, 3),1);
+            dmMProvider.fdmImpReg60MCOO_INICIAL.Value       := StrToIntDef(Copy(sLinha, 37, 6), 1);
+            dmMProvider.fdmImpReg60MCOO_FINAL.Value         := StrToIntDef(Copy(sLinha, 43, 6), 1);
+            dmMProvider.fdmImpReg60MCRZ.Value               := StrToIntDef(Copy(sLinha, 49, 6), 1);
+            dmMProvider.fdmImpReg60MCRO.Value               := StrToIntDef(Copy(sLinha, 55, 3), 1);
+            dmMProvider.fdmImpReg60MVENDA_BRUTA.Value       := (StrToFloat(Copy(sLinha, 58, 16)) / 100);
+            dmMProvider.fdmImpReg60MVALOR_GT.Value          := (StrToFloat(Copy(sLinha, 74, 16)) / 100);
+            dmMProvider.fdmImpReg60MMODELO_DOCUMENTO.Value  := '2D';
+
+          end
+          else if Copy(Trim(sLinha),1,3) = '60A' then
+          begin
+
+            dmMProvider.fdmImpReg60A.Append;
+            dmMProvider.fdmImpReg60ADATA_EMISSAO.Value    := dmMProvider.fdmImpReg60MDATA_EMISSAO.Value;
+            dmMProvider.fdmImpReg60AALIQUOTA.Value        := Copy(sLinha, 32, 4);
+            dmMProvider.fdmImpReg60AVALOR_ALIQUOTA.Value  := StrToFloatDef(Copy(sLinha, 36, 12),0) / 100;
+            dmMProvider.fdmImpReg60ASERIE_ECF.Value       := dmMProvider.fdmImpReg60MSERIE_ECF.Value;
+            dmMProvider.fdmImpReg60ACRZ.Value             := dmMProvider.fdmImpReg60MCRZ.Value;
+            dmMProvider.fdmImpReg60ANUMERO_CAIXA.Value    := dmMProvider.fdmImpReg60MNUMERO_CAIXA.Value;
+            dmMProvider.fdmImpReg60AGT.Value              := dmMProvider.fdmImpReg60MVALOR_GT.Value;
+            dmMProvider.fdmImpReg60A.Post;
+
+          end
+          else if Copy(Trim(sLinha),1,3) = '60I' then
+          begin
+
+            dmMProvider.fdmImpCupom.Append;
+            dmMProvider.fdmImpCupomNUMERO_CAIXA.Value := dmMProvider.fdmImpReg60MNUMERO_CAIXA.Value;
+            dmMProvider.fdmImpCupomNUMERO_CUPOM.Value := StrToIntDef(Copy(sLinha,34,6),1);
+            dmMProvider.fdmImpCupomSERIE_ECF.Value    := dmMProvider.fdmImpReg60MSERIE_ECF.Value;
+            dmMProvider.fdmImpCupomCFOP.Value         := '5102';
+
+            sBarras := FloatToStr(StrToFloat(Copy(sLinha,43,14)));
+
+            if length(Trim(sBarras)) < 8 then
+            begin
+
+              sBarras_temp  := GerarCodigodeBarras(FormatFloat('000000000000',StrToFloat(sBarras)));
+              sBarras       := sBarras_temp;
+            end;
+
+            dmDBEXMaster.fdqPesqProdutos.Close;
+            dmDBEXMaster.fdqPesqProdutos.SQL.Clear;
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('SELECT PRO.*, bar.* FROM PRODUTO PRO');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('JOIN barras bar');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('ON(bar.produto = PRO.produto)');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('where bar.barras = ' + QuotedStr(sBarras));
+            dmDBEXMaster.fdqPesqProdutos.Open;
+
+            dmMProvider.fdmImpCupomTRIBUTACAO.Value         := dmDBEXMaster.fdqPesqProdutos.FieldByName('TRIBUTACAO').AsInteger;
+            dmMProvider.fdmImpCupomALIQUOTA_ICMS.Value      := Trim(Copy(sLinha,95,4));
+
+            if Trim(Copy(sLinha,95,4)) = 'F' then
+              dmMProvider.fdmImpCupomCFOP.Value             := '5405';
+
+            dmMProvider.fdmImpCupomEMISSAO.Value            := dmMProvider.fdmImpReg60MDATA_EMISSAO.Value;
+            dmMProvider.fdmImpCupomBARRAS.Value             := sBarras;
+            dmMProvider.fdmImpCupomQUANTIDADE.Value         := StrToFloatDef(Copy(sLinha,57,13),1) / 1000;
+            dmMProvider.fdmImpCupomSUB_TOTAL.Value          := StrToFloatDef(Copy(sLinha,70,13),1) / 100;
+            dmMProvider.fdmImpCupomVALOR_UNITARIO.Value     :=(dmMProvider.fdmImpCupomSUB_TOTAL.Value / dmMProvider.fdmImpCupomQUANTIDADE.Value);
+            dmMProvider.fdmImpCupomVALOR_DESCONTO.Value     := 0;
+            dmMProvider.fdmImpCupomHORA_ABERTURA.AsDateTime := Time;
+            dmMProvider.fdmImpCupomNUMERO_ITEM.Value        := StrToIntDef(Copy(sLinha,40,3),1);
+
+          end;
+
+        end;
+
+      end;
+
+    end;
+
+    result := true;
+
+  except
+
+    result := false;
+  end;
+
+end;
+
+end.

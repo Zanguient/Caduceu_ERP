@@ -1,0 +1,600 @@
+unit modProduto_DJPDV;
+
+interface
+
+uses SysUtils, Windows, Forms, IniFiles, Classes, StrUtils, CheckLst, Db,
+  variants, Dialogs;
+
+procedure ExportarProdutosDJPDV(sArquivo, sPath: string; iFilial, pTipoCodigoIntegracao: integer);
+procedure ExportarBarrasDJPDV(sArquivo, sPath: string; iFilial, pTipoCodigoIntegracao: integer);
+
+implementation
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes, uFuncoes_BD;
+
+procedure ExportarProdutosDJPDV(sArquivo, sPath: string; iFilial, pTipoCodigoIntegracao: integer);
+var
+  txtArq: TextFile;
+  sLinha, sBarras, sStatusProduto, sBarras_Temp, sDescricao, sProduto: string;
+begin
+
+  AssignFile(txtArq, ExtractFilepath(Application.ExeName) + 'Temp\' + sArquivo);
+
+  ReWrite(txtArq);
+
+  sDescricao := RetirarAcentuacaoString(dmMProvider.cdsProdutoFilialDESCRICAOCUPOMFISCAL.Value);
+
+  case pTipoCodigoIntegracao of
+    0:begin
+
+        if (dmMProvider.cdsConfiguracoesUTILIZAR_PRECO_ATACADO.Value = 1)  then
+        begin
+
+          if dmMProvider.cdsBarrasQUANTIDADE.Value > 1 then
+          begin
+
+            sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+            sDescricao    := RetirarAcentuacaoString(dmMProvider.cdsProdutoFilialDESCRICAOCUPOMFISCAL.Value)
+
+          end
+          else
+            sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+
+        end
+        else
+          sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+
+        if ValidaEAN(Trim(sBarras_Temp)) then
+        begin
+
+          case dmMProvider.cdsConfiguracoesUTILIZAR_DV_EXPORTACAO_PDV.Value of
+            0:begin
+
+                if dmMProvider.cdsBarrasGERADO.Value = 1 then
+                begin
+
+                  if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                    sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+                  else
+                    sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+//                    sBarras := FloatToStr('00000000000000000000',StrToFloat(Copy(sBarras_Temp, 1, 12)));
+
+                end
+                else
+//                  sBarras := FormatFloat('00000000000000000000', StrToFloat(sBarras_Temp))
+                  sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+
+              end;
+            else
+            begin
+
+              if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+              else
+                sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+//                sBarras := FormatFloat('00000000000000000000', StrToFloat(sBarras_Temp));
+
+            end;
+
+          end;
+
+          sLinha := FormatFloat('00000000000000000000', dmMProvider.cdsProdutosPRODUTO.Value)
+                      + sBarras
+                      + Format('%-40.40s',[sDescricao])
+                      + Format('%-20.20s',[dmMProvider.cdsProdutosCOMPLEMENTO.Value])
+                      + Format('%-4.4s',[dmMProvider.cdsProdutosUNIDADE.Value]);
+
+          case dmMProvider.cdsProdutosPROMOCAO.Value of
+            0:begin
+
+                if (dmMProvider.cdsConfiguracoesUTILIZAR_PRECO_ATACADO.Value = 1)  then
+                begin
+
+                  if(dmMProvider.cdsBarrasQUANTIDADE.Value > 1)  then
+                    sLinha    := sLinha + FormatFloat('000000000000',dmMProvider.cdsProdutoFilialPRECO_ATACADO.Value * 1000)
+                  else
+                    sLinha    := sLinha + FormatFloat('000000000000',((dmMProvider.cdsProdutoFilialPRECODEVENDA.Value * 1000)));
+
+                end
+                else
+                  sLinha    := sLinha + FormatFloat('000000000000', ((dmMProvider.cdsProdutoFilialPRECODEVENDA.Value  * dmMProvider.cdsBarrasQUANTIDADE.Value) * 1000));
+
+              end;
+            1:begin
+
+                if (dmMProvider.cdsConfiguracoesUTILIZAR_PRECO_ATACADO.Value = 1) and (dmMProvider.cdsBarrasQUANTIDADE.Value > 1) then
+                  sLinha    := sLinha + FormatFloat('000000000000',dmMProvider.cdsProdutoFilialPRECO_ATACADO.Value * 1000)
+                else if dmMProvider.cdsConfiguracoesUTILIZAR_PRECO_ATACADO.Value = 1 then
+                  sLinha    := sLinha + FormatFloat('000000000000', ((dmMProvider.cdsProdutoFilialPRECOPROMOCAO.Value * 1000)))
+                else
+                  sLinha    := sLinha + FormatFloat('000000000000', ((dmMProvider.cdsProdutoFilialPRECOPROMOCAO.Value * dmMProvider.cdsBarrasQUANTIDADE.Value) * 1000));
+
+              end;
+
+          end;
+
+          RelacionarTributacao_Produto;
+
+          sLinha := sLinha + '000000'                                           //desconto promocional
+                      + Format('%-1.1s',[dmMProvider.cdsTributacaoCODIGOECF.Value])
+                      + Format('%-4.4s',[FormatFloat('0000',dmMProvider.cdsTributacaoALIQUOTA.Value * 100)])
+                      + Format('%-65.65s',[' ']);                               //observação referente ao produto
+
+          if dmMProvider.cdsBarrasPESADO.Value = 1 then
+            sLinha := sLinha + 'S'                                              //calcula quantidade produto pesavel
+          else
+            sLinha := sLinha + 'N';
+
+          if dmMProvider.cdsProdutosPERMITE_VENDA_FRACIONADA.Value = 1 then
+            sLinha := sLinha + 'S'                                              //permite venda fracionada
+          else
+            sLinha := sLinha + 'N';
+
+          sLinha := sLinha
+                      + 'N'                                                     //permite digitar quantidade
+                      + 'N'                                                     //usa configuração do ECF para arredondamento ou truncamento
+                      + 'N';                                                    //produção própria
+
+
+          if dmMProvider.cdsProdutosGRUPO.Value > 0 then
+          begin
+
+            RelacionarGrupo_Produto;
+
+            sLinha := sLinha + FormatFloat('000000', dmMProvider.cdsProdutosGRUPO.Value)
+                             + Format('%-30.30s',[dmMProvider.cdsGrupoNOME.Value])
+          end
+          else
+          begin
+
+            sLinha := sLinha + '0     '
+                             + Format('%-30.30s',[' ']);
+
+          end;
+
+          sLinha := sLinha + '000000'                                              //codigo departamento
+                           + Format('%-30.30s',[' '])                           //descrição departamento
+                           + '000000'                                           //chave estrangeira tabela marca
+                           + Format('%-30.30s',[' '])                           //descrição tabel marca
+                           + '000000'                                           //código vasilhame
+                           + Format('%-30.30s',[' '])                           //descrição vasilhame
+                           + '000000';                                          //código da animação
+
+          if dmMProvider.cdsProdutosATIVO.Value = 1 then
+            sLinha := sLinha + '000000'                                         //permite venda
+          else
+            sLinha := sLinha + FormatFloat('000000',dmMProvider.cdsProdutosATIVO.Value);
+
+          sLinha := sLinha + Format('%-20.20s',[dmMProvider.cdsProdutosNCM.Value]);
+
+          sLinha := sLinha + '000000';
+
+          if dmMProvider.cdsBarrasGERADO.Value = 0 then
+          begin
+
+            sLinha := sLinha + Format('%20.20s',[FloatToStr(StrToFloat(dmMProvider.cdsBarrasBARRAS.Value))]) //sBarras      //gtin contabil
+                      + Format('%20.20s',[' '])                                 //ext IPI
+                      + Format('%20.20s',[FloatToStr(StrToFloat(dmMProvider.cdsBarrasBARRAS.Value))]); {sBarras};            //gtin tributavel
+
+          end
+
+          else
+          begin
+
+            sLinha := sLinha + Format('%20.20s',[' '])                          //gtin contabil
+                      + Format('%20.20s',[' '])                                 //ext IPI
+                      + Format('%20.20s',[' ']);                                //gtin tributavel
+
+          end;
+
+          sLinha := sLinha + '000000'                                           //chave estrangeira tabela de icms para nfe
+                      + '000000'                                                //chave estrangeira tabela de ipi para nfe
+                      + '000000'                                                //chave estrangeira tabela de issqn para nfe
+                      + '000000'                                                //chave estrangeira tabela de imposto de importacaopara nfe
+                      + '000000'                                                //chave estrangeira tabela de pis para nfe
+                      + '000000'                                                //chave estrangeira tabela de pis st para nfe
+                      + '000000'                                                //chave estrangeira tabela de cofins para nfe
+                      + '000000'                                                //chave estrangeira tabela de cofins st para nfe
+                      + 'N';                                                    //S = produto é KIT / N = produto não é KIT
+
+          if dmMProvider.cdsProdutosSALDO_TOTAL.Value < 0 then
+            sLinha := sLinha + FormatFloat('00000000000', dmMProvider.cdsProdutosSALDO_TOTAL.Value * 1000)
+          else
+            sLinha := sLinha + FormatFloat('000000000000', dmMProvider.cdsProdutosSALDO_TOTAL.Value * 1000);
+
+          RelacionarNCM_CEST_Produto;
+
+          sLinha := sLinha + '000'                                              //prazo para devolução do item
+                      + Format('%-7.7s',[dmMProvider.cdsNcmNbsTABELA_CEST.Value])
+                      + 'N';                                                    //S = controla estoque / N = não controla estoque
+
+          if Length(Trim(dmMProvider.cdsProdutosCODIGO_ANP.Value)) > 0 then
+            sLinha := sLinha +FormatFloat('000000000', StrToIntDef(dmMProvider.cdsProdutosCODIGO_ANP.Value,0))
+          else
+            sLinha := sLinha + Format('%-9.9s',[' ']);
+
+          WriteLn(txtArq, sLinha);
+
+        end;
+
+        CloseFile(txtArq);
+
+
+      end;
+    1:begin
+
+        if (dmMProvider.cdsConfiguracoesUTILIZAR_PRECO_ATACADO.Value = 1)  then
+        begin
+
+          if dmMProvider.cdsBarrasQUANTIDADE.Value > 1 then
+          begin
+
+            sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+            sDescricao    := RetirarAcentuacaoString(dmMProvider.cdsProdutoFilialDESCRICAOCUPOMFISCAL.Value)
+
+          end
+          else
+            sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+
+        end
+        else
+          sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+
+
+        case dmMProvider.cdsConfiguracoesUTILIZAR_DV_EXPORTACAO_PDV.Value of
+          0:begin
+
+              if dmMProvider.cdsBarrasGERADO.Value = 1 then
+              begin
+
+                if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                  sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+                else
+                  sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+//                    sBarras := FloatToStr('00000000000000000000',StrToFloat(Copy(sBarras_Temp, 1, 12)));
+
+              end
+              else
+//                  sBarras := FormatFloat('00000000000000000000', StrToFloat(sBarras_Temp))
+                sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+
+            end;
+          else
+          begin
+
+            if dmMProvider.cdsBarrasPESADO.Value = 1 then
+              sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+            else
+              sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+//                sBarras := FormatFloat('00000000000000000000', StrToFloat(sBarras_Temp));
+
+          end;
+
+        end;
+
+
+
+        {if dmMProvider.cdsProdutosUNIDADE.Value <> 'KG' then
+        begin
+
+          sBarras   := Format('%-20.20s',[FloatToStr(StrToFloat(dmMProvider.cdsBarrasBARRAS.Value))]);
+
+          if Length(Trim(sBarras)) = 11  then
+            sBarras := Format('%-20.20s',[FormatFloat('000000000000',StrToFloat(dmMProvider.cdsBarrasBARRAS.Value))]);
+
+        end
+        else
+          sBarras   := Format('%-20.20s',[FloatToStr(StrToFloat(dmMProvider.cdsBarrasBARRAS.Value))]);
+//          sBarras   := Format('%-20.20s',[IntToStr(dmMProvider.cdsProdutosPRODUTO.Value)]);
+        }
+        sLinha    := Format('%-20.20s',[IntToStr(dmMProvider.cdsProdutosPRODUTO.Value)])
+                    + sBarras
+                    + Format('%-40.40s',[sDescricao])
+                    + Format('%-20.20s',[dmMProvider.cdsProdutosCOMPLEMENTO.Value])
+                    + Format('%-4.4s',[dmMProvider.cdsProdutosUNIDADE.Value]);
+
+        case dmMProvider.cdsProdutosPROMOCAO.Value of
+          0:begin
+
+              if (dmMProvider.cdsConfiguracoesUTILIZAR_PRECO_ATACADO.Value = 1)  then
+                sLinha    := sLinha + FormatFloat('000000000000',dmMProvider.cdsProdutoFilialPRECO_ATACADO.Value * 1000)
+              else
+                sLinha    := sLinha + FormatFloat('000000000000', dmMProvider.cdsProdutoFilialPRECODEVENDA.Value * 1000);
+
+            end;
+          1:begin
+
+              if dmMProvider.cdsConfiguracoesUTILIZAR_PRECO_ATACADO.Value = 1 then
+                sLinha    := sLinha + FormatFloat('000000000000', dmMProvider.cdsProdutoFilialPRECOPROMOCAO.Value * 1000)
+              else
+                sLinha    := sLinha + FormatFloat('000000000000', dmMProvider.cdsProdutoFilialPRECOPROMOCAO.Value * 1000);
+
+            end;
+
+        end;
+
+        sLinha := sLinha + '000000'                                           //desconto promocional
+                    + Format('%-1.1s',[dmMProvider.cdsTributacaoCODIGOECF.Value])
+                    + Format('%-4.4s',[FormatFloat('0000',dmMProvider.cdsTributacaoALIQUOTA.Value * 100)])
+                    + Format('%-65.65s',[' ']);                               //observação referente ao produto
+
+        if dmMProvider.cdsProdutosUNIDADE.Value = 'KG' then
+          sLinha := sLinha + 'S'                                              //calcula quantidade produto pesavel
+        else
+          sLinha := sLinha + 'N';
+
+        if dmMProvider.cdsProdutosPERMITE_VENDA_FRACIONADA.Value = 1 then
+          sLinha := sLinha + 'S'                                              //permite venda fracionada
+        else
+          sLinha := sLinha + 'N';
+
+        sLinha := sLinha
+                    + 'N'                                                     //permite digitar quantidade
+                    + 'N'                                                     //usa configuração do ECF para arredondamento ou truncamento
+                    + 'N';                                                    //produção própria
+
+
+        if dmMProvider.cdsProdutosGRUPO.Value > 0 then
+          sLinha := sLinha + FormatFloat('000000', dmMProvider.cdsProdutosGRUPO.Value)
+                           + Format('%-30.30s',[dmMProvider.cdsProdutosNOME_GRUPO.Value])
+        else
+          sLinha := sLinha + '     0'
+                           + Format('%-30.30s',[' ']);
+
+        sLinha := sLinha + '     0'                                           //codigo departamento
+                         + Format('%-30.30s',[' '])                           //descrição departamento
+                         + '     0'                                           //chave estrangeira tabela marca
+                         + Format('%-30.30s',[' '])                           //descrição tabel marca
+                         + '     0'                                           //código vasilhame
+                         + Format('%-30.30s',[' '])                           //descrição vasilhame
+                         + '     0';                                          //código da animação
+
+        if dmMProvider.cdsProdutosATIVO.Value = 1 then
+          sLinha := sLinha + '000000'                                         //permite venda
+        else
+          sLinha := sLinha + Format('%-6.6s',[FormatFloat('000000',dmMProvider.cdsProdutosATIVO.Value)]);
+
+        sLinha := sLinha + Format('%-20.20s',[dmMProvider.cdsProdutosNCM.Value]);
+
+        sLinha := sLinha + '     0';                                         //codigo do tipo de descricao adcional
+
+        if dmMProvider.cdsBarrasGERADO.Value = 0 then
+        begin
+
+          sLinha := sLinha + Format('%20.20s',[FloatToStr(StrToFloat(dmMProvider.cdsBarrasBARRAS.Value))]) {sBarras}      //gtin contabil
+                    + Format('%-20.20s',[' '])                                //ext IPI
+                    + Format('%20.20s',[FloatToStr(StrToFloat(dmMProvider.cdsBarrasBARRAS.Value))]); {sBarras;}           //gtin tributavel
+
+        end
+
+        else
+        begin
+
+          sLinha := sLinha + Format('%-20.20s',[' '])                         //gtin contabil
+                    + Format('%-20.20s',[' '])                                //ext IPI
+                    + Format('%-20.20s',[' ']);                               //gtin tributavel
+
+        end;
+
+        sLinha := sLinha + '0     '                                           //chave estrangeira tabela de icms para nfe
+                    + '0     '                                                //chave estrangeira tabela de ipi para nfe
+                    + '0     '                                                //chave estrangeira tabela de issqn para nfe
+                    + '0     '                                                //chave estrangeira tabela de imposto de importacaopara nfe
+                    + '0     '                                                //chave estrangeira tabela de pis para nfe
+                    + '0     '                                                //chave estrangeira tabela de pis st para nfe
+                    + '0     '                                                //chave estrangeira tabela de cofins para nfe
+                    + '0     '                                                //chave estrangeira tabela de cofins st para nfe
+                    + 'N';                                                    //S = produto é KIT / N = produto não é KIT
+
+        if dmMProvider.cdsProdutosSALDO_TOTAL.Value < 0 then
+          sLinha := sLinha + FormatFloat('00000000000', dmMProvider.cdsProdutosSALDO_TOTAL.Value * 1000)
+        else
+          sLinha := sLinha + FormatFloat('000000000000', dmMProvider.cdsProdutosSALDO_TOTAL.Value * 1000);
+
+        RelacionarNCM_CEST_Produto;
+
+        sLinha := sLinha + '000'                                              //prazo para devolução do item
+                    + Format('%-7.7s',[dmMProvider.cdsNcmNbsTABELA_CEST.Value])
+                    + 'N';                                                    //S = controla estoque / N = não controla estoque
+        if Length(Trim(dmMProvider.cdsProdutosCODIGO_ANP.Value)) > 0 then
+          sLinha := sLinha +FormatFloat('000000000', StrToIntDef(dmMProvider.cdsProdutosCODIGO_ANP.Value,0))
+        else
+          sLinha := sLinha + Format('%-9.9s',[' ']);
+
+        WriteLn(txtArq, sLinha);
+
+        CloseFile(txtArq);
+
+//        ExportarBarrasDJPDV(dmMProvider.cdsParamIntegraPDVARQUIVO_COD_BARRAS.Value, sPath, iFilial, dmMProvider.cdsParamIntegraPDVTIPO_CODIGO_INTEGRACAO.Value);
+
+      end;
+
+  end;
+
+
+  if DirectoryExists(sPath) then
+    CopyFile(PChar(ExtractFilepath(Application.ExeName) + 'Temp\' + sArquivo), PChar(sPath + sArquivo), False)
+  else
+  begin
+
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario + #13 + #13 + 'Caminho ' + sPath
+                            + ', não encontrado. Favor verificar!'), 'Atenção!', mb_IconWarning + mb_Ok);
+
+  end;
+
+end;
+procedure ExportarBarrasDJPDV(sArquivo, sPath: string; iFilial, pTipoCodigoIntegracao: integer);
+var
+  txtArq: TextFile;
+  sLinha, sBarras, sBarras_Temp, sArqLogBarras, sProduto: string;
+  sLog_Barras:TStringList;
+begin
+
+  if not dmMProvider.cdsBarras.IsEmpty then
+  begin
+
+    FormatSettings.DecimalSeparator       := ',';
+
+    with dmMProvider.cdsBarras do
+    begin
+
+      First;
+
+      if not eof then
+      begin
+
+        AssignFile(txtArq, ExtractFilepath(Application.ExeName) + 'Temp\' + sArquivo);
+
+        ReWrite(txtArq);
+
+        repeat
+
+          sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+
+          case pTipoCodigoIntegracao of
+            0:begin
+
+                if ValidaEAN(Trim(sBarras_Temp)) then
+                begin
+
+                  case dmMProvider.cdsConfiguracoesUTILIZAR_DV_EXPORTACAO_PDV.Value of
+                    0:begin
+
+                        if dmMProvider.cdsBarrasGERADO.Value = 1 then
+                        begin
+
+                          if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                            sBarras := Format('%-20.20s',[FormatFloat('000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+                          else
+//                            sBarras := Format('%-20.20s',[FormatFloat('00000000000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+                            sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+
+                        end
+                        else
+//                          sBarras := Format('%-20.20s',[FormatFloat('00000000000000', StrToFloat(sBarras_Temp))]);
+                          sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+
+                      end;
+                    else
+                    begin
+
+                      if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                        sBarras := Format('%-20.20s',[FormatFloat('000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+                      else
+//                        sBarras := Format('%-20.20s',[FormatFloat('00000000000000', StrToFloat(sBarras_Temp))]);
+                        sBarras := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+
+                    end;
+
+                  end;
+
+                  sLinha := sBarras + sBarras + ' ' + '00000' + FormatFloat('0000000', dmMProvider.cdsBarrasQUANTIDADE.Value * 100);
+
+                  WriteLn(txtArq, sLinha);
+
+                end
+                else
+                  sLog_Barras.Add('GTIN inválido: '  + sBarras_Temp);
+
+              end;
+            1:begin
+
+                if ValidaEAN(Trim(sBarras_Temp)) then
+                begin
+
+                  case dmMProvider.cdsConfiguracoesUTILIZAR_DV_EXPORTACAO_PDV.Value of
+                    0:begin
+
+                        if dmMProvider.cdsBarrasGERADO.Value = 1 then
+                        begin
+
+                          if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                          begin
+
+//                            sBarras   := Format('%-20.20s',[FormatFloat('00000000000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+                            sBarras   := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+//                            sBarras   := Format('%-20.20s',[FormatFloat('000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+//                            sProduto  := Format('%-20.20s',['2' + FormatFloat('00000',dmMProvider.cdsBarrasPRODUTO.Value)]);
+                            sProduto  := Format('%-20.20s',[FormatFloat('00000',dmMProvider.cdsBarrasPRODUTO.Value)]);
+
+                          end
+                          else
+                          begin
+
+//                            sBarras   := Format('%-20.20s',[FormatFloat('00000000000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+                            sBarras   := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+                            sProduto  := Format('%-20.20s',[IntToStr(dmMProvider.cdsBarrasPRODUTO.Value)]);
+
+                          end;
+
+                        end
+                        else
+                        begin
+
+//                          sBarras   := Format('%-20.20s',[FormatFloat('00000000000000', StrToFloat(sBarras_Temp))]);
+                          sBarras   := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+                          sProduto  := Format('%-20.20s',[IntToStr(dmMProvider.cdsBarrasPRODUTO.Value)]);
+
+                        end;
+
+                      end;
+                    else
+                    begin
+
+                      if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                      begin
+
+//                        sBarras   := Format('%-20.20s',[FormatFloat('00000000000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+                        sBarras   := Format('%-20.20s',[FloatToStr(StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+//                        sBarras   := Format('%-20.20s',[FormatFloat('000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))]);
+//                        sProduto  := Format('%-20.20s',['2' + FormatFloat('00000',dmMProvider.cdsBarrasPRODUTO.Value)]);
+                        sProduto  := Format('%-20.20s',[FormatFloat('00000',dmMProvider.cdsBarrasPRODUTO.Value)]);
+
+                      end
+                      else
+                      begin
+
+//                        sBarras   := Format('%-20.20s',[FormatFloat('00000000000000', StrToFloat(sBarras_Temp))]);
+                        sBarras   := Format('%-20.20s',[FloatToStr(StrToFloat(sBarras_Temp))]);
+                        sProduto  := Format('%-20.20s',[IntToStr(dmMProvider.cdsBarrasPRODUTO.Value)]);
+
+                      end;
+
+                    end;
+
+                  end;
+
+                  sLinha := sProduto + sBarras + ' ' + '00000' + FormatFloat('0000000', dmMProvider.cdsBarrasQUANTIDADE.Value * 100);
+
+                  WriteLn(txtArq, sLinha);
+
+                end;
+
+              end;
+
+          end;
+
+          Next;
+
+        until eof;
+        CloseFile(txtArq);
+
+        end;
+
+      end;
+
+    end;
+
+{    if DirectoryExists(sPath) then
+      CopyFile(PChar(ExtractFilepath(Application.ExeName) + 'Temp\' + sArquivo), PChar(sPath + sArquivo), False)
+    else
+      Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario + #13 + #13 + 'Caminho ' + sPath
+                              + ', não encontrado. Favor verificar!'), 'Atenção!', mb_IconWarning + mb_Ok);
+}
+    FormatSettings.DecimalSeparator := ',';
+
+
+end;
+
+end.

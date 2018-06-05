@@ -1,0 +1,35 @@
+unit modCLD_PV;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls;
+
+type
+  TfrmCLD_PV = class(TForm)
+    imgCancelar: TImage;
+    grpCLD_PV: TGroupBox;
+    procedure imgCancelarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCLD_PV: TfrmCLD_PV;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmCLD_PV.imgCancelarClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

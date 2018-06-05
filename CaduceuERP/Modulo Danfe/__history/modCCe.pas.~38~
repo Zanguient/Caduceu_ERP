@@ -1,0 +1,216 @@
+unit modCCe;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls, Vcl.ExtCtrls, Data.DB, Vcl.Grids, Vcl.DBGrids, Vcl.Imaging.pngimage;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmCCe = class(TForm)
+    rdgOpcaoPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    edtConteudoPesquisa: TEdit;
+    pgcCCe: TPageControl;
+    tbsTabela: TTabSheet;
+    tbsCCe: TTabSheet;
+    grdTabela: TDBGrid;
+    impPesquisar: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    imgOk: TImage;
+    grpInfoNFe: TGroupBox;
+    frpNumeroNfe: TGroupBox;
+    lblNumneroNfe: TLabel;
+    grpEmissaoNfe: TGroupBox;
+    lblEmissaoNfe: TLabel;
+    grpChaveNfe: TGroupBox;
+    lblChaveNfe: TLabel;
+    grpCorrecao: TGroupBox;
+    memTextoCorrecao: TMemo;
+    GroupBox1: TGroupBox;
+    mtmInfoCCe: TMemo;
+    procedure FormCreate(Sender: TObject);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure rdgOpcaoPesquisaClick(Sender: TObject);
+    procedure imgOkClick(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+    procedure memTextoCorrecaoEnter(Sender: TObject);
+    procedure memTextoCorrecaoKeyPress(Sender: TObject; var Key: Char);
+    procedure FormActivate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCCe: TfrmCCe;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor; AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,  ACol, ARow)
+
+end;
+
+procedure TfrmCCe.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmCCe.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+  LimparMSG_ERRO(lblMsg);
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    dmMProvider.cdsCCe.Close;
+    dmMProvider.cdsCCe.ProviderName := 'dspCCe';
+    dmDBEXMaster.fdqCCe.SQL.Clear;
+    dmDBEXMaster.fdqCCe.SQL.Add('SELECT * FROM  CCE');
+
+    case rdgOpcaoPesquisa.ItemIndex of
+      0:dmDBEXMaster.fdqCCe.SQL.Add('where nota_fiscal = ' + Trim(edtConteudoPesquisa.Text));
+      1:begin
+
+          if ValidarData(Trim(edtConteudoPesquisa.Text)) then
+            dmDBEXMaster.fdqCCe.SQL.Add('where emissao_nota = ' + QuotedStr(Trim(edtConteudoPesquisa.Text)))
+          else
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_DATA_INVALIDA + edtConteudoPesquisa.Text;
+
+        end;
+      2:begin
+
+          if ValidarData(Trim(edtConteudoPesquisa.Text)) then
+            dmDBEXMaster.fdqCCe.SQL.Add('where data_cce = ' + QuotedStr(Trim(edtConteudoPesquisa.Text)))
+          else
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_DATA_INVALIDA + edtConteudoPesquisa.Text;
+
+        end;
+    end;
+
+    dmDBEXMaster.fdqCCe.SQL.Add('order by data_cce');
+
+    dmMProvider.cdsCCe.Open;
+    dmMProvider.cdsCCe.ProviderName := '';
+
+  end;
+
+end;
+
+procedure TfrmCCe.edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmCCe.FormActivate(Sender: TObject);
+begin
+
+  memTextoCorrecao.SetFocus;
+
+end;
+
+procedure TfrmCCe.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  for i := 0 to grdTabela.Columns.Count - 1 do
+    grdTabela.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  pgcCCe.ActivePageIndex := 1;
+
+end;
+
+procedure TfrmCCe.imgOkClick(Sender: TObject);
+begin
+
+  if Length(Trim(memTextoCorrecao.Text)) < 15 then
+  begin
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_TAMANHO_MINIMO;
+    Application.ProcessMessages;
+
+    memTextoCorrecao.SetFocus;
+
+    ModalResult := mrNone;
+
+  end
+  else
+  begin
+
+    LimparMSG_ERRO(lblMsg);
+    ModalResult := mrOk;
+
+  end;
+
+end;
+
+procedure TfrmCCe.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+procedure TfrmCCe.memTextoCorrecaoEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmCCe.memTextoCorrecaoKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  Key := UpCase(Key);
+
+end;
+
+procedure TfrmCCe.rdgOpcaoPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.SetFocus;
+
+  if rdgOpcaoPesquisa.ItemIndex = 3 then
+    edtConteudoPesquisaExit(self);
+
+end;
+
+end.

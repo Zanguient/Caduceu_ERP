@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/05/12 14:10:12.000.500,=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/05/12 14:11:43.000.269,C:\Projetos\Delphi_XE6\GenesisAC\Modulo Danfe\modImprimirEventos.pas=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/05/12 14:11:43.000.269,C:\Projetos\Delphi_XE6\GenesisAC\Modulo Danfe\modImprimirEventos.dfm=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.dfm</Transaction>
+    <Transaction>2017/12/07 09:38:42.000.537,=D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas</Transaction>
+    <Transaction>2017/12/07 09:39:20.000.293,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2017/12/07 09:40:17.000.827,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMDJPdv.pas</Transaction>
+    <Transaction>2017/12/08 05:20:55.000.189,=D:\Projetos\Delphi_XE6\GenesisAC\Unit4.pas</Transaction>
+  </Transactions>
+</BorlandProject>

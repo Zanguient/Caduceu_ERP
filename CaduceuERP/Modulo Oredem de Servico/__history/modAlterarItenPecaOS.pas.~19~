@@ -1,0 +1,131 @@
+unit modAlterarItenPecaOS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, db;
+
+type
+  TfrmAlterarItemPeca = class(TForm)
+    imgIncluir: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    grpDescricaoPeca: TGroupBox;
+    edtDescricao: TDBEdit;
+    grpInformaacoesItem: TGroupBox;
+    grpQuantidade: TGroupBox;
+    grpValorUnitario: TGroupBox;
+    grpTecnicoResponsavel: TGroupBox;
+    edtQuantidade: TDBEdit;
+    edtValorUnitario: TDBEdit;
+    cboTecnicoResponsavel: TDBLookupComboBox;
+    procedure imgSairClick(Sender: TObject);
+    procedure imgIncluirClick(Sender: TObject);
+    procedure edtQuantidadeEnter(Sender: TObject);
+    procedure edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
+    procedure edtDescricaoKeyPress(Sender: TObject; var Key: Char);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmAlterarItemPeca: TfrmAlterarItemPeca;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmAlterarItemPeca.edtDescricaoKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmAlterarItemPeca.edtDescricaoKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmAlterarItemPeca.edtQuantidadeEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmAlterarItemPeca.edtQuantidadeKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = FormatSettings.DecimalSeparator then
+    Key := ',';
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmAlterarItemPeca.imgIncluirClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsItens_OS_Pecas.State in [dsEdit] then
+    ModalResult := mrOk
+  else
+    ModalResult := mrClose;
+
+end;
+
+procedure TfrmAlterarItemPeca.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

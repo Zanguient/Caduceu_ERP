@@ -1,0 +1,59 @@
+unit modCLD_PV;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls, Vcl.Mask, Vcl.DBCtrls;
+
+type
+  TfrmCLD_PV = class(TForm)
+    imgCancelar: TImage;
+    grpCLD_PV: TGroupBox;
+    grpProduto: TGroupBox;
+    edtProduto: TDBEdit;
+    edtDescricao: TDBEdit;
+    edtUnidade: TDBEdit;
+    grpFormacaoPreco: TGroupBox;
+    lblCustoBruto: TLabel;
+    lblDescontonaCompra: TLabel;
+    lblCreditodeICMS: TLabel;
+    Label4: TLabel;
+    lblOutrosCustos: TLabel;
+    lblFrete: TLabel;
+    lblValorICMSR: TLabel;
+    lblCustoLiquido: TLabel;
+    lblICMS_Pagar: TLabel;
+    lblPIS_Cofins: TLabel;
+    lblCustoOperacional: TLabel;
+    lblComissao: TLabel;
+    lblLucroLiquido: TLabel;
+    lblDescontonaVenda: TLabel;
+    lblMenorPreco: TLabel;
+    lblPrecoCalculado: TLabel;
+    lblPrecodeVenda: TLabel;
+    procedure imgCancelarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCLD_PV: TfrmCLD_PV;
+
+implementation
+
+{$R *.dfm}
+
+uses dataMSource;
+
+procedure TfrmCLD_PV.imgCancelarClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

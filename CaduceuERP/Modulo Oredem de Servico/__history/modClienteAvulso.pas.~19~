@@ -1,0 +1,62 @@
+unit modClienteAvulso;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls;
+
+type
+  TfrmModClienteAvulso = class(TForm)
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpInfoCliente: TGroupBox;
+    lblCNPJ_CPF: TLabel;
+    lblNome: TLabel;
+    Label3: TLabel;
+    lblEndereco: TLabel;
+    lblNumero: TLabel;
+    lblCEP: TLabel;
+    lblBairro: TLabel;
+    lblCidade: TLabel;
+    lblUF: TLabel;
+    lblContato: TLabel;
+    lblDDD: TLabel;
+    lblTelefone: TLabel;
+    lblEmail: TLabel;
+    edtCNPJ_CPF: TEdit;
+    edtIE_RG: TEdit;
+    edtNome: TEdit;
+    edtEndereco: TEdit;
+    edtNumero: TEdit;
+    edtCEP: TEdit;
+    edtUF: TEdit;
+    edtBairro: TEdit;
+    edtCidade: TEdit;
+    edtContato: TEdit;
+    edtDDD: TEdit;
+    edtTelefone: TEdit;
+    edtEmail: TEdit;
+    procedure imgSairClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmModClienteAvulso: TfrmModClienteAvulso;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmModClienteAvulso.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

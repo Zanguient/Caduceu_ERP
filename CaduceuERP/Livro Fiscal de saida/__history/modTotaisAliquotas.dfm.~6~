@@ -1,0 +1,60 @@
+object frmTotaisAliquotas: TfrmTotaisAliquotas
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Totais por Al'#237'quota'
+  ClientHeight = 300
+  ClientWidth = 259
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object stgTotaisAliquotas: TStringGrid
+    Left = 8
+    Top = 8
+    Width = 241
+    Height = 257
+    ColCount = 2
+    DrawingStyle = gdsGradient
+    FixedCols = 0
+    RowCount = 2
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    ColWidths = (
+      80
+      127)
+    RowHeights = (
+      24
+      24)
+  end
+  object btnSair: TButton
+    Left = 175
+    Top = 271
+    Width = 75
+    Height = 25
+    Cursor = crHandPoint
+    Caption = 'Sair'
+    TabOrder = 1
+    OnClick = btnSairClick
+  end
+  object sqqTotalizaAliquotas: TSQLQuery
+    MaxBlobSize = -1
+    Params = <>
+    Left = 136
+    Top = 104
+  end
+end

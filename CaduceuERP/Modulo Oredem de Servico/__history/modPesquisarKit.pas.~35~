@@ -1,0 +1,209 @@
+unit modPesquisarKit;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls, Vcl.Grids, Vcl.DBGrids;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmPesquisaKit = class(TForm)
+    grpPesquisa: TGroupBox;
+    edtConteudoPesquisa: TEdit;
+    grpKit: TGroupBox;
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    grdProducao: TDBGrid;
+    procedure imgSairClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure grdProducaoDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure LimparMSG_ERRO;
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPesquisaKit: TfrmPesquisaKit;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes;
+
+procedure TfrmPesquisaKit.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmPesquisaKit.edtConteudoPesquisaExit(Sender: TObject);
+var
+  sProduto, sWhere:string;
+begin
+
+  MudarCorEdit(sender);
+  LimparMSG_ERRO;
+
+  if Length(Trim(edtConteudoPesquisa.Text))  > 0 then
+  begin
+
+    dmDBEXMaster.fdqMasterPesquisa.Close;
+    dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+    dmDBEXMaster.fdqMasterPesquisa.SQL.Add('SELECT PRODUTO FROM PRODUCAO WHERE PRODUTO IN (SELECT PRODUTO FROM PRODUTO WHERE DESCRICAO LIKE ' + QuotedStr('%' + Trim(edtConteudoPesquisa.Text) + '%') + ')' );
+    dmDBEXMaster.fdqMasterPesquisa.SQL.Add('ORDER BY PRODUTO');
+    dmDBEXMaster.fdqMasterPesquisa.Open;
+
+    dmDBEXMaster.fdqMasterPesquisa.First;
+
+    sProduto  := IntToStr(dmDBEXMaster.fdqMasterPesquisa.FieldByName('PRODUTO').AsInteger);
+
+    sWhere    := 'WHERE PRODUTO >=  ' + sProduto;
+
+    dmDBEXMaster.fdqMasterPesquisa.Last;
+
+    sProduto  := IntToStr(dmDBEXMaster.fdqMasterPesquisa.FieldByName('PRODUTO').AsInteger);
+
+    sWhere    := sWhere + ' AND PRODUTO <= ' + sProduto;
+
+    dmMProvider.cdsProducao.Close;
+    dmMProvider.cdsProducao.ProviderName := 'dspProducao';
+
+    dmDBEXMaster.fdqProducao.Close;
+    dmDBEXMaster.fdqProducao.SQL.Clear;
+    dmDBEXMaster.fdqProducao.SQL.Add('SELECT * FROM PRODUCAO');
+    dmDBEXMaster.fdqProducao.SQL.Add(sWhere);
+    dmDBEXMaster.fdqProducao.SQL.Add('ORDER BY PRODUTO');
+
+    dmMProvider.cdsProducao.Open;
+    dmMProvider.cdsProducao.ProviderName := '';
+
+    if dmMProvider.cdsProducao.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+      edtConteudoPesquisa.SetFocus;
+
+    end
+    else
+      grdProducao.SetFocus;
+
+  end;
+
+end;
+
+procedure TfrmPesquisaKit.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmPesquisaKit.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                           := COR_PADRAO_DIALOGOS;
+
+  for i := 0 to grdProducao.Columns.Count - 1 do
+    grdProducao.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+
+  dmMProvider.cdsProducao.Close;
+  dmMProvider.cdsProducao.ProviderName := 'dspProducao';
+
+  dmDBEXMaster.fdqProducao.SQL.Clear;
+  dmDBEXMaster.fdqProducao.SQL.Add('select * from producao');
+  dmDBEXMaster.fdqProducao.SQL.Add('order by producao');
+
+  dmMProvider.cdsProducao.Open;
+  dmMProvider.cdsProducao.ProviderName := '';
+
+end;
+
+procedure TfrmPesquisaKit.grdProducaoDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsProducao.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsProducao.RecNo) then
+    begin
+
+      grdProducao.Canvas.Font.Color   := clBlack;
+      grdProducao.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdProducao.Canvas.Font.Color   := clBlack;
+      grdProducao.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdProducao.Canvas.FillRect(Rect);
+    grdProducao.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmPesquisaKit.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+procedure TfrmPesquisaKit.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+end.

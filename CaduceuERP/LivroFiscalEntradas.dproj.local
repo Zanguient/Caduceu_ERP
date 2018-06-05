@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/08/10 16:44:34.000.743,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+    <Transaction>2016/08/10 16:44:44.000.174,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2016/08/10 16:46:05.000.914,=D:\Projetos\Componentes\Delphi Seatle\Acbr\Fontes\PCNComum\pcnAuxiliar.pas</Transaction>
+    <Transaction>2016/08/10 16:46:44.000.191,D:\Projetos\Componentes\Delphi Seatle\Acbr\Fontes\PCNComum\pcnAuxiliar.pas=</Transaction>
+    <Transaction>2016/08/10 16:47:40.000.507,=D:\Projetos\Componentes\Delphi Seatle\Acbr\Fontes\PCNComum\pcnAuxiliar.pas</Transaction>
+    <Transaction>2016/08/10 16:51:39.000.466,D:\Projetos\Componentes\Delphi Seatle\Acbr\Fontes\PCNComum\pcnAuxiliar.pas=</Transaction>
+    <Transaction>2016/08/10 16:52:12.000.001,D:\Projetos\Funcoes Genericas\uFuncoes.pas=</Transaction>
+    <Transaction>2016/08/10 16:52:45.000.129,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+    <Transaction>2016/08/10 18:31:12.000.214,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2016/08/10 18:31:47.000.215,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2016/08/10 18:32:30.000.787,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2016/08/11 09:24:29.000.791,D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas=</Transaction>
+    <Transaction>2016/08/11 09:24:47.000.790,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2017/06/20 07:27:36.000.656,=D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas</Transaction>
+    <Transaction>2017/06/20 07:28:59.000.700,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2017/11/30 07:59:25.000.652,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMDJPdv.pas</Transaction>
+  </Transactions>
+</BorlandProject>

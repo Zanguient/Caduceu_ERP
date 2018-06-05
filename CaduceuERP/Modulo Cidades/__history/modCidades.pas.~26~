@@ -1,0 +1,786 @@
+unit modCidades;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage, Vcl.StdActns, System.Actions, Vcl.ActnList, Vcl.ComCtrls,
+  Vcl.Grids, Vcl.DBGrids, Vcl.Mask, Vcl.DBCtrls, Data.DB;
+
+type
+  TfrmCidades = class(TForm)
+    imgNovo: TImage;
+    lblF2: TLabel;
+    imgDesfazer: TImage;
+    lblF3: TLabel;
+    imgSalvar: TImage;
+    lblF4: TLabel;
+    imgExcluir: TImage;
+    lblF5: TLabel;
+    imgEditar: TImage;
+    lblF6: TLabel;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    ActionList1: TActionList;
+    WindowClose1: TWindowClose;
+    actIncluir: TAction;
+    actDesfazer: TAction;
+    actSalvar: TAction;
+    actEditar: TAction;
+    actExcluir: TAction;
+    pgcCidades: TPageControl;
+    tbsTabela: TTabSheet;
+    tbsCadastro: TTabSheet;
+    grdTabela: TDBGrid;
+    grpCadastro: TGroupBox;
+    lblCodigo: TLabel;
+    lblNomeCidade: TLabel;
+    lblEstado: TLabel;
+    lblCodigoIBGE: TLabel;
+    edtCodigo: TDBEdit;
+    edtNome: TDBEdit;
+    edtCodigoIBGE: TDBEdit;
+    cboEstados: TDBLookupComboBox;
+    procedure FormCreate(Sender: TObject);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;  Shift: TShiftState);
+    function AbrirTabelaCidades(pOpcao:smallint; pConteudo:string):boolean;
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    procedure edtNomeEnter(Sender: TObject);
+    procedure edtCodigoIBGEEnter(Sender: TObject);
+    procedure edtNomeExit(Sender: TObject);
+    procedure edtCodigoIBGEExit(Sender: TObject);
+    procedure actEditarExecute(Sender: TObject);
+    procedure actDesfazerExecute(Sender: TObject);
+    function AbrirTabelaEstados(pOpcao:smallint; pConteudo:string):boolean;
+    procedure actIncluirExecute(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure lblF5Click(Sender: TObject);
+    procedure tbsCadastroShow(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+    function Consistir_Codigo_IBGE_UF:boolean;
+    function ValidarCampos:boolean;
+    function Man_Tab_Cidades(pOpcao:Integer):boolean;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCidades: TfrmCidades;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSProcedure, uConstantes_Padrao,
+  uFuncoes, dataMSource;
+
+procedure TfrmCidades.grdTabelaDblClick(Sender: TObject);
+begin
+
+  AbrirTabelaEstados(2,dmMProvider.cdsCidadesESTADO.Value);
+  pgcCidades.Pages[1].TabVisible  := true;
+  pgcCidades.ActivePageIndex      := 1;
+
+end;
+
+procedure TfrmCidades.grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsCidades.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsCidades.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+
+end;
+
+procedure TfrmCidades.grdTabelaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(Self);
+
+end;
+
+procedure TfrmCidades.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+function TfrmCidades.AbrirTabelaCidades(pOpcao:smallint; pConteudo:string):boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsCidades.Close;
+  dmMProvider.cdsCidades.ProviderName := 'dspCidades';;
+  dmDBEXMaster.fdqCidades.SQL.Clear;
+  dmDBEXMaster.fdqCidades.SQL.Add('select cidade, nome, estado, codigo_municipio');
+  dmDBEXMaster.fdqCidades.SQL.Add('from cidades');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Cidades(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqCidades.SQL.Add(sWhere);
+  dmDBEXMaster.fdqCidades.SQL.Add('ORDER BY ESTADO, NOME');
+
+  try
+
+    dmMProvider.cdsCidades.Open;
+    dmMProvider.cdsCidades.ProviderName := '';
+
+    if (dmMProvider.cdsCidades.IsEmpty) and (pConteudo <> '-1') then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsCidades.IsEmpty;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+function TfrmCidades.AbrirTabelaEstados(pOpcao: smallint; pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsEstados.Close;
+  dmMProvider.cdsEstados.ProviderName := 'dspEstados';;
+  dmDBEXMaster.fdqEstados.SQL.Clear;
+  dmDBEXMaster.fdqEstados.SQL.Add('SELECT * FROM ESTADOS');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Estados(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqEstados.SQL.Add(sWhere);
+  dmDBEXMaster.fdqEstados.SQL.Add('ORDER BY NOME');
+
+  try
+
+    dmMProvider.cdsEstados.Open;
+    dmMProvider.cdsEstados.ProviderName := '';
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+procedure TfrmCidades.actDesfazerExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsCidades.Active then
+    if InserindoEditando(dmMProvider.cdsCidades) then
+    begin
+      dmMProvider.cdsCidades.Cancel;
+
+      HabilitaDesabilitaControles(False);
+
+      pgcCidades.Pages[1].TabVisible  := false;
+
+      pgcCidades.ActivePageIndex      := 0;
+
+      edtConteudoPesquisa.Clear;
+      edtConteudoPesquisa.SetFocus;
+
+    end;
+
+end;
+
+procedure TfrmCidades.actEditarExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsCidades.Active then
+  begin
+
+    if not InserindoEditando(dmMProvider.cdsCidades) then
+    begin
+
+      HabilitaDesabilitaControles(True);
+      edtNome.SetFocus;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmCidades.actExcluirExecute(Sender: TObject);
+begin
+
+  if Man_Tab_Cidades(1) then
+  begin
+
+    dmMProvider.cdsCidades.Delete;
+
+    HabilitaDesabilitaControles(false);
+    edtConteudoPesquisa.Clear;
+    edtConteudoPesquisa.SetFocus;
+
+  end;
+
+end;
+
+procedure TfrmCidades.actIncluirExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    edtConteudoPesquisa.Clear;
+
+    AbrirTabelaCidades(2,'-1');
+
+    AbrirTabelaEstados(2,'');
+
+    pgcCidades.Pages[1].TabVisible  := True;
+
+    HabilitaDesabilitaControles(True);
+
+    pgcCidades.ActivePageIndex      := 1;
+
+    dmMProvider.cdsCidades.Append;
+
+    edtNome.SetFocus;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmCidades.actSalvarExecute(Sender: TObject);
+var
+  sCodigo_IBGE:string;
+begin
+
+  ActiveControl := nil;
+
+  if dmMProvider.cdsCidades.Active then
+  begin
+
+    if InserindoEditando(dmMProvider.cdsCidades) then
+    begin
+
+      if ValidarCampos then
+      begin
+
+        if not Consistir_Codigo_IBGE_UF then
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CIDADE_UF_INCONSISTENTE;
+          TocarSomAlerta(ord(SystemHand));
+          edtCodigoIBGE.SetFocus;
+
+        end
+        else
+        begin
+
+          sCodigo_IBGE := Validar_DigitoCidade(FormatFloat('0000000',dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value));
+
+          if not StrToInt(sCodigo_IBGE) = dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value then
+          begin
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CODIGO_IBGE_ERRADO + ' - correto: ' + sCodigo_IBGE;
+            TocarSomAlerta(ord(SystemHand));
+            edtCodigoIBGE.SetFocus;
+
+          end
+          else
+          begin
+
+            LimparMSG_ERRO;
+
+            if Man_Tab_Cidades(0) then
+            begin
+
+              dmMProvider.cdsCidades.Post;
+
+              HabilitaDesabilitaControles(false);
+              edtConteudoPesquisa.Clear;
+              edtConteudoPesquisa.SetFocus;
+
+            end;
+
+          end;
+
+        end;
+
+      end
+      else
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PREENCHIMENTO_OBRIGATORIO;
+        TocarSomAlerta(ord(SystemHand));
+
+      end;
+
+    end;
+
+  end;
+
+end;
+
+function TfrmCidades.Consistir_Codigo_IBGE_UF: boolean;
+var
+  sCodigoIBGE_UF:string;
+begin
+
+  try
+
+    dmDBEXMaster.fdqEstados.Close;
+    dmDBEXMaster.fdqEstados.SQL.Clear;;
+    dmDBEXMaster.fdqEstados.SQL.Add('SELECT CODIGO_ESTADO_IBGE');
+    dmDBEXMaster.fdqEstados.SQL.Add('FROM ESTADOS');
+    dmDBEXMaster.fdqEstados.SQL.Add('WHERE SIGLA = '+ QuotedStr(dmMProvider.cdsCidadesESTADO.Value));
+    dmDBEXMaster.fdqEstados.Open;
+
+    sCodigoIBGE_UF := dmDBEXMaster.fdqEstados.Fields[0].Value;
+
+    Result := (Copy(FormatFloat('0000000',dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value),1,2) = sCodigoIBGE_UF);
+
+    dmDBEXMaster.fdcMaster.Close;
+
+  except
+
+  end;
+
+end;
+
+procedure TfrmCidades.edtCodigoIBGEEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmCidades.edtCodigoIBGEExit(Sender: TObject);
+var
+  sCodigo_IBGE:string;
+begin
+
+  sCodigo_IBGE := '';
+  LimparMSG_ERRO;
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsCidades.Active then
+  begin
+
+    if InserindoEditando(dmMProvider.cdsCidades) then
+    begin
+
+      if Length(Trim(dmMProvider.cdsCidadesESTADO.Value)) > 0 then
+      begin
+
+        if not Consistir_Codigo_IBGE_UF then
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CIDADE_UF_INCONSISTENTE;
+          TocarSomAlerta(ord(SystemHand));
+          edtCodigoIBGE.SetFocus;
+
+        end
+        else
+        begin
+
+          sCodigo_IBGE := Validar_DigitoCidade(FormatFloat('0000000',dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value));
+
+          if not (StrToInt(sCodigo_IBGE) = dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value) then
+          begin
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CODIGO_IBGE_ERRADO + ' - correto: ' + sCodigo_IBGE;
+            TocarSomAlerta(ord(SystemHand));
+            edtCodigoIBGE.SetFocus;
+
+          end;
+
+        end;
+
+      end
+      else
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PREENCHIMENTO_OBRIGATORIO;
+        TocarSomAlerta(ord(SystemHand));
+        cboEstados.SetFocus;
+
+     end;
+
+    end;
+
+   end;
+
+end;
+
+procedure TfrmCidades.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmCidades.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+
+  LimparMSG_ERRO;
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    if AbrirTabelaCidades(rdpOpcoesPesquisa.ItemIndex, edtConteudoPesquisa.Text) then
+    begin
+
+      pgcCidades.ActivePageIndex := 0;
+      grdTabela.SetFocus;
+
+    end;
+
+    edtConteudoPesquisa.Clear;
+    MudarCorEdit(Sender);
+
+  end;
+
+
+end;
+
+procedure TfrmCidades.edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmCidades.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmCidades.edtNomeEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmCidades.edtNomeExit(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmCidades.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                           := COR_PADRAO_TELAS;
+  Caption                         := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario       := ParamStr(1);
+  dmDBEXMaster.sSenha             := paramstr(2);
+  dmDBEXMaster.iIdUsuario         := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial          := StrToInt(ParamStr(4));
+
+  if (Length(Trim(ParamStr(5))) > 0)  and (Length(Trim(ParamStr(6))) > 0) then
+  begin
+
+    if AbrirTabelaCidades(0, Trim(ParamStr(5))) then
+    begin
+
+      AbrirTabelaEstados(2,dmMProvider.cdsCidadesESTADO.Value);
+      dmMProvider.cdsCidades.Edit;
+      dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value := StrToInt(Trim(ParamStr(6)));
+      HabilitaDesabilitaControles(True);
+      pgcCidades.Pages[1].TabVisible  := True;
+      pgcCidades.ActivePageIndex      := 1;
+
+    end;
+
+  end
+  else
+    pgcCidades.Pages[1].TabVisible  := false;
+
+
+end;
+
+procedure TfrmCidades.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmCidades.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+  begin
+
+    LimparMSG_ERRO;
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    actExcluirExecute(self);
+
+  end
+  else   if (UpperCase(key) = 'N') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    LimparMSG_ERRO;
+
+  end;
+
+
+end;
+
+procedure TfrmCidades.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsCidades.Active then
+  begin
+
+    if not InserindoEditando(dmMProvider.cdsCidades) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmCidades.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+function TfrmCidades.Man_Tab_Cidades(pOpcao: Integer): boolean;
+begin
+
+  try
+
+    if not dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.StartTransaction;
+
+    dmMSProcedure.fdspCidades.Params[0].Value := pOpcao;
+    dmMSProcedure.fdspCidades.Params[1].Value := dmMProvider.cdsCidadesCIDADE.Value;
+    dmMSProcedure.fdspCidades.Params[2].Value := dmMProvider.cdsCidadesNOME.Value;
+    dmMSProcedure.fdspCidades.Params[3].Value := dmMProvider.cdsCidadesESTADO.Value;
+    dmMSProcedure.fdspCidades.Params[4].Value := dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value;
+    dmMSProcedure.fdspCidades.Params[5].Value := dmDBEXMaster.iIdUsuario;
+    dmMSProcedure.fdspCidades.Params[6].Value := pubNomeComputador;
+    dmMSProcedure.fdspCidades.Params[7].Value := RetornarIP;
+    dmMSProcedure.fdspCidades.ExecProc;
+
+    if not InserindoEditando(dmMProvider.cdsCidades) then
+      dmMProvider.cdsCidades.Edit;
+
+    if dmMSProcedure.fdspCidades.Params[8].Value > 0 then
+      dmMProvider.cdsCidadesCIDADE.Value := dmMSProcedure.fdspCidades.Params[8].Value;
+
+
+    if dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.Commit;
+
+    LimparMSG_ERRO;
+
+    Result := true;
+
+  except
+    on E: exception do
+    begin
+
+      if dmDBEXMaster.fdtMaster.Active then
+        dmDBEXMaster.fdtMaster.Rollback;
+
+      Tratar_Erro_Conexao(E);
+
+      Result := False;
+
+    end;
+  end;
+
+end;
+
+procedure TfrmCidades.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+procedure TfrmCidades.tbsCadastroShow(Sender: TObject);
+begin
+
+  if (Length(Trim(ParamStr(5))) > 0)  and (Length(Trim(ParamStr(6))) > 0) then
+  begin
+
+    edtCodigoIBGE.SetFocus;
+    actSalvarExecute(self);
+
+  end;
+
+end;
+
+procedure TfrmCidades.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang:string;
+begin
+
+  if Pos('Unable',pE.Message) > 0then
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO
+  else if Pos('FOREIGN',pE.Message) > 0then
+  begin
+
+    sChave_Extrang := Trim(Copy(pE.Message,pos('ON TABLE',Uppercase(pE.Message))+ 10,Length(pE.Message)));
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_ERRO_CHAVE_ESTRANGEIRA
+                      + Copy(sChave_Extrang,1,pos('"',sChave_Extrang)-1);
+
+  end
+  else
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + pE.Message;
+
+  TocarSomAlerta(ord(SystemHand));
+
+end;
+
+function TfrmCidades.ValidarCampos: boolean;
+begin
+
+  Result := true;
+
+  if Length(Trim(dmMProvider.cdsCidadesNOME.Value)) <= 0 then
+  begin
+
+    edtNome.SetFocus;
+    Result := false;
+
+  end
+  else if Length(Trim(dmMProvider.cdsCidadesESTADO.Value)) <= 0 then
+  begin
+
+    cboEstados.SetFocus;
+    Result := false;
+
+  end
+  else if dmMProvider.cdsCidadesCODIGO_MUNICIPIO.Value <= 0 then
+  begin
+
+    edtCodigoIBGE.SetFocus;
+    Result := false;
+
+  end;
+
+end;
+
+procedure TfrmCidades.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

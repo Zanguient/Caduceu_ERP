@@ -1,0 +1,1317 @@
+unit modPerdas;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.Mask, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls,
+  Vcl.StdActns, System.Actions, Vcl.ActnList, JvExStdCtrls, JvEdit,
+  JvValidateEdit, db;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+
+  TfrmPerdas = class(TForm)
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    imgSair: TImage;
+    imgEditar: TImage;
+    imgExcluir: TImage;
+    imgSalvar: TImage;
+    imgDesfazer: TImage;
+    imgNovo: TImage;
+    lblF6: TLabel;
+    lblF5: TLabel;
+    lblF4: TLabel;
+    lblF3: TLabel;
+    lblF2: TLabel;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    pgcPerdas: TPageControl;
+    tbsTabela: TTabSheet;
+    grdTabela: TDBGrid;
+    tbsCadastro: TTabSheet;
+    grpCadastro: TGroupBox;
+    ActionList1: TActionList;
+    actEditar: TAction;
+    actDesfazer: TAction;
+    WindowClose1: TWindowClose;
+    actMinimizar: TAction;
+    actIncluir: TAction;
+    actSalvar: TAction;
+    actExcluir: TAction;
+    actPesquisa: TAction;
+    grpGradeItens: TGroupBox;
+    grdItensPerdas: TDBGrid;
+    lblControle: TLabel;
+    lblDataLancamento: TLabel;
+    lblFornecedor: TLabel;
+    lblQuantidades: TLabel;
+    lblValorTotal: TLabel;
+    edtControle: TDBEdit;
+    edtDataLancamento: TDBEdit;
+    edtQuantidadesTotais: TDBEdit;
+    edtValorTotal: TDBEdit;
+    edtFornecedor: TDBEdit;
+    edtRazaoSocial: TDBEdit;
+    grpItensPerdas: TGroupBox;
+    grpProduto: TGroupBox;
+    rgpQuantidade: TGroupBox;
+    grpCustoUnitario: TGroupBox;
+    grpDescricao: TGroupBox;
+    edtQuantidade: TJvValidateEdit;
+    edtCustoUnitario: TJvValidateEdit;
+    lblFuncionario: TLabel;
+    edtFuncionario: TDBEdit;
+    edtNomeFuncionario: TDBEdit;
+    edtDescricaoProduto: TEdit;
+    actExcluirItensPerdas: TAction;
+    edtProduto: TEdit;
+    imgGreraRelatorioConsulta: TImage;
+    actImprimir: TAction;
+    imgPesqFornecedor: TImage;
+    imgPesqproduto: TImage;
+    procedure FormCreate(Sender: TObject);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtFornecedorExit(Sender: TObject);
+    procedure edtQuantidadeExit(Sender: TObject);
+    procedure edtCustoUnitarioExit(Sender: TObject);
+    procedure edtFuncionarioExit(Sender: TObject);
+    procedure actIncluirExecute(Sender: TObject);
+    procedure grdItensPerdasDblClick(Sender: TObject);
+    procedure grdItensPerdasKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure actExcluirItensPerdasExecute(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdItensPerdasKeyPress(Sender: TObject; var Key: Char);
+    procedure actSalvarExecute(Sender: TObject);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure actEditarExecute(Sender: TObject);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure lblF5Click(Sender: TObject);
+    procedure edtProdutoExit(Sender: TObject);
+    procedure edtProdutoKeyPress(Sender: TObject; var Key: Char);
+    procedure actImprimirExecute(Sender: TObject);
+    procedure imgPesqFornecedorClick(Sender: TObject);
+    procedure imgPesqprodutoClick(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+    function AbrirTabelaPerdas(pOpcao: smallint; pConteudo: string): boolean;
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    function Man_Tab_Perdas(pOpcao:smallint):boolean;
+    function Man_Tab_Itens_Perdas(pOpcao:smallint):boolean;
+    procedure Resetcampos;
+    procedure PreencherCampos;
+    procedure CalcularTotaisPerdas;
+    function PesquisarItensPerdas(pProduto:integer):boolean;
+  public
+    { Public declarations }
+    iProxItensPerdas:integer;
+  end;
+
+var
+  frmPerdas: TfrmPerdas;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMRelatorios, dataMSource,
+  dataMSProcedure, modPesquisaProduto, uConstantes_Padrao, uFuncoes,
+  modPesquisaFornecedorCNPJRSocial;
+
+function TfrmPerdas.AbrirTabelaPerdas(pOpcao: smallint; pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsPerdas.Close;
+  dmMProvider.cdsPerdas.ProviderName := 'dspPerdas';
+
+  dmDBEXMaster.fdqPerdas.SQL.Clear;
+  dmDBEXMaster.fdqPerdas.SQL.Add('select * from perdas');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Perdas(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqPerdas.SQL.Add(sWhere);
+  dmDBEXMaster.fdqPerdas.SQL.Add('ORDER BY perdas');
+
+  try
+
+    dmMProvider.cdsPerdas.Open;
+    dmMProvider.cdsPerdas.ProviderName := '';
+
+    if (dmMProvider.cdsPerdas.IsEmpty) and (pConteudo <> '-1') then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    dmMProvider.RelacionarItens_Perdas(dmMProvider.cdsPerdasPERDAS.Value);
+    Result := not dmMProvider.cdsPerdas.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmPerdas.actDesfazerExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsPerdas.Cancel;
+
+  if dmMProvider.cdsItensPerdas.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsItensPerdas.Cancel;
+
+  pgcPerdas.Pages[1].TabVisible  := false;
+  pgcPerdas.ActivePageIndex      := 0;
+
+  HabilitaDesabilitaControles(false);
+
+end;
+
+procedure TfrmPerdas.actEditarExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsPerdas.Active then
+  begin
+
+    if not (dmMProvider.cdsPerdas.State in [dsEdit, dsInsert])  then
+    begin
+
+      pgcPerdas.Pages[1].TabVisible  := true;
+      pgcPerdas.ActivePageIndex      := 1;
+
+      HabilitaDesabilitaControles(True);
+      dmMProvider.cdsPerdas.Edit;
+      edtFornecedor.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.actExcluirExecute(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsItensPerdas.IsEmpty then
+  begin
+
+    while not dmMProvider.cdsItensPerdas.Eof do
+    begin
+
+      if Man_Tab_Itens_Perdas(1) then
+        dmMProvider.cdsItensPerdas.Delete;
+
+    end;
+
+  end;
+
+  if Man_Tab_Perdas(1) then
+    dmMProvider.cdsPerdas.delete;
+
+
+  HabilitaDesabilitaControles(false);
+
+  pgcPerdas.Pages[1].TabVisible  := false;
+  pgcPerdas.ActivePageIndex      := 0;
+
+  LimparMSG_ERRO;
+  edtConteudoPesquisa.Text;
+
+end;
+
+procedure TfrmPerdas.actExcluirItensPerdasExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  Man_Tab_Itens_Perdas(1);
+  if not dmMProvider.cdsItensPerdas.IsEmpty then
+    dmMProvider.RelacionarItens_Perdas(dmMProvider.cdsItensPerdasPERDA.Value);
+
+end;
+
+procedure TfrmPerdas.actImprimirExecute(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsPerdas.IsEmpty then
+  begin
+
+    if FileExists(ExtractFilePath(Application.ExeName)+'Rav\Relatorios_Perdas.rav') then
+    begin
+
+      dmRelatorios.rvsGenesisAC.SystemPreview.ZoomFactor  := 126.4;
+      dmRelatorios.rvdGenesis.DataSet                     := dmMProvider.cdsPerdas;
+
+      dmRelatorios.rvpGenesisAC.ProjectFile := ExtractFilePath(Application.ExeName)+'Rav\Relatorios_Perdas.rav';
+      dmRelatorios.rvpGenesisAC.SelectReport('rptPerda',true);
+      dmRelatorios.rvpGenesisAC.SetParam('pNOME_LOJA',dmMProvider.cdsFilialRAZAOSOCIAL.Value);
+      dmRelatorios.rvpGenesisAC.SetParam('pLOGO_MARCA',ExtractFilePath(Application.ExeName) + 'Logomarca\LogoMarca.bmp');
+      dmRelatorios.rvpGenesisAC.Execute;
+      dmRelatorios.rvpGenesisAC.Close;
+
+  end
+  else
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario + ', ' + MSG_ARQ_NEXISTE + #13
+                + ExtractFilePath(Application.ExeName)+'Rav\Relatorios_Perdas.rav'), 'Atenção!',mb_IconWarning + mb_Ok);
+
+  end;
+
+
+end;
+
+procedure TfrmPerdas.actIncluirExecute(Sender: TObject);
+begin
+
+  if not (dmMProvider.cdsPerdas.State in [dsEdit, dsInsert]) then
+  begin
+
+    LimparMSG_ERRO;
+
+    try
+
+      edtConteudoPesquisa.Clear;
+
+      AbrirTabelaPerdas(0,'-1');
+
+      pgcPerdas.Pages[1].TabVisible  := True;
+
+      HabilitaDesabilitaControles(True);
+
+      pgcPerdas.ActivePageIndex      := 1;
+
+      dmMProvider.cdsPerdas.Append;
+
+      edtFornecedor.SetFocus;
+
+    except
+      on E: exception do
+        Tratar_Erro_Conexao(E);
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.actSalvarExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+  begin
+
+    if Man_Tab_Perdas(0) then
+    begin
+
+      dmMProvider.cdsPerdas.Post;
+      HabilitaDesabilitaControles(false);
+
+    end;
+
+    pgcPerdas.Pages[1].TabVisible  := false;
+    pgcPerdas.ActivePageIndex      := 0;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.CalcularTotaisPerdas;
+begin
+
+  dmDBEXMaster.fdqMasterPesquisa.Close;
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('select * from RETORNAR_TOTAIS_PERDAS(:ip_perda)');
+  dmDBEXMaster.fdqMasterPesquisa.ParamByName('ip_perda').Value := dmMProvider.cdsPerdasPERDAS.Value;
+  dmDBEXMaster.fdqMasterPesquisa.Open;
+
+  if not dmDBEXMaster.fdqMasterPesquisa.IsEmpty then
+  begin
+
+    if not (dmMProvider.cdsPerdas.State in [dsEdit, dsInsert]) then
+      dmMProvider.cdsPerdas.Edit;
+
+    dmMProvider.cdsPerdasTOTAL_QUANTIDADE.Value := dmDBEXMaster.fdqMasterPesquisa.FieldByName('OP_TOT_QUANTIDADE').Value;
+    dmMProvider.cdsPerdasVALOR_TOTAL.Value      := dmDBEXMaster.fdqMasterPesquisa.FieldByName('OP_TOT_VALOR').Value;
+
+  end;
+
+  dmDBEXMaster.fdqMasterPesquisa.Close;
+
+end;
+
+procedure TfrmPerdas.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmPerdas.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+  if not (dmMProvider.cdsPerdas.State in [dsEdit, dsInsert]) then
+  begin
+
+    if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+    begin
+
+      if AbrirTabelaPerdas(rdpOpcoesPesquisa.ItemIndex,edtConteudoPesquisa.Text) then
+      begin
+
+        pgcPerdas.Pages[1].TabVisible := false;
+        pgcPerdas.ActivePageIndex     := 0;
+        edtConteudoPesquisa.Clear;
+        grdTabela.SetFocus;
+
+      end
+      else
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + edtConteudoPesquisa.Text;
+        Application.ProcessMessages;
+
+        edtConteudoPesquisa.SetFocus;
+
+      end;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmPerdas.edtCustoUnitarioExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+  begin
+
+    if length(Trim(edtProduto.Text)) > 0 then
+    begin
+
+      dmDBEXMaster.fdtMaster.StartTransaction;
+
+      if Man_Tab_Perdas(0) then
+      begin
+
+        dmMProvider.cdsPerdas.Post;
+        dmMProvider.cdsPerdas.Edit;
+
+        if not Man_Tab_Itens_Perdas(0) then
+          dmDBEXMaster.fdtMaster.Rollback
+        else
+        begin
+
+          CalcularTotaisPerdas;
+          dmMProvider.RelacionarItens_Perdas(dmMProvider.cdsPerdasPERDAS.Value);
+          frmPerdas.Tag := 0;
+
+        end;
+
+      end
+      else
+        dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+    edtProduto.SetFocus;
+    Resetcampos;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.edtFornecedorExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+  begin
+
+    if dmMProvider.cdsPerdasFORNECEDOR.Value > 0 then
+    begin
+
+      try
+
+        dmMProvider.cdsFornecedor.Close;
+        dmMProvider.cdsFornecedor.ProviderName := 'dspFornecedor';
+
+        dmDBEXMaster.fdqFornecedor.SQL.Clear;
+        dmDBEXMaster.fdqFornecedor.SQL.Add('SELECT FORNECEDOR.*, CIDADES.NOME NOMECIDADE, ESTADOS.NOME NOMEESTADO');
+        dmDBEXMaster.fdqFornecedor.SQL.Add('FROM FORNECEDOR');
+        dmDBEXMaster.fdqFornecedor.SQL.Add('JOIN CIDADES CIDADES');
+        dmDBEXMaster.fdqFornecedor.SQL.Add('ON(CIDADES.CIDADE = FORNECEDOR.CIDADE)');
+        dmDBEXMaster.fdqFornecedor.SQL.Add('JOIN ESTADOS ESTADOS');
+        dmDBEXMaster.fdqFornecedor.SQL.Add('ON(ESTADOS.SIGLA = FORNECEDOR.ESTADO)');
+        dmDBEXMaster.fdqFornecedor.SQL.Add('WHERE FORNECEDOR = ' + IntToStr(dmMProvider.cdsPerdasFORNECEDOR.Value));
+
+        dmMProvider.cdsFornecedor.Open;
+        dmMProvider.cdsFornecedor.ProviderName := '';
+
+        if dmMProvider.cdsFornecedor.IsEmpty then
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + InttoStr(dmMProvider.cdsPerdasFORNECEDOR.Value);
+          TocarSomAlerta(ord(SystemHand));
+
+          edtFornecedor.SetFocus;
+
+          dmMProvider.cdsFornecedor.Close;
+
+        end;
+
+      except
+
+        on E: exception do
+          Tratar_Erro_Conexao(E);
+
+      end;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.edtFuncionarioExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+  begin
+
+    if dmMProvider.cdsPerdasFUNCIONARIO.Value > 0 then
+    begin
+
+      try
+
+        dmMProvider.cdsFuncionarios.Close;
+        dmMProvider.cdsFuncionarios.ProviderName := 'dspFuncionarios';
+
+        dmDBEXMaster.fdqFuncionarios.SQL.Clear;
+        dmDBEXMaster.fdqFuncionarios.SQL.Add('select * from funcionario');
+        dmDBEXMaster.fdqFuncionarios.SQL.Add('where funcionario = ' + IntToStr(dmMProvider.cdsPerdasFUNCIONARIO.Value));
+
+        dmMProvider.cdsFuncionarios.Open;
+        dmMProvider.cdsFuncionarios.ProviderName := '';
+
+        if dmMProvider.cdsFuncionarios.IsEmpty then
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + InttoStr(dmMProvider.cdsPerdasFUNCIONARIO.Value);
+          TocarSomAlerta(ord(SystemHand));
+
+          edtFuncionario.SetFocus;
+
+          dmMProvider.cdsFuncionarios.Close;
+
+        end;
+
+      except
+
+        on E: exception do
+          Tratar_Erro_Conexao(E);
+
+      end;
+
+    end
+    else
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CAMPO_OBRIGATORIO;
+      edtFuncionario.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.edtProdutoExit(Sender: TObject);
+var
+  sBarras:string;
+  iProduto:integer;
+
+begin
+
+  MudarCorEdit(sender);
+  LimparMSG_ERRO;
+
+  try
+
+    if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+    begin
+
+      if frmPerdas.Tag <= 0 then
+      begin
+
+        if (Length(Trim(edtProduto.Text)) > 6) then
+        begin
+
+          if (Length(Trim(edtProduto.Text)) < 8) and (Length(Trim(edtProduto.Text)) < 13) then
+            sBarras := GerarCodigodeBarras(FormatFloat('000000000000',StrToFloat(edtProduto.Text)))
+          else
+            sBarras := Trim(edtProduto.Text);
+
+          if ValidarBarras(sBarras) then
+          begin
+
+            dmDBEXMaster.fdqMasterPesquisa.Close;
+            dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+            dmDBEXMaster.fdqMasterPesquisa.SQL.Add('select * from barras');
+            dmDBEXMaster.fdqMasterPesquisa.SQL.Add('where barras = ' + QuotedStr(sBarras));
+            dmDBEXMaster.fdqMasterPesquisa.Open;
+
+            if dmDBEXMaster.fdqMasterPesquisa.IsEmpty then
+            begin
+
+              lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + edtProduto.Text;
+              TocarSomAlerta(ord(SystemHand));
+
+              dmDBEXMaster.fdqMasterPesquisa.Close;
+              edtProduto.SetFocus;
+
+            end
+            else
+            begin
+
+              iProduto := dmDBEXMaster.fdqMasterPesquisa.FieldByName('PRODUTO').Value;
+
+              if not PesquisarItensPerdas(iProduto) then
+              begin
+
+                lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_VALIDAR_ITEM_PERDAS;
+                Application.ProcessMessages;
+                edtProduto.SetFocus;
+                exit;
+
+              end;
+
+              dmMProvider.cdsProdutos.Close;
+              dmMProvider.cdsProdutos.ProviderName := 'dspProdutos';
+
+              dmDBEXMaster.fdqProdutos.SQL.Clear;
+              dmDBEXMaster.fdqProdutos.SQL.Add('SELECT PRO.*, PF.* FROM PRODUTO PRO');
+              dmDBEXMaster.fdqProdutos.SQL.Add('JOIN PRODUTOFILIAL PF');
+              dmDBEXMaster.fdqProdutos.SQL.Add('ON(PF.PRODUTO = PRO.PRODUTO)');
+              dmDBEXMaster.fdqProdutos.SQL.Add('WHERE PRO.PRODUTO = ' + IntToStr(iProduto));
+
+              dmDBEXMaster.fdqMasterPesquisa.Close;
+
+              dmMProvider.cdsProdutos.Open;
+              dmMProvider.cdsProdutos.ProviderName := '';
+
+              if dmMProvider.cdsProdutos.IsEmpty then
+              begin
+
+                lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + edtProduto.Text;
+                TocarSomAlerta(ord(SystemHand));
+
+                edtProduto.SetFocus;
+
+                dmMProvider.cdsProdutos.Close;
+
+              end
+              else
+              begin
+
+                edtCustoUnitario.Value    := dmMProvider.cdsProdutosCUSTOLIQUIDO.Value;
+                edtDescricaoProduto.Text  := dmMProvider.cdsProdutosDESCRICAO.Value;
+
+              end;
+
+            end;
+
+          end
+          else
+          begin
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CODIGO_EAN_INVALIDO + edtProduto.Text;
+            TocarSomAlerta(ord(SystemHand));
+
+          end;
+
+        end
+        else if (Length(Trim(edtProduto.Text)) > 0) and (Length(Trim(edtProduto.Text)) <= 6) then
+        begin
+
+          if PesquisarItensPerdas(StrToInt(edtProduto.Text)) then
+          begin
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_VALIDAR_ITEM_PERDAS;
+            Application.ProcessMessages;
+            edtProduto.SetFocus;
+            exit;
+
+          end;
+
+          dmMProvider.cdsProdutos.Close;
+          dmMProvider.cdsProdutos.ProviderName := 'dspProdutos';
+
+          dmDBEXMaster.fdqProdutos.SQL.Clear;
+          dmDBEXMaster.fdqProdutos.SQL.Add('SELECT PRO.*, PF.* FROM PRODUTO PRO');
+          dmDBEXMaster.fdqProdutos.SQL.Add('JOIN PRODUTOFILIAL PF');
+          dmDBEXMaster.fdqProdutos.SQL.Add('ON(PF.PRODUTO = PRO.PRODUTO)');
+          dmDBEXMaster.fdqProdutos.SQL.Add('WHERE PRO.PRODUTO = ' + IntToStr(dmMProvider.cdsItensPerdasPRODUTO.Value));
+
+          dmMProvider.cdsProdutos.Open;
+          dmMProvider.cdsProdutos.ProviderName := '';
+
+          if dmMProvider.cdsProdutos.IsEmpty then
+          begin
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + edtProduto.Text;
+            TocarSomAlerta(ord(SystemHand));
+
+            edtProduto.SetFocus;
+
+            dmMProvider.cdsProdutos.Close;
+
+          end;
+
+        end;
+
+      end;
+
+    end;
+    except
+
+      on E: exception do
+        Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmPerdas.edtProdutoKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+  else if not(Key in ['0' .. '9', Chr(8)]) then
+    Key := #0;
+
+end;
+
+procedure TfrmPerdas.edtQuantidadeExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+  begin
+
+    if edtQuantidade.Value <= 0 then
+      edtQuantidade.Value := 1;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = FormatSettings.DecimalSeparator then
+    Key := ',';
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmPerdas.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                           := COR_PADRAO_TELAS;
+  Caption                         := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario       := ParamStr(1);
+  dmDBEXMaster.sSenha             := paramstr(2);
+  dmDBEXMaster.iIdUsuario         := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial          := StrToInt(ParamStr(4));
+
+  pgcPerdas.Pages[1].TabVisible  := false;
+
+  for i := 0 to grdTabela.Columns.Count - 1 do
+    grdTabela.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  iProxItensPerdas := 0;
+
+  dmMProvider.cdsFilial.Close;
+  dmMProvider.cdsFilial.ProviderName := 'dspFilial';
+
+  dmDBEXMaster.fdqFilial.SQL.Clear;
+  dmDBEXMaster.fdqFilial.SQL.Add('SELECT fil.*, (select nome as nome_cidade from cidades where cidade = fil.cidade) FROM FILIAL fil');
+  dmDBEXMaster.fdqFilial.SQL.Add('where fil.filial= ' + IntToStr(dmDBEXMaster.iIdFilial));
+
+  dmMProvider.cdsFilial.Open;
+  dmMProvider.cdsFilial.ProviderName := '';
+
+
+end;
+
+procedure TfrmPerdas.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmPerdas.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  try
+
+    if (UpperCase(Key) = 'S') and (lblMsg.Tag = ord(ExcluirItensPerdas)) then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := ord(nulo);
+      actExcluirItensPerdasExecute(self);
+      CalcularTotaisPerdas;
+
+    end
+    else   if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := 0;
+      actExcluirExecute(self);
+
+    end
+
+    else if (UpperCase(Key) = 'N') AND (lblMsg.Tag <> ord(nulo)) then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := ord(nulo);
+      LimparMSG_ERRO;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+procedure TfrmPerdas.grdItensPerdasDblClick(Sender: TObject);
+begin
+
+  if (not dmMProvider.cdsItensPerdas.IsEmpty) and (grpCadastro.Enabled) then
+  begin
+
+    frmPerdas.Tag := 1;
+
+    PreencherCampos;
+    edtProduto.SetFocus;
+
+  end;
+end;
+
+procedure TfrmPerdas.grdItensPerdasKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+
+  case Key of
+
+    VK_DELETE:
+      begin
+
+        LimparMSG_ERRO;
+
+        if (not dmMProvider.cdsItensPerdas.IsEmpty) and (grpCadastro.Enabled) then
+        begin
+
+          lblMsg.Tag      := ord(ExcluirItensPerdas);
+          lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+        end;
+
+      end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.grdItensPerdasKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(self);
+
+end;
+
+procedure TfrmPerdas.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsPerdas.IsEmpty then
+  begin
+
+    dmMProvider.RelacionarItens_Perdas(dmMProvider.cdsPerdasPERDAS.Value);
+    pgcPerdas.Pages[1].TabVisible := true;
+    pgcPerdas.ActivePageIndex     := 1;
+
+  end;
+end;
+
+procedure TfrmPerdas.grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsPerdas.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsPerdas.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmPerdas.grdTabelaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+
+  if key = #13 then
+    grdTabelaDblClick(self);
+
+end;
+
+procedure TfrmPerdas.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+procedure TfrmPerdas.imgPesqFornecedorClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+  begin
+
+    frmPesquisaFornecedor := TfrmPesquisaFornecedor.Create(self);
+
+    if frmPesquisaFornecedor.ShowModal <> mrOk then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CAMPO_OBRIGATORIO;
+      edtFornecedor.SetFocus
+
+    end
+    else
+      dmMProvider.cdsPerdasFORNECEDOR.Value := dmMProvider.cdsFornecedorFORNECEDOR.Value;
+
+    FreeAndNil(frmPesquisaFornecedor);
+
+  end;
+
+end;
+
+procedure TfrmPerdas.imgPesqprodutoClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsPerdas.State in [dsEdit, dsInsert] then
+  begin
+
+    dmMProvider.cdsProdutos.Close;
+    dmMProvider.cdsProdutos.ProviderName := 'dspProdutos';
+
+    frmPesquisaProduto := TfrmPesquisaProduto.Create(self);
+
+    if frmPesquisaProduto.ShowModal = mrOk then
+    begin
+
+      if PesquisarItensPerdas(dmMProvider.cdsProdutosPRODUTO.Value) then
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_VALIDAR_ITEM_PERDAS;
+        Application.ProcessMessages;
+        edtProduto.SetFocus;
+        exit;
+
+      end;
+
+      edtProduto.Text           := IntToStr(dmMProvider.cdsProdutosPRODUTO.Value);
+      edtCustoUnitario.Value    := dmMProvider.cdsProdutosCUSTOLIQUIDO.Value;
+      edtDescricaoProduto.Text  := dmMProvider.cdsProdutosDESCRICAO.Value;
+      edtQuantidade.SetFocus;
+
+    end;
+
+    FreeAndNil(frmPesquisaProduto);
+
+  end;
+
+end;
+
+procedure TfrmPerdas.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsPerdas.Active then
+  begin
+
+    if not InserindoEditando(dmMProvider.cdsPerdas) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+function TfrmPerdas.Man_Tab_Itens_Perdas(pOpcao:smallint):boolean;
+begin
+
+  try
+
+    if not dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.StartTransaction;
+
+    dmMSProcedure.fdspItensPerdas.Params[0].Value := pOpcao;
+
+    if iProxItensPerdas <> dmMProvider.cdsItensPerdasITENS_PERDAS.Value
+    then
+    begin
+
+      dmMSProcedure.fdspMaster.StoredProcName := 'RETORNAR_GNR_ITEM_PERDA';
+      dmMSProcedure.fdspMaster.ExecProc;
+
+      iProxItensPerdas := (dmMSProcedure.fdspMaster.Params[0].Value + 1);
+
+    end;
+
+    dmMSProcedure.fdspItensPerdas.Params[1].Value := dmMProvider.cdsPerdasPERDAS.Value;
+
+    if pOpcao = 0 then
+    begin
+
+      dmMSProcedure.fdspItensPerdas.Params[2].Value := iProxItensPerdas;
+      dmMSProcedure.fdspItensPerdas.Params[3].Value := StrToInt(Trim(edtProduto.Text))
+
+    end
+    else
+    begin
+
+      dmMSProcedure.fdspItensPerdas.Params[2].Value := dmMProvider.cdsItensPerdasITENS_PERDAS.Value;
+      dmMSProcedure.fdspItensPerdas.Params[3].Value := dmMProvider.cdsItensPerdasPRODUTO.Value;
+
+    end;
+
+    dmMSProcedure.fdspItensPerdas.Params[4].Value := edtQuantidade.Value;
+    dmMSProcedure.fdspItensPerdas.Params[5].Value := edtCustoUnitario.Value;
+
+    dmMSProcedure.fdspItensPerdas.ExecProc;
+
+    if dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.Commit;
+
+    dmMProvider.RelacionarItens_Perdas(dmMProvider.cdsPerdasPERDAS.Value);
+    iProxItensPerdas := 0;
+
+
+    Result := true;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      Result := False;
+
+      if dmDBEXMaster.fdtMaster.Active then
+        dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+  end;
+
+end;
+
+function TfrmPerdas.Man_Tab_Perdas(pOpcao: smallint): boolean;
+begin
+
+  try
+
+    dmMSProcedure.fdspPerda.Params[0].Value := pOpcao;
+    dmMSProcedure.fdspPerda.Params[1].Value := dmMProvider.cdsPerdasPERDAS.Value;
+    dmMSProcedure.fdspPerda.Params[2].Value := dmMProvider.cdsPerdasFORNECEDOR.Value;
+    dmMSProcedure.fdspPerda.Params[3].Value := dmMProvider.cdsPerdasDATA_LANCAMENTO.Value;
+    dmMSProcedure.fdspPerda.Params[4].Value := dmMProvider.cdsPerdasTOTAL_QUANTIDADE.Value;
+    dmMSProcedure.fdspPerda.Params[5].Value := dmMProvider.cdsPerdasVALOR_TOTAL.Value;
+    dmMSProcedure.fdspPerda.Params[6].Value := dmMProvider.cdsPerdasFUNCIONARIO.Value;
+
+    dmMSProcedure.fdspPerda.ExecProc;
+
+    if dmMSProcedure.fdspPerda.Params[7].Value  > 0 then
+      dmMProvider.cdsPerdasPERDAS.Value   := dmMSProcedure.fdspPerda.Params[7].Value;
+
+    Result := true;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      Result := False;
+
+    end;
+
+  end;
+
+end;
+
+function TfrmPerdas.PesquisarItensPerdas(pProduto:integer):boolean;
+var
+  sWhere:string;
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    dmDBEXMaster.fdqMasterPesquisa.Close;
+    dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+    dmDBEXMaster.fdqMasterPesquisa.SQL.Add('SELECT * FROM ITENS_PERDAS');
+    dmDBEXMaster.fdqMasterPesquisa.SQL.Add('WHERE PRODUTO = ' + IntToStr(pProduto));
+    dmDBEXMaster.fdqMasterPesquisa.SQL.Add('AND PERDA = ' + IntToStr(dmMProvider.cdsPerdasPERDAS.Value));
+    dmDBEXMaster.fdqMasterPesquisa.Open;
+
+    Result := not dmDBEXMaster.fdqMasterPesquisa.IsEmpty;
+
+    dmDBEXMaster.fdqMasterPesquisa.Close;
+
+   except
+    on E: exception do
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario+ ', ' + Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmPerdas.PreencherCampos;
+begin
+
+  iProxItensPerdas          := dmMProvider.cdsItensPerdasITENS_PERDAS.Value;
+  edtProduto.Text           := IntToStr(dmMProvider.cdsItensPerdasPRODUTO.Value);
+  edtQuantidade.Value       := dmMProvider.cdsItensPerdasQUANTIDADE.Value;
+  edtCustoUnitario.Value    := dmMProvider.cdsItensPerdasVALOR_UNITARIO.Value;
+  edtDescricaoProduto.Text  := dmMProvider.cdsItensPerdasDESCRICAO.Value;
+
+end;
+
+procedure TfrmPerdas.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  case rdpOpcoesPesquisa.ItemIndex  of
+    0:begin
+
+        edtConteudoPesquisa.Clear;
+        edtConteudoPesquisa.SetFocus;
+
+      end;
+    1:begin //fornecedor
+
+        frmPesquisaFornecedor := TfrmPesquisaFornecedor.Create(self);
+
+        if frmPesquisaFornecedor.ShowModal = mrOk then
+        begin
+
+          AbrirTabelaPerdas(rdpOpcoesPesquisa.ItemIndex,InttoStr(dmMProvider.cdsFornecedorFORNECEDOR.Value));
+
+          pgcPerdas.Pages[1].TabVisible := False;
+          pgcPerdas.ActivePageIndex     := 0;
+
+          grdTabela.SetFocus;
+
+        end;
+
+        FreeAndNil(frmPesquisaFornecedor);
+
+      end;
+    2:begin //produto
+
+        frmPesquisaProduto := TfrmPesquisaProduto.Create(self);
+        dmMProvider.cdsProdutos.Close;
+
+        if frmPesquisaProduto.ShowModal = mrOk then
+        begin
+
+          AbrirTabelaPerdas(rdpOpcoesPesquisa.ItemIndex,IntToStr(dmMProvider.cdsProdutosPRODUTO.Value));
+
+          pgcPerdas.Pages[1].TabVisible := False;
+          pgcPerdas.ActivePageIndex     := 0;
+
+          grdTabela.SetFocus;
+
+        end;
+
+        FreeAndNil(frmPesquisaProduto);
+
+      end;
+
+  end;
+
+end;
+
+procedure TfrmPerdas.Resetcampos;
+begin
+
+  edtProduto.Clear;
+  edtDescricaoProduto.Clear;
+  edtQuantidade.Value     := 1;
+  edtCustoUnitario.Value  := 0;
+
+end;
+
+procedure TfrmPerdas.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

@@ -1,0 +1,89 @@
+unit modAutomacaoIBPT;
+
+interface
+
+uses SysUtils, Windows, Forms;
+
+procedure ExportarItens_IBPT(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+
+
+implementation
+
+uses modAutomacao, modDBEXMaster, modDMMProvider, modSSPMaster, uFuncoes,
+  modDMCDSMaster;
+
+procedure ExportarItens_IBPT(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+var
+  txtArq: TextFile;
+  sLinha: string;
+begin
+
+  dmDBEXMaster.sqqProdutos.Close;
+  dmDBEXMaster.sqqProdutos.SQL.Clear;
+  dmDBEXMaster.sqqProdutos.SQL.Add('SELECT PRO.DESCRICAO, PRO.cf_ipi, PRO.NCM,');
+  dmDBEXMaster.sqqProdutos.SQL.Add('BAR.BARRAS, PRO.PRODUTO  FROM PRODUTO PRO');
+  dmDBEXMaster.sqqProdutos.SQL.Add('join BARRAS BAR');
+  dmDBEXMaster.sqqProdutos.SQL.Add('ON(BAR.produto = PRO.PRODUTO)');
+  dmDBEXMaster.sqqProdutos.SQL.Add('WHERE PRO.ativo = 1');
+  dmDBEXMaster.sqqProdutos.SQL.Add('ORDER BY PRO.NCM');
+  dmDBEXMaster.sqqProdutos.Open;
+
+  if dmDBEXMaster.sqqProdutos.IsEmpty then
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+      + MSG_ARQ_EXP_PRO_VAZIO), 'Atenção!', mb_IconWarning + mb_Ok)
+  else
+  begin
+
+    dmCDSMaster.PovoarDataSetItens_IBPT;
+    frmAutomacao.lblQtdTotalItens.Caption  := IntToStr(dmCDSMaster.cdsItens_IBPT.RecordCount);
+    frmAutomacao.pgbItens_IPBT.Max         := dmCDSMaster.cdsItens_IBPT.RecordCount;
+    Application.ProcessMessages;
+
+    with dmCDSMaster.cdsItens_IBPT do
+    begin
+
+      First;
+
+      if not EOF then
+      begin
+
+        AssignFile(txtArq, sPath + sArquivo);
+        ReWrite(txtArq);
+
+        repeat
+
+          frmAutomacao.pgbProgressoArqBalanca.Position  := dmCDSMaster.cdsItens_IBPT.RecNo;
+          Application.ProcessMessages;
+
+          sLinha := Trim(dmCDSMaster.cdsItens_IBPTDESCRICAO.AsString) + ';'
+                    + Trim(dmCDSMaster.cdsItens_IBPTNCM.AsString) + ';';
+
+          if dmCDSMaster.cdsItens_IBPTEX_TIPI.Value > 0 then
+            sLinha := sLinha + FormatFloat('00',dmCDSMaster.cdsItens_IBPTEX_TIPI.AsInteger) + ';'
+          else
+            sLinha := sLinha + ';';
+
+          sLinha := sLinha + Trim(dmCDSMaster.cdsItens_IBPTEAN.AsString) + ';'
+                    + IntToStr(dmCDSMaster.cdsItens_IBPTPRODUTO.AsInteger);
+          WriteLn(txtArq, sLinha);
+
+          Next;
+
+        until EOF;
+        CloseFile(txtArq);
+
+          Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+            + 'O arquivo de ITENS IBPT ' + sPath + sArquivo
+            + ', foi gerado com sucesso!'), 'Atenção!', mb_IconInformation + mb_Ok);
+
+        frmAutomacao.pgbProgressoArqBalanca.Position := 0;
+
+      end;
+
+    end;
+
+  end;
+
+end;
+
+end.

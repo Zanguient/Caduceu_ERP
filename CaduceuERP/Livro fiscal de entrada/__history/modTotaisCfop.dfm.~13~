@@ -1,0 +1,89 @@
+object frmTotaisCfop: TfrmTotaisCfop
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Totais por CFOP'
+  ClientHeight = 449
+  ClientWidth = 687
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object lblTotaisEstaduais: TLabel
+    Left = 8
+    Top = 197
+    Width = 93
+    Height = 13
+    Caption = 'Totaisno  Estado'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label1: TLabel
+    Left = 8
+    Top = 407
+    Width = 123
+    Height = 13
+    Caption = 'Totais Outros Estados'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object stgTotaisCfopEstadual: TStringGrid
+    AlignWithMargins = True
+    Left = 10
+    Top = 6
+    Width = 669
+    Height = 185
+    ColCount = 6
+    FixedCols = 0
+    RowCount = 2
+    TabOrder = 0
+    ColWidths = (
+      118
+      131
+      92
+      93
+      98
+      87)
+  end
+  object stgTotaisCfopInterEstadual: TStringGrid
+    AlignWithMargins = True
+    Left = 9
+    Top = 216
+    Width = 669
+    Height = 185
+    ColCount = 6
+    FixedCols = 0
+    RowCount = 2
+    TabOrder = 1
+    ColWidths = (
+      118
+      131
+      92
+      93
+      98
+      87)
+  end
+  object sqqTotalizaValorContabil: TSQLQuery
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = dmDBEXMaster.sqcMaster
+    Left = 144
+    Top = 96
+  end
+end

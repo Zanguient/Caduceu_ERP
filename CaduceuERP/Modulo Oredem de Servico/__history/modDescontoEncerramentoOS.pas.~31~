@@ -1,0 +1,124 @@
+unit modDescontoEncerramentoOS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.DBCtrls, Vcl.Mask,
+  JvExStdCtrls, JvEdit, JvValidateEdit, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  db;
+
+type
+  TfrmDescontoEncerramentoOS = class(TForm)
+    lblTotalOS: TLabel;
+    edtTotalOS: TDBText;
+    lblDesconto: TLabel;
+    lblInfoDesconto: TLabel;
+    Label1: TLabel;
+    edtValorTotalOS: TJvValidateEdit;
+    imgSair: TImage;
+    imgConfirmar: TImage;
+    edtDesconto: TJvValidateEdit;
+    procedure FormCreate(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+    procedure imgConfirmarClick(Sender: TObject);
+    procedure edtDescontoEnter(Sender: TObject);
+    procedure edtDescontoKeyPress(Sender: TObject; var Key: Char);
+    procedure edtDescontoChange(Sender: TObject);
+    procedure edtDescontoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmDescontoEncerramentoOS: TfrmDescontoEncerramentoOS;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmDescontoEncerramentoOS.edtDescontoChange(Sender: TObject);
+begin
+
+  edtValorTotalOS.Value  := dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value - edtDesconto.Value;
+
+end;
+
+procedure TfrmDescontoEncerramentoOS.edtDescontoEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmDescontoEncerramentoOS.edtDescontoKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+
+%  if (Shift = [ssShift]) and (Char(key) = '%') and (edtDesconto.Value >0) then
+  begin
+
+    edtDesconto.Value     := dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value * (edtDesconto.Value / 100);
+    edtValorTotalOS.Value := dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value - dmMProvider.cdsOrdemServicoVALOR_OUTROS.Value;
+
+  end;
+
+end;
+
+procedure TfrmDescontoEncerramentoOS.edtDescontoKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+
+  if Key = FormatSettings.DecimalSeparator then
+    Key := ',';
+
+  if (Key = '%') and (edtDesconto.Value > 0) then
+  begin
+
+    edtDesconto.Value     := dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value * (edtDesconto.Value / 100);
+    edtValorTotalOS.Value := dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value - dmMProvider.cdsOrdemServicoVALOR_OUTROS.Value;
+
+  end;
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+
+end;
+
+procedure TfrmDescontoEncerramentoOS.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+  Color                 := COR_PADRAO_DIALOGOS;
+  edtValorTotalOS.Value := dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value
+
+end;
+
+procedure TfrmDescontoEncerramentoOS.imgConfirmarClick(Sender: TObject);
+begin
+
+  ModalResult := mrOk;
+
+end;
+
+procedure TfrmDescontoEncerramentoOS.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

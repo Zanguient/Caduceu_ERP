@@ -1,0 +1,181 @@
+unit modImprimirEventos;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls, ACBrNFeDANFEClass, ACBrNFeDANFeRLClass, ACBrBase, ACBrDFe,
+  ACBrNFe, Vcl.ComCtrls, ACBrUtil, pcnConversaoNFe;
+
+type
+  TfrmImprimirEventos = class(TForm)
+    imgSair: TImage;
+    grpSelecionarXML: TGroupBox;
+    grpXML_NFe: TGroupBox;
+    grpXML_Evento: TGroupBox;
+    imgImrimir: TImage;
+    imgXML_Nfe: TImage;
+    imgXML_Evento: TImage;
+    ACBrNFe1: TACBrNFe;
+    ACBrNFeDANFeRL1: TACBrNFeDANFeRL;
+    lblChaveNfe: TLabel;
+    lblProtocolo: TLabel;
+    lblNumeroNF: TLabel;
+    lblEmissaoNFe: TLabel;
+    lblSituacao: TLabel;
+    edtChaveNFe: TEdit;
+    edtProtocoloNFe: TEdit;
+    edtNumeroNF: TEdit;
+    edtSituacaoNF: TEdit;
+    edtEmissaoNF: TEdit;
+    OpenDialog1: TOpenDialog;
+    lblDataEvento: TLabel;
+    edtdataEvento: TEdit;
+    Label1: TLabel;
+    edtTipoEvento: TEdit;
+    Label2: TLabel;
+    memMotivo: TMemo;
+    procedure FormCreate(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+    procedure imgXML_NfeClick(Sender: TObject);
+    procedure imgXML_EventoClick(Sender: TObject);
+  private
+    { Private declarations }
+    procedure CarregarConfiguracoesACBR;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmImprimirEventos: TfrmImprimirEventos;
+
+implementation
+
+{$R *.dfm}
+
+uses uConstantes_Padrao, uFuncoes, dataMProvider;
+
+procedure TfrmImprimirEventos.CarregarConfiguracoesACBR;
+var
+  Ok : Boolean;
+begin
+
+  ACBrNFe1.SSL.NumeroSerie  := dmMProvider.cdsConfig_iniSERIE_CERTIFICADO_DIGITAL.Text;
+  ACBrNFe1.DANFE.Logo       := dmMProvider.cdsParametros_NFELOGO_MARCA.Value;
+  ACBrNFe1.DANFE.PathPDF    := dmMProvider.cdsConfiguracoesPATH_SALVAR_PDF.Value;
+
+  with ACBrNFe1.Configuracoes.Geral do
+  begin
+
+    ExibirErroSchema      := (dmMProvider.cdsParametros_NFEEXIBIR_ERRO_SCHEMA.Value = 1);
+    FormatoAlerta         := dmMProvider.cdsParametros_NFEFORMATO_ALERTA.Value;
+//    FormaEmissao     := TpcnTipoEmissao(); //ver possibilidade de criar configuracao
+    ModeloDF              := TpcnModeloDF(0);
+    VersaoDF              := TpcnVersaoDF(2);
+    IdCSC                 := '';
+    CSC                   := '';
+    Salvar                := (dmMProvider.cdsParametros_NFESALVAR_ARQUIVOS_ENVIO_RESPOSTA.Value = 1);
+    AtualizarXMLCancelado := (dmMProvider.cdsParametros_NFEATUALIZAR_XML.Value = 1);
+    ExibirErroSchema      := (dmMProvider.cdsParametros_NFEEXIBIR_ERRO_SCHEMA.Value = 1);
+    RetirarAcentos        := (dmMProvider.cdsParametros_NFERETIRAR_ACENTOS_XML_ENVIADO.Value = 1);
+    RetirarEspacos        := true;
+
+  end;
+
+  with ACBrNFe1.Configuracoes.Arquivos do
+  begin
+
+    Salvar             := (dmMProvider.cdsParametros_NFESALVAR_ARQS_EM_PASTAS_SEPARADAS.Value = 1);
+    SepararPorMes      := (dmMProvider.cdsParametros_NFECRIAR_PASTAS_MENSALMENTE.Value = 1);
+    AdicionarLiteral   := (dmMProvider.cdsParametros_NFEADICIONAR_LITERAL_NOME_PASTAS.Value = 1);
+    EmissaoPathNFe     := (dmMProvider.cdsParametros_NFESALVAR_NFE_PELA_EMISSAO.Value = 1);
+    SalvarEvento       := (dmMProvider.cdsParametros_NFESALVAR_ARQUIVOS_EVENTOS.Value = 1);
+    SepararPorCNPJ     := (dmMProvider.cdsParametros_NFESEPARAR_ARQ_POR_CNPJ_CERTIF.Value = 1);
+    SepararPorModelo   := (dmMProvider.cdsParametros_NFESEPARAR_ARQ_POR_MODELO_DOC.Value = 1);
+    PathSalvar         := dmMProvider.cdsParametros_NFEPASTA_LOGS.AsString;
+    PathSchemas        := dmMProvider.cdsParametros_NFEPASTA_SCHEMAS.AsString;
+    PathNFe            := dmMProvider.cdsParametros_NFEPASTA_ARQS_NFE.AsString;
+    PathInu            := dmMProvider.cdsParametros_NFEPASTA_ARQS_INUTILIZACAO.AsString;
+    PathEvento         := dmMProvider.cdsParametros_NFEPASTA_ARQS_EVENTO.AsString;
+
+  end;
+
+end;
+
+procedure TfrmImprimirEventos.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(handle);
+
+  CarregarConfiguracoesACBR;
+
+end;
+
+procedure TfrmImprimirEventos.imgSairClick(Sender: TObject);
+begin
+
+  Close
+
+end;
+
+procedure TfrmImprimirEventos.imgXML_EventoClick(Sender: TObject);
+begin
+
+  if ACBrNFe1.NotasFiscais.Count > 0 then
+  begin
+
+    OpenDialog1.Title       := 'Selecione a NFE';
+    OpenDialog1.DefaultExt  := '*-procEventoNFe.xml';
+    OpenDialog1.FilterIndex := 1;
+    OpenDialog1.Filter      := 'Arquivos Eventos (*procEventoNFe.xml)|*-procEventoNFe.xml|Arquivos XML (*.XML)|*.XML|Todos os Arquivos (*.*)|*.*';
+    OpenDialog1.InitialDir  := ACBrNFe1.Configuracoes.Arquivos.PathEvento;
+
+    if OpenDialog1.Execute then
+    begin
+
+      ACBrNFe1.EventoNFe.Evento.Clear;
+      ACBrNFe1.EventoNFe.LerXML(OpenDialog1.FileName) ;
+
+      edtdataEvento.Text := FormatDateTime('dd/mm/yyyy', ACBrNFe1.EventoNFe.Evento.Items[0].InfEvento.dhEvento);
+      edtTipoEvento.Text := ACBrNFe1.EventoNFe.Evento.Items[0].InfEvento.DescricaoTipoEvento(ACBrNFe1.EventoNFe.Evento.Items[0].InfEvento.tpEvento);
+      memMotivo.Text     := ACBrNFe1.EventoNFe.Evento.Items[0].InfEvento.detEvento.xCorrecao;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmImprimirEventos.imgXML_NfeClick(Sender: TObject);
+begin
+
+  OpenDialog1.InitialDir  := ACBrNFe1.Configuracoes.Arquivos.PathNFe;
+  OpenDialog1.Title       := 'Selecione a NFE';
+  OpenDialog1.DefaultExt  := '*-nfe.XML';
+  OpenDialog1.FilterIndex := 1;
+  OpenDialog1.Filter      := 'Arquivos NFE (*-nfe.XML)|*-nfe.XML|Arquivos XML (*.XML)|*.XML|Todos os Arquivos (*.*)|*.*';
+
+  if OpenDialog1.Execute then
+  begin
+
+    ACBrNFe1.NotasFiscais.Clear;
+    ACBrNFe1.NotasFiscais.LoadFromFile(OpenDialog1.FileName);
+
+    edtChaveNFe.Text      := ACBrNFe1.NotasFiscais.Items[0].NFe.procNFe.chNFe;
+    edtProtocoloNFe.Text  := ACBrNFe1.NotasFiscais.Items[0].NFe.procNFe.nProt;
+    edtNumeroNF.Text      := IntToStr(ACBrNFe1.NotasFiscais.Items[0].NFe.Ide.nNF);
+    edtEmissaoNF.Text     := FormatDateTime('dd/mm/yyyy', ACBrNFe1.NotasFiscais.Items[0].NFe.Ide.dEmi);
+
+    if ACBrNFe1.NotasFiscais.Items[0].NFe.procNFe.cStat = 101 then
+      edtSituacaoNF.Text    := 'CANCELADA'
+    else
+      edtSituacaoNF.Text    := 'NORMAL';
+
+    grpXML_Evento.Enabled := True;
+
+  end;
+
+end;
+
+end.

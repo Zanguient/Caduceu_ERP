@@ -1,0 +1,1786 @@
+unit modApuracaoICMS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, 
+  Vcl.Graphics, Vcl.Forms, Vcl.Dialogs, FireDAC.Stan.Intf, FireDAC.Stan.Option, 
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, 
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB, 
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.StdCtrls, Vcl.ExtCtrls, 
+  System.Classes, Vcl.Controls, Vcl.Grids, Data.FMTBcd, Vcl.Menus, 
+  System.Actions, Vcl.ActnList, Vcl.Mask, Vcl.ComCtrls, Vcl.DBCtrls, 
+  Vcl.DBGrids, Vcl.ToolWin, System.DateUtils, RDprint, FireDAC.DBX.Migrate;
+
+type
+  TfrmApuracaoICMS = class(TForm)
+    pgcLivroFiscalSaida: TPageControl;
+    tbsCadastro: TTabSheet;
+    grpEmpresa: TGroupBox;
+    lblRSocial: TLabel;
+    lblInscrEstadual: TLabel;
+    lblCnpj: TLabel;
+    lblMesAnoReferencia: TLabel;
+    edtRSocial: TEdit;
+    edtInscrEstadual: TEdit;
+    edtCNPJ: TEdit;
+    edtMesAnoReferencia: TEdit;
+    stbAtalho: TStatusBar;
+    Panel2: TPanel;
+    Panel1: TPanel;
+    stgTotaisCfopEstadualE: TStringGrid;
+    Panel3: TPanel;
+    edtTVContalbilEST: TEdit;
+    edtTBCalculoEst: TEdit;
+    edtCreditoEst: TEdit;
+    edtIsentasNTEst: TEdit;
+    edtOutrasEst: TEdit;
+    Panel4: TPanel;
+    edtTVContalbilinter: TEdit;
+    edtTBCalculoInter: TEdit;
+    edtCreditoInter: TEdit;
+    edtIsentasNTInter: TEdit;
+    edtOutrasInter: TEdit;
+    actApuracaoICMS: TActionList;
+    actSair: TAction;
+    actImprimirApuracao: TAction;
+    stgTotaisCfopEstadualS: TStringGrid;
+    Panel5: TPanel;
+    edtTVContalbilEST_S: TEdit;
+    edtTBCalculoeST_S: TEdit;
+    edtDebitoEst: TEdit;
+    edtIsentasNTEst_S: TEdit;
+    edtOutrasEst_S: TEdit;
+    Panel6: TPanel;
+    edtTVContalbilinter_S: TEdit;
+    edtTBCalculoInter_S: TEdit;
+    edtDebitoInter: TEdit;
+    edtIsentasNTInter_S: TEdit;
+    edtOutrasInter_S: TEdit;
+    Panel7: TPanel;
+    fdqSelecionaPeriodo: TFDQuery;
+    grpPeriodo: TGroupBox;
+    Label2: TLabel;
+    Label3: TLabel;
+    edtDataInicial: TMaskEdit;
+    edtDataFinal: TMaskEdit;
+    grpMesAno: TGroupBox;
+    cboPeriodoApuracao: TComboBox;
+    grpPesquisa: TGroupBox;
+    edtPesquisa: TEdit;
+    btnIprimirApuracao: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    fdqTotalizaVContabilE: TFDQuery;
+    fdqTotalizaBCalculoE: TFDQuery;
+    fdqTotalizaCredito_E: TFDQuery;
+    fdqTotalizaIsentasNT_E: TFDQuery;
+    fdqTotalizaOutras_E: TFDQuery;
+    fdqTotalVLContEstadual_E: TFDQuery;
+    fdqTotalBCalculoEstadual_E: TFDQuery;
+    fdqTotalICreditadoEstadual_E: TFDQuery;
+    fdqTotalIsentasNTEstadual_E: TFDQuery;
+    fdqTotalOutrasEstadual_E: TFDQuery;
+    fdqTotalizaVContabil_IE: TFDQuery;
+    fdqTotalizaBCalculo_IE: TFDQuery;
+    fdqTotalICreditadoEstadual_IE: TFDQuery;
+    fdqTotalIsentasNTEstadual_IE: TFDQuery;
+    fdqTotalOutrasEstadual_IE: TFDQuery;
+    fdqTotalizaVContabilS: TFDQuery;
+    fdqTotalizaBCalculoS: TFDQuery;
+    fdqTotalizaDebito_S: TFDQuery;
+    fdqTotalizaIsentasNT_S: TFDQuery;
+    fdqTotalizaOutras_S: TFDQuery;
+    fdqTotalVLContEstadual_S: TFDQuery;
+    fdqTotalBCalculoEstadual_S: TFDQuery;
+    fdqTotalIDebitadoEstadual_S: TFDQuery;
+    fdqTotalIsentasNTEstadual_S: TFDQuery;
+    fdqTotalOutrasEstadual_S: TFDQuery;
+    fdqTotalizaVContabil_IE_S: TFDQuery;
+    fdqTotalizaBCalculo_IE_S: TFDQuery;
+    fdqTotalIDebitadoEstadual_IE_S: TFDQuery;
+    fdqTotalIsentasNTEstadual_IE_S: TFDQuery;
+    fdqTotalOutrasEstadual_IE_S: TFDQuery;
+    rdpLivroApuracao: TRDprint;
+    pnlMsgAguarde: TPanel;
+    actImprimirResumoApuracao: TAction;
+    fdqDataApuracao: TFDQuery;
+    FDQuery1: TFDQuery;
+    procedure FormCreate(Sender: TObject);
+    procedure actSairExecute(Sender: TObject);
+    procedure stbAtalhoDrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel;
+      const Rect: TRect);
+    procedure edtDataInicialEnter(Sender: TObject);
+    procedure edtDataInicialExit(Sender: TObject);
+    procedure edtDataInicialKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtDataInicialKeyPress(Sender: TObject; var Key: Char);
+    procedure edtDataFinalExit(Sender: TObject);
+    procedure edtDataFinalEnter(Sender: TObject);
+    procedure edtPesquisaEnter(Sender: TObject);
+    procedure edtPesquisaExit(Sender: TObject);
+    procedure cboPeriodoApuracaoExit(Sender: TObject);
+    procedure actImprimirApuracaoExecute(Sender: TObject);
+    procedure rdpLivroApuracaoNewPage(Sender: TObject; Pagina: Integer);
+    procedure actImprimirResumoApuracaoExecute(Sender: TObject);
+  private
+    { Private declarations }
+    sWhere: string;
+    iLinha:integer;
+    procedure Totalizar_Valores_Entradas(pOpcao: smallint);
+    procedure Totalizar_Valores_Saidas(pOpcao: smallint);
+    procedure ImprimirApuracao;
+    procedure ImprimirApuracaoEntradas;
+    procedure ImprimirApuracaoSaidas;
+    procedure ImprimirResumoApuracao;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmApuracaoICMS: TfrmApuracaoICMS;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  dataDBEXMaster, dataMProvider, dataMRelatorios, dataMSource, dataMSProcedure, 
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmApuracaoICMS.actImprimirApuracaoExecute(Sender: TObject);
+begin
+
+  Tag := 0;
+
+  if not fdqTotalizaVContabilE.IsEmpty then
+    ImprimirApuracao;
+
+end;
+
+procedure TfrmApuracaoICMS.actImprimirResumoApuracaoExecute(Sender: TObject);
+begin
+
+  if not fdqTotalizaVContabilE.IsEmpty then
+    ImprimirResumoApuracao;
+
+end;
+
+procedure TfrmApuracaoICMS.actSairExecute(Sender: TObject);
+begin
+    Close;
+end;
+
+procedure TfrmApuracaoICMS.cboPeriodoApuracaoExit(Sender: TObject);
+begin
+
+  if cboPeriodoApuracao.Text <> '' then
+  begin
+
+    Totalizar_Valores_Entradas(1);
+    Totalizar_Valores_Saidas(1);
+
+    fdqDataApuracao.Close;
+    fdqDataApuracao.SQL.Clear;
+    fdqDataApuracao.SQL.Add('SELECT DATA_ENTRADA FROM LIVRO_ENTRADA WHERE MES_ANO = ' + QuotedStr(cboPeriodoApuracao.Text));
+    fdqDataApuracao.Open;
+
+  end;
+
+end;
+
+procedure TfrmApuracaoICMS.edtDataFinalEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmApuracaoICMS.edtDataFinalExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  try
+    if edtDataFinal.Text <> '  /  /    ' then
+    begin
+
+      edtDataFinal.Text := FormatDateTime('dd/mm/yyyy',
+        StrToDate(edtDataFinal.Text));
+
+      Totalizar_Valores_Entradas(0);
+      Totalizar_Valores_Saidas(0);
+
+    end;
+  except
+    Application.MessageBox('Data inválida', 'Atenção',
+      mb_IconInformation + mb_Ok);
+    edtDataFinal.SetFocus;
+  end;
+
+end;
+
+procedure TfrmApuracaoICMS.edtDataInicialEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmApuracaoICMS.edtDataInicialExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  try
+    if edtDataInicial.Text <> '  /  /    ' then
+      edtDataInicial.Text := FormatDateTime('dd/mm/yyyy',
+        StrToDate(edtDataInicial.Text));
+  except
+    Application.MessageBox('Data inválida', 'Atenção',
+      mb_IconInformation + mb_Ok);
+    edtDataInicial.SetFocus;
+  end;
+
+end;
+
+procedure TfrmApuracaoICMS.edtDataInicialKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+  case Key of
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+  end;
+  if iDirecao <> -1 then
+  begin
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+  end;
+end;
+
+procedure TfrmApuracaoICMS.edtDataInicialKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+    Key := #0;
+    PostMessage(handle, WM_KEYDOWN, VK_TAB, 1);
+  end;
+
+end;
+
+procedure TfrmApuracaoICMS.edtPesquisaEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmApuracaoICMS.edtPesquisaExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if edtPesquisa.Text <> '' then
+  begin
+
+    Totalizar_Valores_Entradas(2);
+    Totalizar_Valores_Saidas(2);
+
+  end;
+
+end;
+
+procedure TfrmApuracaoICMS.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(handle);
+
+  Caption                             := Application.Title + ' - ' + RetornarVersao(Application.ExeName, 1);
+
+  pgcLivroFiscalSaida.ActivePageIndex := 0;
+
+  dmDBEXMaster.sNomeUsuario           := ParamStr(1);
+  dmDBEXMaster.sSenha                 := ParamStr(2);
+  dmDBEXMaster.iIdUsuario             := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial              := StrToInt(ParamStr(4));
+
+
+  edtRSocial.Text                     := dmMProvider.cdsFilialRAZAOSOCIAL.Value;
+  edtInscrEstadual.Text               := dmMProvider.cdsFilialINSCRICAO.Value;
+  edtCNPJ.Text                        := FormatarCNPJCPF(dmMProvider.cdsFilialCNPJ.Value);
+
+  fdqSelecionaPeriodo.Open;
+
+  while not fdqSelecionaPeriodo.Eof do
+  begin
+
+    cboPeriodoApuracao.Items.Add(fdqSelecionaPeriodo.FieldByName('MES_ANO').AsString);
+    fdqSelecionaPeriodo.Next;
+
+  end;
+
+  stgTotaisCfopEstadualE.Cols[0].Text := 'Cfop';
+  stgTotaisCfopEstadualE.Cols[1].Text := 'Descrição Cfop';
+  stgTotaisCfopEstadualE.Cols[2].Text := 'Vlr Contábil';
+  stgTotaisCfopEstadualE.Cols[3].Text := 'B.Cálculo';
+  stgTotaisCfopEstadualE.Cols[4].Text := 'Crédito';
+  stgTotaisCfopEstadualE.Cols[5].Text := 'Isentas/NT';
+  stgTotaisCfopEstadualE.Cols[6].Text := 'Outras';
+
+  stgTotaisCfopEstadualS.Cols[0].Text := 'Cfop';
+  stgTotaisCfopEstadualS.Cols[1].Text := 'Descrição Cfop';
+  stgTotaisCfopEstadualS.Cols[2].Text := 'Vlr Contábil';
+  stgTotaisCfopEstadualS.Cols[3].Text := 'B.Cálculo';
+  stgTotaisCfopEstadualS.Cols[4].Text := 'Débito';
+  stgTotaisCfopEstadualS.Cols[5].Text := 'Isentas/NT';
+  stgTotaisCfopEstadualS.Cols[6].Text := 'Outras';
+
+end;
+
+procedure TfrmApuracaoICMS.ImprimirApuracao;
+begin
+
+  rdpLivroApuracao.TitulodoRelatorio := 'L I V R O   A P U R A C A O   D O   I C M S ';
+  rdpLivroApuracao.OpcoesPreview.Preview := True;
+
+  rdpLivroApuracao.abrir; // Inicia a montagem do relatório...
+
+  if rdpLivroApuracao.Setup = False then
+    exit;
+
+  pnlMsgAguarde.Visible := True;
+
+  Application.ProcessMessages;
+
+  fdqTotalizaVContabilE.First;
+
+  if (edtDataInicial.Text <> '  /  /    ') and (edtDataFinal.Text <> '  /  /    ') then
+    sWhere := 'AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy', StrToDate(edtDataInicial.Text)))
+      + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy', StrToDate(edtDataFinal.Text)))
+  else if cboPeriodoApuracao.Text <> '' then
+    sWhere := 'AND MES_ANO = ' + QuotedStr(cboPeriodoApuracao.Text)
+  else if edtPesquisa.Text <> '' then
+    sWhere := 'AND LIVRO_SAIDA.NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalEntradaNUMERO_DOCUMENTO.Value)
+  else
+    sWhere := 'AND LIVRO_SAIDA.NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalEntradaNUMERO_DOCUMENTO.Value);
+
+  ImprimirApuracaoEntradas;
+
+  ImprimirApuracaoSaidas;
+
+  pnlMsgAguarde.Visible := False;
+
+  Application.ProcessMessages;
+  rdpLivroApuracao.Fechar;
+
+end;
+
+procedure TfrmApuracaoICMS.ImprimirApuracaoEntradas;
+begin
+
+  while not fdqTotalizaVContabilE.Eof do
+  begin
+
+    inc(iLinha);
+
+    rdpLivroApuracao.impBox(iLinha, 1,'i                     i');
+    rdpLivroApuracao.imp   (iLinha, 25, fdqTotalizaVContabilE.FieldByName('CFOP').Value);
+    rdpLivroApuracao.impBox(iLinha, 30,'i');
+    rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaVContabilE.FieldByName('VC_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+    // TOTALIZA BASE POR CFOP
+    fdqTotalizaBCalculoE.Close;
+    fdqTotalizaBCalculoE.SQL.Clear;
+    fdqTotalizaBCalculoE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.BASE_CALCULO_VALOR_OPERACAO),0) AS BC_E');
+    fdqTotalizaBCalculoE.SQL.Add('FROM LIVRO_ENTRADA');
+    fdqTotalizaBCalculoE.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+    fdqTotalizaBCalculoE.SQL.Add('AND CODIGO_VALORES_FISCAIS = 1');
+
+    if sWhere <> '' then
+      fdqTotalizaBCalculoE.SQL.Add(sWhere);
+
+    fdqTotalizaBCalculoE.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaBCalculoE.FieldByName('BC_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+    // TOTALIZA IMPOSTO CREDITADO POR CFOP
+    fdqTotalizaCredito_E.Close;
+    fdqTotalizaCredito_E.SQL.Clear;
+    fdqTotalizaCredito_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.IMPOSTO_CREDITADO),0) AS IC_E');
+    fdqTotalizaCredito_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+    fdqTotalizaCredito_E.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+    fdqTotalizaCredito_E.SQL.Add('AND CODIGO_VALORES_FISCAIS = 1');
+
+    if sWhere <> '' then
+      fdqTotalizaCredito_E.SQL.Add(sWhere);
+
+    fdqTotalizaCredito_E.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaCredito_E.FieldByName('IC_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+    // TOTALIZA ISENTAS NT POR CFOP
+    fdqTotalizaIsentasNT_E.Close;
+    fdqTotalizaIsentasNT_E.SQL.Clear;
+    fdqTotalizaIsentasNT_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS ISENTAS_NT_E');
+    fdqTotalizaIsentasNT_E.SQL.Add('FROM LIVRO_ENTRADA');
+    fdqTotalizaIsentasNT_E.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+    fdqTotalizaIsentasNT_E.SQL.Add('AND CODIGO_VALORES_FISCAIS = 2');
+
+    if sWhere <> '' then
+      fdqTotalizaIsentasNT_E.SQL.Add(sWhere);
+
+    fdqTotalizaIsentasNT_E.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaIsentasNT_E.FieldByName('ISENTAS_NT_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+    // TOTALIZA OUTRAS POR CFOP
+    fdqTotalizaOutras_E.Close;
+    fdqTotalizaOutras_E.SQL.Clear;
+    fdqTotalizaOutras_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS OUTRAS_E');
+    fdqTotalizaOutras_E.SQL.Add('FROM LIVRO_ENTRADA');
+    fdqTotalizaOutras_E.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+    fdqTotalizaOutras_E.SQL.Add('AND CODIGO_VALORES_FISCAIS = 3');
+
+    if sWhere <> '' then
+      fdqTotalizaOutras_E.SQL.Add(sWhere);
+
+    fdqTotalizaOutras_E.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaOutras_E.FieldByName('OUTRAS_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+
+    fdqTotalizaVContabilE.Next;
+  end;
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'<---------------------v------+---------------+-----------------------------+----------------------------+-------------------------+---------------------------->');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 2, '1.000 DO ESTADO');
+
+  //TOTALIZA VL CONTABIL ESTADUAL
+  fdqTotalVLContEstadual_E.Close;
+  fdqTotalVLContEstadual_E.SQL.Clear;
+  fdqTotalVLContEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TVC_E');
+  fdqTotalVLContEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalVLContEstadual_E.SQL.Add('WHERE UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+  if sWhere <> '' then
+    fdqTotalVLContEstadual_E.SQL.Add(sWhere);
+
+  fdqTotalVLContEstadual_E.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalVLContEstadual_E.FieldByName('TVC_E').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+  //TOTALIZA B. CALCULO ESTADUAL
+  fdqTotalBCalculoEstadual_E.Close;
+  fdqTotalBCalculoEstadual_E.SQL.Clear;
+  fdqTotalBCalculoEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.BASE_CALCULO_VALOR_OPERACAO),0) AS TBC_E');
+  fdqTotalBCalculoEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalBCalculoEstadual_E.SQL.Add('WHERE UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalBCalculoEstadual_E.SQL.Add('AND ALIQUOTA > 0');
+  if sWhere <> '' then
+    fdqTotalBCalculoEstadual_E.SQL.Add(sWhere);
+
+  fdqTotalBCalculoEstadual_E.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalBCalculoEstadual_E.FieldByName('TBC_E').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+  //TOTALIZA CREDITO ESTADUAL
+  fdqTotalICreditadoEstadual_E.Close;
+  fdqTotalICreditadoEstadual_E.SQL.Clear;
+  fdqTotalICreditadoEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.IMPOSTO_CREDITADO),0) AS TCREDITO_E');
+  fdqTotalICreditadoEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalICreditadoEstadual_E.SQL.Add('WHERE UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalICreditadoEstadual_E.SQL.Add('AND ALIQUOTA > 0');
+
+  if sWhere <> '' then
+    fdqTotalICreditadoEstadual_E.SQL.Add(sWhere);
+
+  fdqTotalICreditadoEstadual_E.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalICreditadoEstadual_E.FieldByName('TCREDITO_E').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+  //TOTALIZA ISENTAS ESTADUAL
+  fdqTotalIsentasNTEstadual_E.Close;
+  fdqTotalIsentasNTEstadual_E.SQL.Clear;
+  fdqTotalIsentasNTEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TISENTAS_E');
+  fdqTotalIsentasNTEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalIsentasNTEstadual_E.SQL.Add(' WHERE UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalIsentasNTEstadual_E.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 2');
+
+  if sWhere <> '' then
+    fdqTotalIsentasNTEstadual_E.SQL.Add(sWhere);
+
+  fdqTotalIsentasNTEstadual_E.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIsentasNTEstadual_E.FieldByName('TISENTAS_E').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+  //TOTALIZA OUTRAS ESTADUAL
+  fdqTotalOutrasEstadual_E.Close;
+  fdqTotalOutrasEstadual_E.SQL.Clear;
+  fdqTotalOutrasEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TOUTRAS_E');
+  fdqTotalOutrasEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalOutrasEstadual_E.SQL.Add(' WHERE UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalOutrasEstadual_E.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 3');
+
+  if sWhere <> '' then
+    fdqTotalOutrasEstadual_E.SQL.Add(sWhere);
+
+  fdqTotalOutrasEstadual_E.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalOutrasEstadual_E.FieldByName('TOUTRAS_E').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 2, '2.000 DE OUT ESTADO');
+
+  //TOTALIZA VL CONTABIL INTERESTADUAL
+  fdqTotalizaVContabil_IE.Close;
+  fdqTotalizaVContabil_IE.SQL.Clear;
+  fdqTotalizaVContabil_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TVC_IE');
+  fdqTotalizaVContabil_IE.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalizaVContabil_IE.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+  if sWhere <> '' then
+    fdqTotalizaVContabil_IE.SQL.Add(sWhere);
+
+  fdqTotalizaVContabil_IE.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaVContabil_IE.FieldByName('TVC_IE').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+  //TOTALIZA B. CALCULO INTERESTADUAL
+  fdqTotalizaBCalculo_IE.Close;
+  fdqTotalizaBCalculo_IE.SQL.Clear;
+  fdqTotalizaBCalculo_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.BASE_CALCULO_VALOR_OPERACAO),0) AS TBC_IE');
+  fdqTotalizaBCalculo_IE.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalizaBCalculo_IE.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalizaBCalculo_IE.SQL.Add('AND ALIQUOTA > 0');
+  if sWhere <> '' then
+    fdqTotalizaBCalculo_IE.SQL.Add(sWhere);
+
+  fdqTotalizaBCalculo_IE.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaBCalculo_IE.FieldByName('TBC_IE').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+  //TOTALIZA CREDITO INTERESTADUAL
+  fdqTotalICreditadoEstadual_IE.Close;
+  fdqTotalICreditadoEstadual_IE.SQL.Clear;
+  fdqTotalICreditadoEstadual_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.IMPOSTO_CREDITADO),0) AS TCREDITO_IE');
+  fdqTotalICreditadoEstadual_IE.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalICreditadoEstadual_IE.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalICreditadoEstadual_IE.SQL.Add('AND ALIQUOTA > 0');
+
+  if sWhere <> '' then
+    fdqTotalICreditadoEstadual_IE.SQL.Add(sWhere);
+
+  fdqTotalICreditadoEstadual_IE.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalICreditadoEstadual_IE.FieldByName('TCREDITO_IE').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+  //TOTALIZA ISENTAS INTERESTADUAL
+  fdqTotalIsentasNTEstadual_IE.Close;
+  fdqTotalIsentasNTEstadual_IE.SQL.Clear;
+  fdqTotalIsentasNTEstadual_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TISENTAS_IE');
+  fdqTotalIsentasNTEstadual_IE.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalIsentasNTEstadual_IE.SQL.Add(' WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalIsentasNTEstadual_IE.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 2');
+
+  if sWhere <> '' then
+    fdqTotalIsentasNTEstadual_IE.SQL.Add(sWhere);
+
+  fdqTotalIsentasNTEstadual_IE.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIsentasNTEstadual_IE.FieldByName('TISENTAS_IE').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+  //TOTALIZA OUTRAS INTERESTADUAL
+  fdqTotalOutrasEstadual_IE.Close;
+  fdqTotalOutrasEstadual_IE.SQL.Clear;
+  fdqTotalOutrasEstadual_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TOUTRAS_IE');
+  fdqTotalOutrasEstadual_IE.SQL.Add('FROM LIVRO_ENTRADA');
+  fdqTotalOutrasEstadual_IE.SQL.Add(' WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalOutrasEstadual_IE.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 3');
+
+  if sWhere <> '' then
+    fdqTotalOutrasEstadual_IE.SQL.Add(sWhere);
+
+  fdqTotalOutrasEstadual_IE.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalOutrasEstadual_IE.FieldByName('TOUTRAS_IE').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 2, '3.000 DO EXTERIOR');
+
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+  rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+  rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+  rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'<----------------------------+---------------+-----------------------------+----------------------------+-------------------------+---------------------------->');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.impF  (iLinha, 2, 'Total:',[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.impF  (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalVLContEstadual_E.FieldByName('TVC_E').Value+fdqTotalizaVContabil_IE.FieldByName('TVC_IE').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.impF  (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalBCalculoEstadual_E.FieldByName('TBC_E').Value+fdqTotalizaBCalculo_IE.FieldByName('TBC_IE').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+  rdpLivroApuracao.impF  (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalICreditadoEstadual_E.FieldByName('TCREDITO_E').Value+fdqTotalICreditadoEstadual_IE.FieldByName('TCREDITO_IE').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+  rdpLivroApuracao.impF  (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIsentasNTEstadual_E.FieldByName('TISENTAS_E').Value+fdqTotalIsentasNTEstadual_IE.FieldByName('TISENTAS_IE').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+  rdpLivroApuracao.impF  (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalOutrasEstadual_E.FieldByName('TOUTRAS_E').Value+fdqTotalOutrasEstadual_IE.FieldByName('TOUTRAS_IE').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'d----------------------------v---------------v-----------------------------v----------------------------v-------------------------v----------------------------c');
+
+end;
+
+procedure TfrmApuracaoICMS.ImprimirApuracaoSaidas;
+begin
+
+  inc(iLinha);
+  rdpLivroApuracao.impF  (iLinha, 63, 'S A I D A S',[NEGRITO, EXPANDIDO]);
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,
+    'a----------------------------t---------------t-----------------------------------------------------------------------------------------------------------------b');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 10, 'Codificacao');
+  rdpLivroApuracao.impBox(iLinha, 30,'i               i');
+  rdpLivroApuracao.imp   (iLinha, 90, 'Valores Fiscais');
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'<---------------------t------>');
+  rdpLivroApuracao.imp   (iLinha, 35, 'Valores');
+  rdpLivroApuracao.impBox(iLinha, 46,'<----------------------------------------------------------t------------------------------------------------------>');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.impBox(iLinha, 23,'i');
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.imp   (iLinha, 62, 'Operacoes com Debito do Imposto');
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+  rdpLivroApuracao.imp   (iLinha, 118, 'Operacoes sem Debito do Imposto');
+  rdpLivroApuracao.impBox(iLinha, 160, 'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 08, 'Contabil');
+  rdpLivroApuracao.impBox(iLinha, 23,'i');
+  rdpLivroApuracao.imp   (iLinha, 24, 'Fiscal');
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.imp   (iLinha, 34, 'Contabeis');
+  rdpLivroApuracao.impBox(iLinha, 46,'<-----------------------------t----------------------------+-------------------------t---------------------------->');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i                     i      i               i');
+  rdpLivroApuracao.imp   (iLinha, 54, 'Base de Calculo');
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+  rdpLivroApuracao.imp   (iLinha, 82, 'Imposto Debitado');
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+  rdpLivroApuracao.imp   (iLinha, 107, 'Isentas/Nao Tributaveis');
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+  rdpLivroApuracao.imp   (iLinha, 143, 'Outras');
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'<---------------------+------+---------------+-----------------------------+----------------------------+-------------------------+---------------------------->');
+
+  fdqTotalizaVContabilS.First;
+
+  while not  fdqTotalizaVContabilS.Eof do
+  begin
+    inc(iLinha);
+
+    rdpLivroApuracao.impBox(iLinha, 1,'i                     i');
+    rdpLivroApuracao.imp   (iLinha, 25, fdqTotalizaVContabilS.FieldByName('CFOP').Value);
+    rdpLivroApuracao.impBox(iLinha, 30,'i');
+    rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaVContabilS.FieldByName('VC_S').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+    // TOTALIZA BASE POR CFOP
+    fdqTotalizaBCalculoS.Close;
+    fdqTotalizaBCalculoS.SQL.Clear;
+    fdqTotalizaBCalculoS.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.BASE_CALCULO),0) AS BC_E');
+    fdqTotalizaBCalculoS.SQL.Add('FROM LIVRO_SAIDA');
+    fdqTotalizaBCalculoS.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+    fdqTotalizaBCalculoS.SQL.Add('AND ALIQUOTA > 0');
+
+    if sWhere <> '' then
+      fdqTotalizaBCalculoS.SQL.Add(sWhere);
+
+    fdqTotalizaBCalculoS.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaBCalculoS.FieldByName('BC_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+    // TOTALIZA IMPOSTO DEBITADO POR CFOP
+    fdqTotalizaDebito_S.Close;
+    fdqTotalizaDebito_S.SQL.Clear;
+    fdqTotalizaDebito_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.IMPOSTO_DEBITADO),0) AS ID_E');
+    fdqTotalizaDebito_S.SQL.Add('FROM LIVRO_SAIDA');
+    fdqTotalizaDebito_S.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+    fdqTotalizaDebito_S.SQL.Add('AND IMPOSTO_DEBITADO > 0');
+
+    if sWhere <> '' then
+      fdqTotalizaDebito_S.SQL.Add(sWhere);
+
+    fdqTotalizaDebito_S.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaDebito_S.FieldByName('ID_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+    // TOTALIZA ISENTAS NT POR CFOP
+    fdqTotalizaIsentasNT_S.Close;
+    fdqTotalizaIsentasNT_S.SQL.Clear;
+    fdqTotalizaIsentasNT_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS ISENTAS_NT_E');
+    fdqTotalizaIsentasNT_S.SQL.Add('FROM LIVRO_SAIDA');
+    fdqTotalizaIsentasNT_S.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+    fdqTotalizaIsentasNT_S.SQL.Add('AND ISENTAS_NAO_TRIBUTADAS > 0');
+
+    if sWhere <> '' then
+      fdqTotalizaIsentasNT_S.SQL.Add(sWhere);
+
+    fdqTotalizaIsentasNT_S.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaIsentasNT_S.FieldByName('ISENTAS_NT_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+    // TOTALIZA OUTRAS POR CFOP
+    fdqTotalizaOutras_S.Close;
+    fdqTotalizaOutras_S.SQL.Clear;
+    fdqTotalizaOutras_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.OUTRAS),0) AS OUTRAS_E');
+    fdqTotalizaOutras_S.SQL.Add('FROM LIVRO_SAIDA');
+    fdqTotalizaOutras_S.SQL.Add('WHERE CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+    fdqTotalizaOutras_S.SQL.Add('AND OUTRAS > 0');
+
+    if sWhere <> '' then
+      fdqTotalizaOutras_S.SQL.Add(sWhere);
+
+    fdqTotalizaOutras_S.Open;
+
+    rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaOutras_S.FieldByName('OUTRAS_E').Value)]));
+    rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+    fdqTotalizaVContabilS.Next;
+  end;
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'<---------------------v------+---------------+-----------------------------+----------------------------+-------------------------+---------------------------->');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 2, '5.000 P/ O ESTADO');
+
+  //TOTALIZA VLCONTABIL ESTADUAL
+  fdqTotalVLContEstadual_S.Close;
+  fdqTotalVLContEstadual_S.SQL.Clear;
+  fdqTotalVLContEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS TVC_S');
+  fdqTotalVLContEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalVLContEstadual_S.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+  if sWhere <> '' then
+    fdqTotalVLContEstadual_S.SQL.Add(sWhere);
+
+  fdqTotalVLContEstadual_S.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalVLContEstadual_S.FieldByName('TVC_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+  //TOTALIZA b. CALCULO ESTADUAL
+  fdqTotalBCalculoEstadual_S.Close;
+  fdqTotalBCalculoEstadual_S.SQL.Clear;
+  fdqTotalBCalculoEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.BASE_CALCULO),0) AS TBC_S');
+  fdqTotalBCalculoEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalBCalculoEstadual_S.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+  if sWhere <> '' then
+    fdqTotalBCalculoEstadual_S.SQL.Add(sWhere);
+
+  fdqTotalBCalculoEstadual_S.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalBCalculoEstadual_S.FieldByName('TBC_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+  //TOTALIZA DEBITO ESTADUAL
+  fdqTotalIDebitadoEstadual_S.Close;
+  fdqTotalIDebitadoEstadual_S.SQL.Clear;
+  fdqTotalIDebitadoEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.IMPOSTO_DEBITADO),0) AS TDEBITO_S');
+  fdqTotalIDebitadoEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalIDebitadoEstadual_S.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+  if sWhere <> '' then
+    fdqTotalIDebitadoEstadual_S.SQL.Add(sWhere);
+
+  fdqTotalIDebitadoEstadual_S.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIDebitadoEstadual_S.FieldByName('TDEBITO_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+  //TOTALIZA ISENTAS ESTADUAL
+  fdqTotalIsentasNTEstadual_S.Close;
+  fdqTotalIsentasNTEstadual_S.SQL.Clear;
+  fdqTotalIsentasNTEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.ISENTAS_NAO_TRIBUTADAS),0) AS TISENTAS_S');
+  fdqTotalIsentasNTEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalIsentasNTEstadual_S.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalIsentasNTEstadual_S.SQL.Add(' AND ISENTAS_NAO_TRIBUTADAS > 0');
+
+  if sWhere <> '' then
+    fdqTotalIsentasNTEstadual_S.SQL.Add(sWhere);
+
+  fdqTotalIsentasNTEstadual_S.Open;
+  rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIsentasNTEstadual_S.FieldByName('TISENTAS_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+  //TOTALIZA OUTRAS ESTADUAL
+  fdqTotalOutrasEstadual_S.Close;
+  fdqTotalOutrasEstadual_S.SQL.Clear;
+  fdqTotalOutrasEstadual_S.SQL.Add('SELECT COALESCE(SUM(VALOR_CONTABIL),0) AS TOUTRAS_S');
+  fdqTotalOutrasEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalOutrasEstadual_S.SQL.Add('WHERE UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalOutrasEstadual_S.SQL.Add(' AND OUTRAS > 0');
+
+  if sWhere <> '' then
+    fdqTotalOutrasEstadual_S.SQL.Add(sWhere);
+
+  fdqTotalOutrasEstadual_S.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalOutrasEstadual_S.FieldByName('TOUTRAS_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 2, '6.000 P/OUT ESTADO');
+
+  //TOTALIZA VLCONTABIL INTER_ESTADUAL
+  fdqTotalizaVContabil_IE_S.Close;
+  fdqTotalizaVContabil_IE_S.SQL.Clear;
+  fdqTotalizaVContabil_IE_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS TVC_IE_S');
+  fdqTotalizaVContabil_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalizaVContabil_IE_S.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+  if sWhere <> '' then
+    fdqTotalizaVContabil_IE_S.SQL.Add(sWhere);
+
+  fdqTotalizaVContabil_IE_S.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaVContabil_IE_S.FieldByName('TVC_IE_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+  //TOTALIZA b. CALCULO INTER_ESTADUAL
+  fdqTotalizaBCalculo_IE_S.Close;
+  fdqTotalizaBCalculo_IE_S.SQL.Clear;
+  fdqTotalizaBCalculo_IE_S.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO),0) AS TBC_IE_S');
+  fdqTotalizaBCalculo_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalizaBCalculo_IE_S.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalizaBCalculo_IE_S.SQL.Add(' AND ALIQUOTA > 0');
+
+  if sWhere <> '' then
+    fdqTotalizaBCalculo_IE_S.SQL.Add(sWhere);
+
+  fdqTotalizaBCalculo_IE_S.Open;
+
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalizaBCalculo_IE_S.FieldByName('TBC_IE_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+  //TOTALIZA DEBITO INTER_ESTADUAL
+  fdqTotalIDebitadoEstadual_IE_S.Close;
+  fdqTotalIDebitadoEstadual_IE_S.SQL.Clear;
+  fdqTotalIDebitadoEstadual_IE_S.SQL.Add('SELECT COALESCE(SUM(IMPOSTO_DEBITADO),0) AS TDEBITO_IE_S');
+  fdqTotalIDebitadoEstadual_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalIDebitadoEstadual_IE_S.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+  if sWhere <> '' then
+    fdqTotalIDebitadoEstadual_IE_S.SQL.Add(sWhere);
+
+  fdqTotalIDebitadoEstadual_IE_S.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIDebitadoEstadual_IE_S.FieldByName('TDEBITO_IE_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+  //TOTALIZA ISENTAS INTER_ESTADUAL
+  fdqTotalIsentasNTEstadual_IE_S.Close;
+  fdqTotalIsentasNTEstadual_IE_S.SQL.Clear;
+  fdqTotalIsentasNTEstadual_IE_S.SQL.Add('SELECT COALESCE(SUM(ISENTAS_NAO_TRIBUTADAS),0) AS TISENTAS_IE_S');
+  fdqTotalIsentasNTEstadual_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalIsentasNTEstadual_IE_S.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalIsentasNTEstadual_IE_S.SQL.Add(' AND ISENTAS_NAO_TRIBUTADAS > 0');
+
+  if sWhere <> '' then
+    fdqTotalIsentasNTEstadual_IE_S.SQL.Add(sWhere);
+
+  fdqTotalIsentasNTEstadual_IE_S.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIsentasNTEstadual_IE_S.FieldByName('TISENTAS_IE_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+  //TOTALIZA OUTRAS INTERESTADUAL
+  fdqTotalOutrasEstadual_IE_S.Close;
+  fdqTotalOutrasEstadual_IE_S.SQL.Clear;
+  fdqTotalOutrasEstadual_IE_S.SQL.Add('SELECT COALESCE(SUM(VALOR_CONTABIL),0) AS TOUTRAS_IE_S');
+  fdqTotalOutrasEstadual_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+  fdqTotalOutrasEstadual_IE_S.SQL.Add('WHERE UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+  fdqTotalOutrasEstadual_IE_S.SQL.Add(' AND OUTRAS > 0');
+
+  if sWhere <> '' then
+    fdqTotalOutrasEstadual_IE_S.SQL.Add(sWhere);
+
+  fdqTotalOutrasEstadual_IE_S.Open;
+
+  rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalOutrasEstadual_IE_S.FieldByName('TOUTRAS_IE_S').Value)]));
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.imp   (iLinha, 2, '7.000 P/O EXTERIOR');
+
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.imp   (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.imp   (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+
+  rdpLivroApuracao.imp   (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+
+  rdpLivroApuracao.imp   (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+
+  rdpLivroApuracao.imp   (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',0)]));
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'<----------------------------+---------------+-----------------------------+----------------------------+-------------------------+---------------------------->');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'i');
+  rdpLivroApuracao.impF  (iLinha, 2, 'Total:',[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 30,'i');
+  rdpLivroApuracao.impF  (iLinha, 34, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalVLContEstadual_S.FieldByName('TVC_S').Value+fdqTotalizaVContabil_IE_S.FieldByName('TVC_IE_S').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 46,'i');
+  rdpLivroApuracao.impF  (iLinha, 64, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalBCalculoEstadual_S.FieldByName('TBC_S').Value+fdqTotalizaBCalculo_IE_S.FieldByName('TBC_IE_S').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 76,'i');
+  rdpLivroApuracao.impF  (iLinha, 93, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIDebitadoEstadual_S.FieldByName('TDEBITO_S').Value+fdqTotalIDebitadoEstadual_IE_S.FieldByName('TDEBITO_IE_S').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 105,'i');
+  rdpLivroApuracao.impF  (iLinha, 119, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalIsentasNTEstadual_S.FieldByName('TISENTAS_S').Value+fdqTotalIsentasNTEstadual_IE_S.FieldByName('TISENTAS_IE_S').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 131,'i');
+  rdpLivroApuracao.impF  (iLinha, 148, Format('%12.12s',[FormatFloat('#,##0.00',fdqTotalOutrasEstadual_S.FieldByName('TOUTRAS_S').Value+fdqTotalOutrasEstadual_IE_S.FieldByName('TOUTRAS_IE_S').Value)]),[NEGRITO]);
+  rdpLivroApuracao.impBox(iLinha, 160,'i');
+
+  inc(iLinha);
+  rdpLivroApuracao.impBox(iLinha, 1,'d----------------------------v---------------v-----------------------------v----------------------------v-------------------------v----------------------------c');
+
+end;
+
+procedure TfrmApuracaoICMS.ImprimirResumoApuracao;
+begin
+
+  Tag := 1;
+
+  rdpLivroApuracao.TitulodoRelatorio := 'R E S U M O   D A   A P U R A C A O   D O   I M P O S T O   I C M S';
+  rdpLivroApuracao.OpcoesPreview.Preview := True;
+
+  rdpLivroApuracao.abrir; // Inicia a montagem do relatório...
+
+  if rdpLivroApuracao.Setup = False then
+    exit;
+
+  pnlMsgAguarde.Visible := True;
+
+  Application.ProcessMessages;
+
+  fdqTotalizaVContabilE.First;
+
+  if (edtDataInicial.Text <> '  /  /    ') and (edtDataFinal.Text <> '  /  /    ') then
+    sWhere := 'AND DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy', StrToDate(edtDataInicial.Text)))
+      + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy', StrToDate(edtDataFinal.Text)))
+  else if cboPeriodoApuracao.Text <> '' then
+    sWhere := 'AND MES_ANO = ' + QuotedStr(cboPeriodoApuracao.Text)
+  else if edtPesquisa.Text <> '' then
+    sWhere := 'AND LIVRO_SAIDA.NUMERO_DOCUMENTO = ' + QuotedStr(dmCDSMaster.cdsLivroFiscalEntradaNUMERO_DOCUMENTO.Value)
+  else
+    sWhere := 'AND LIVRO_SAIDA.NUMERO_DOCUMENTO = ' + QuotedStr(dmCDSMaster.cdsLivroFiscalEntradaNUMERO_DOCUMENTO.Value);
+
+  ImprimirApuracaoEntradas;
+
+  ImprimirApuracaoSaidas;
+
+  pnlMsgAguarde.Visible := False;
+
+  Application.ProcessMessages;
+  rdpLivroApuracao.Fechar;
+
+end;
+
+procedure TfrmApuracaoICMS.rdpLivroApuracaoNewPage(Sender: TObject;
+  Pagina: Integer);
+begin
+  case tag of
+    0:begin
+
+        rdpLivroApuracao.impBox(1, 1,
+        'a--------------------------------------------------------------------------------------------------------------------------------------------------------------b');
+
+        rdpLivroApuracao.impBox(2, 1, 'i');
+        rdpLivroApuracao.impF  (2, 33, rdpLivroApuracao.TitulodoRelatorio,[NEGRITO, EXPANDIDO]);
+        rdpLivroApuracao.impF  (2, 150, 'Modelo: P9',[NEGRITO]);
+        rdpLivroApuracao.impBox(2, 160, 'i');
+
+        rdpLivroApuracao.impBox(3, 1, 'i');
+        rdpLivroApuracao.impF  (3, 2, 'Empresa.......:', [NEGRITO]);
+        rdpLivroApuracao.imp   (3, 18, dmCDSMaster.cdsFilialRAZAO_SOCIAL.Value);
+        rdpLivroApuracao.impBox(3, 160, 'i');
+
+        rdpLivroApuracao.impBox(4, 1, 'i');
+        rdpLivroApuracao.impF  (4, 2, 'Inscr.Estadual:', [NEGRITO]);
+        rdpLivroApuracao.imp   (4, 18, dmCDSMaster.cdsFilialINSCRICAO_ESTADUAL.Value);
+        rdpLivroApuracao.impF  (4, 45, 'CNPJ......:', [NEGRITO]);
+        rdpLivroApuracao.imp   (4, 57, FormatarCNPJCPF(dmCDSMaster.cdsFilialCNPJ.Value));
+        rdpLivroApuracao.impBox(4, 160, 'i');
+
+        rdpLivroApuracao.impBox(5, 1, 'i');
+        rdpLivroApuracao.impF  (5, 2, 'Pagina........:', [NEGRITO]);
+        rdpLivroApuracao.imp   (5, 18, IntToStr(Pagina));
+        rdpLivroApuracao.impF  (5, 45, 'Referencia:', [NEGRITO]);
+
+        if cboPeriodoApuracao.Text <> '' then
+        begin
+
+          rdpLivroApuracao.imp (5, 57,RetornaPeriodoReferencia(fdqDataApuracao.FieldByName('DATA_ENTRADA').Value));
+          rdpLivroApuracao.impF(5, 80, 'Periodo:', [NEGRITO]);
+          rdpLivroApuracao.imp (5, 89,'Mensal');
+
+        end
+        else if (edtDataInicial.Text <> '  /  /    ') and (edtDataFinal.Text <> '  /  /    ') then
+        begin
+
+          rdpLivroApuracao.imp (5, 57,RetornaPeriodoReferencia(StrToDate(edtDataInicial.Text)));
+          rdpLivroApuracao.impF(5, 80, 'Periodo:', [NEGRITO]);
+          rdpLivroApuracao.imp (5, 89,'de ' + edtDataInicial.Text + ' a ' + edtDataFinal.Text );
+
+        end;
+
+        rdpLivroApuracao.impBox(5, 160, 'i');
+        rdpLivroApuracao.impBox(6, 1,
+          'd--------------------------------------------------------------------------------------------------------------------------------------------------------------c');
+        rdpLivroApuracao.impF  (7, 60, 'E N T R A D A S',[NEGRITO, EXPANDIDO]);
+        rdpLivroApuracao.impBox(8, 1,
+          'a----------------------------t---------------t-----------------------------------------------------------------------------------------------------------------b');
+        rdpLivroApuracao.impBox(9, 1,'i');
+        rdpLivroApuracao.imp   (9, 10, 'Codificacao');
+        rdpLivroApuracao.impBox(9, 30,'i               i');
+        rdpLivroApuracao.imp   (9, 90, 'Valores Fiscais');
+        rdpLivroApuracao.impBox(9, 160,'i');
+
+        rdpLivroApuracao.impBox(10, 1,'<---------------------t------>');
+        rdpLivroApuracao.imp   (10, 35, 'Valores');
+        rdpLivroApuracao.impBox(10, 46,'<----------------------------------------------------------t------------------------------------------------------>');
+
+        rdpLivroApuracao.impBox(11, 1,'i');
+        rdpLivroApuracao.impBox(11, 23,'i');
+        rdpLivroApuracao.impBox(11, 30,'i');
+        rdpLivroApuracao.impBox(11, 46,'i');
+        rdpLivroApuracao.imp   (11, 62, 'Operacoes com Credito do Imposto');
+        rdpLivroApuracao.impBox(11, 105,'i');
+        rdpLivroApuracao.imp   (11, 118, 'Operacoes sem Credito do Imposto');
+        rdpLivroApuracao.impBox(11, 160, 'i');
+
+        rdpLivroApuracao.impBox(12, 1,'i');
+        rdpLivroApuracao.imp   (12, 08, 'Contabil');
+        rdpLivroApuracao.impBox(12, 23,'i');
+        rdpLivroApuracao.imp   (12, 24, 'Fiscal');
+        rdpLivroApuracao.impBox(12, 30,'i');
+        rdpLivroApuracao.imp   (12, 34, 'Contabeis');
+        rdpLivroApuracao.impBox(12, 46,'<-----------------------------t----------------------------+-------------------------t---------------------------->');
+
+        rdpLivroApuracao.impBox(13, 1,'i                     i      i               i');
+        rdpLivroApuracao.imp   (13, 54, 'Base de Calculo');
+        rdpLivroApuracao.impBox(13, 76,'i');
+        rdpLivroApuracao.imp   (13, 82, 'Imposto Creditado');
+        rdpLivroApuracao.impBox(13, 105,'i');
+        rdpLivroApuracao.imp   (13, 107, 'Isentas/Nao Tributaveis');
+        rdpLivroApuracao.impBox(13, 131,'i');
+        rdpLivroApuracao.imp   (13, 143, 'Outras');
+        rdpLivroApuracao.impBox(13, 160,'i');
+
+        rdpLivroApuracao.impBox(14, 1,'<---------------------+------+---------------+-----------------------------+----------------------------+-------------------------+---------------------------->');
+
+        iLinha := 14;
+
+      end;
+  end;
+
+end;
+
+procedure TfrmApuracaoICMS.stbAtalhoDrawPanel(StatusBar: TStatusBar;
+  Panel: TStatusPanel; const Rect: TRect);
+begin
+
+  with stbAtalho.Canvas do
+  begin
+    FillRect(Rect);
+
+    {
+
+      define estilo da fonte
+
+      }
+
+    Font.Name := 'Arial';
+    Font.Size := 8;
+    Font.Style := [fsBold];
+
+    // Desenha as imagens de acordo com o indice de cada panel
+    if Panel.Index < 5 then
+      dmDBEXMaster.imgHot.Draw(stbAtalho.Canvas, Rect.Left + 5, Rect.Top + 1,
+        Panel.Index);
+
+    // Escreve o texto em cada panel
+    if Panel.Index = 0 then
+      TextOut(Rect.Left + 25, Rect.Top + 1, 'F2-Incluir');
+
+    if Panel.Index = 1 then
+      TextOut(Rect.Left + 25, Rect.Top + 1, 'F3-Desfazer');
+
+    if Panel.Index = 2 then
+      TextOut(Rect.Left + 25, Rect.Top + 1, 'F4-Salvar');
+
+    if Panel.Index = 3 then
+      TextOut(Rect.Left + 25, Rect.Top + 1, 'F5-Excluir');
+
+    if Panel.Index = 4 then
+      TextOut(Rect.Left + 25, Rect.Top + 1, 'F6-Editar');
+
+  end;
+
+end;
+
+procedure TfrmApuracaoICMS.Totalizar_Valores_Entradas(pOpcao: smallint);
+var
+  i:integer;
+begin
+
+  for i := 0 to stgTotaisCfopEstadualE.RowCount - 1 do
+    stgTotaisCfopEstadualE.Rows[i].Clear;
+
+  stgTotaisCfopEstadualE.RowCount := 2;
+  stgTotaisCfopEstadualE.Cols[0].Text := 'Cfop';
+  stgTotaisCfopEstadualE.Cols[1].Text := 'Descrição Cfop';
+  stgTotaisCfopEstadualE.Cols[2].Text := 'Vlr Contábil';
+  stgTotaisCfopEstadualE.Cols[3].Text := 'B.Cálculo';
+  stgTotaisCfopEstadualE.Cols[4].Text := 'Crédito';
+  stgTotaisCfopEstadualE.Cols[5].Text := 'Isentas/NT';
+  stgTotaisCfopEstadualE.Cols[6].Text := 'Outras';
+
+  case pOpcao of
+    0: // data
+      sWhere := 'WHERE LIVRO_ENTRADA.DATA_ENTRADA BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy', StrToDate(edtDataInicial.Text)))
+        + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrToDate(edtDataFinal.Text)));
+    1:// mes/ano
+      sWhere := 'WHERE LIVRO_ENTRADA.MES_ANO = ' + QuotedStr(cboPeriodoApuracao.Text);
+    2:// documento
+      sWhere := 'WHERE LIVRO_ENTRADA.NUMERO_DOCUMENTO = ' + QuotedStr(edtPesquisa.Text);
+  end;
+
+  fdqTotalizaVContabilE.Close;
+  fdqTotalizaVContabilE.SQL.Clear;
+  fdqTotalizaVContabilE.SQL.Add('SELECT LIVRO_ENTRADA.CFOP, CFOP.DESCRICAO, COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS VC_E');
+  fdqTotalizaVContabilE.SQL.Add('FROM LIVRO_ENTRADA LIVRO_ENTRADA');
+  fdqTotalizaVContabilE.SQL.Add('JOIN CFOP CFOP');
+  fdqTotalizaVContabilE.SQL.Add('ON(LIVRO_ENTRADA.CFOP = CFOP.CFOP)');
+
+  if sWhere <> '' then
+    fdqTotalizaVContabilE.SQL.Add(sWhere);
+
+  fdqTotalizaVContabilE.SQL.Add('GROUP BY LIVRO_ENTRADA.CFOP, CFOP.DESCRICAO');
+  fdqTotalizaVContabilE.SQL.Add('ORDER BY LIVRO_ENTRADA.CFOP, CFOP.DESCRICAO');
+
+  fdqTotalizaVContabilE.Open;
+
+    while not fdqTotalizaVContabilE.Eof do
+    begin
+
+      // TOTALIZA BASE PRO CFOP
+      fdqTotalizaBCalculoE.Close;
+      fdqTotalizaBCalculoE.SQL.Clear;
+      fdqTotalizaBCalculoE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.BASE_CALCULO_VALOR_OPERACAO),0) AS BC_E');
+      fdqTotalizaBCalculoE.SQL.Add('FROM LIVRO_ENTRADA');
+
+      if sWhere <> '' then
+        fdqTotalizaBCalculoE.SQL.Add(sWhere);
+
+      fdqTotalizaBCalculoE.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+      fdqTotalizaBCalculoE.SQL.Add('AND CODIGO_VALORES_FISCAIS = 1');
+
+      fdqTotalizaBCalculoE.Open;
+
+      // TOTALIZA IMPOSTO CREDITADO POR CFOP
+      fdqTotalizaCredito_E.Close;
+      fdqTotalizaCredito_E.SQL.Clear;
+      fdqTotalizaCredito_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.IMPOSTO_CREDITADO),0) AS IC_E');
+      fdqTotalizaCredito_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+      if sWhere <> '' then
+        fdqTotalizaCredito_E.SQL.Add(sWhere);
+
+      fdqTotalizaCredito_E.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+      fdqTotalizaCredito_E.SQL.Add('AND CODIGO_VALORES_FISCAIS = 1');
+
+      fdqTotalizaCredito_E.Open;
+
+      // TOTALIZA ISENTAS NT POR CFOP
+      fdqTotalizaIsentasNT_E.Close;
+      fdqTotalizaIsentasNT_E.SQL.Clear;
+      fdqTotalizaIsentasNT_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS ISENTAS_NT_E');
+      fdqTotalizaIsentasNT_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+      if sWhere <> '' then
+        fdqTotalizaIsentasNT_E.SQL.Add(sWhere);
+
+      fdqTotalizaIsentasNT_E.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+      fdqTotalizaIsentasNT_E.SQL.Add('AND CODIGO_VALORES_FISCAIS = 2');
+
+      fdqTotalizaIsentasNT_E.Open;
+
+      // TOTALIZA OUTRAS POR CFOP
+      fdqTotalizaOutras_E.Close;
+      fdqTotalizaOutras_E.SQL.Clear;
+      fdqTotalizaOutras_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS OUTRAS_E');
+      fdqTotalizaOutras_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+      if sWhere <> '' then
+        fdqTotalizaOutras_E.SQL.Add(sWhere);
+
+      fdqTotalizaOutras_E.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilE.FieldByName('CFOP').Value));
+      fdqTotalizaOutras_E.SQL.Add('AND CODIGO_VALORES_FISCAIS = 3');
+
+      fdqTotalizaOutras_E.Open;
+
+      stgTotaisCfopEstadualE.Cells[0, stgTotaisCfopEstadualE.RowCount - 1] := fdqTotalizaVContabilE.FieldByName('CFOP').Value;
+      stgTotaisCfopEstadualE.Cells[1, stgTotaisCfopEstadualE.RowCount - 1] := Format('%-30.30s',[fdqTotalizaVContabilE.FieldByName('DESCRICAO').Value]);
+      stgTotaisCfopEstadualE.Cells[2, stgTotaisCfopEstadualE.RowCount - 1] := Format('%12.12s', [FormatFloat('#,##0.00',fdqTotalizaVContabilE.FieldByName('VC_E').Value)]);
+      stgTotaisCfopEstadualE.Cells[3, stgTotaisCfopEstadualE.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaBCalculoE.FieldByName('BC_E').Value)]);
+      stgTotaisCfopEstadualE.Cells[4, stgTotaisCfopEstadualE.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaCredito_E.FieldByName('IC_E').Value)]);
+      stgTotaisCfopEstadualE.Cells[5, stgTotaisCfopEstadualE.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaIsentasNT_E.FieldByName('ISENTAS_NT_E').Value)]);
+      stgTotaisCfopEstadualE.Cells[6, stgTotaisCfopEstadualE.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaOutras_E.FieldByName('OUTRAS_E').Value)]);
+
+      if not fdqTotalizaVContabilE.Eof then
+        stgTotaisCfopEstadualE.RowCount := stgTotaisCfopEstadualE.RowCount + 1;
+
+      fdqTotalizaVContabilE.Next;
+
+    end;
+
+    //TOTALIZA VLCONTABIL ESTADUAL
+    fdqTotalVLContEstadual_E.Close;
+    fdqTotalVLContEstadual_E.SQL.Clear;
+    fdqTotalVLContEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TVC_E');
+    fdqTotalVLContEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalVLContEstadual_E.SQL.Add(sWhere);
+
+    fdqTotalVLContEstadual_E.SQL.Add(' AND UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalVLContEstadual_E.Open;
+
+    edtTVContalbilEST.Text := FormatFloat
+      ('#,##0.00', fdqTotalVLContEstadual_E.FieldByName('TVC_E').AsCurrency);
+
+    //TOTALIZA b. CALCULO ESTADUAL
+    fdqTotalBCalculoEstadual_E.Close;
+    fdqTotalBCalculoEstadual_E.SQL.Clear;
+    fdqTotalBCalculoEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.BASE_CALCULO_VALOR_OPERACAO),0) AS TBC_E');
+    fdqTotalBCalculoEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalBCalculoEstadual_E.SQL.Add(sWhere);
+
+    fdqTotalBCalculoEstadual_E.SQL.Add(' AND UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalBCalculoEstadual_E.SQL.Add(' AND ALIQUOTA > 0');
+
+    fdqTotalBCalculoEstadual_E.Open;
+
+    edtTBCalculoEst.Text := FormatFloat
+      ('#,##0.00', fdqTotalBCalculoEstadual_E.FieldByName('TBC_E').AsCurrency);
+
+    //TOTALIZA CREDITO ESTADUAL
+    fdqTotalICreditadoEstadual_E.Close;
+    fdqTotalICreditadoEstadual_E.SQL.Clear;
+    fdqTotalICreditadoEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.IMPOSTO_CREDITADO),0) AS TCREDITO_E');
+    fdqTotalICreditadoEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalICreditadoEstadual_E.SQL.Add(sWhere);
+
+    fdqTotalICreditadoEstadual_E.SQL.Add(' AND UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalICreditadoEstadual_E.Open;
+
+    edtCreditoEst.Text := FormatFloat
+      ('#,##0.00', fdqTotalICreditadoEstadual_E.FieldByName('TCREDITO_E').AsCurrency);
+
+    //TOTALIZA ISENTAS ESTADUAL
+    fdqTotalIsentasNTEstadual_E.Close;
+    fdqTotalIsentasNTEstadual_E.SQL.Clear;
+    fdqTotalIsentasNTEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TISENTAS_E');
+    fdqTotalIsentasNTEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalIsentasNTEstadual_E.SQL.Add(sWhere);
+
+    fdqTotalIsentasNTEstadual_E.SQL.Add(' AND UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalIsentasNTEstadual_E.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 2');
+
+    fdqTotalIsentasNTEstadual_E.Open;
+
+    edtIsentasNTEst.Text := FormatFloat('#,##0.00', fdqTotalIsentasNTEstadual_E.FieldByName('TISENTAS_E').AsCurrency);
+
+    //TOTALIZA OUTRAS ESTADUAL
+    fdqTotalOutrasEstadual_E.Close;
+    fdqTotalOutrasEstadual_E.SQL.Clear;
+    fdqTotalOutrasEstadual_E.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TOUTRAS_E');
+    fdqTotalOutrasEstadual_E.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalOutrasEstadual_E.SQL.Add(sWhere);
+
+    fdqTotalOutrasEstadual_E.SQL.Add(' AND UF_ORIGEM = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalOutrasEstadual_E.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 3');
+
+    fdqTotalOutrasEstadual_E.Open;
+
+    edtOutrasEst.Text := FormatFloat('#,##0.00', fdqTotalOutrasEstadual_E.FieldByName('TOUTRAS_E').AsCurrency);
+
+
+
+
+///*/*/*/*/*/**
+
+    //TOTALIZA VLCONTABIL INTER_ESTADUAL
+    fdqTotalizaVContabil_IE.Close;
+    fdqTotalizaVContabil_IE.SQL.Clear;
+    fdqTotalizaVContabil_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TVC_IE');
+    fdqTotalizaVContabil_IE.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalizaVContabil_IE.SQL.Add(sWhere);
+
+    fdqTotalizaVContabil_IE.SQL.Add(' AND UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalizaVContabil_IE.Open;
+
+    edtTVContalbilinter.Text := FormatFloat
+      ('#,##0.00', fdqTotalizaVContabil_IE.FieldByName('TVC_IE').AsCurrency);
+
+    //TOTALIZA b. CALCULO INTER_ESTADUAL
+    fdqTotalizaBCalculo_IE.Close;
+    fdqTotalizaBCalculo_IE.SQL.Clear;
+    fdqTotalizaBCalculo_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.BASE_CALCULO_VALOR_OPERACAO),0) AS TBC_IE');
+    fdqTotalizaBCalculo_IE.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalizaBCalculo_IE.SQL.Add(sWhere);
+
+    fdqTotalizaBCalculo_IE.SQL.Add(' AND UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalizaBCalculo_IE.SQL.Add(' AND ALIQUOTA > 0');
+
+    fdqTotalizaBCalculo_IE.Open;
+
+    edtTBCalculoInter.Text := FormatFloat
+      ('#,##0.00', fdqTotalizaBCalculo_IE.FieldByName('TBC_IE').AsCurrency);
+
+    //TOTALIZA CREDITO INTER_ESTADUAL
+    fdqTotalICreditadoEstadual_IE.Close;
+    fdqTotalICreditadoEstadual_IE.SQL.Clear;
+    fdqTotalICreditadoEstadual_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.IMPOSTO_CREDITADO),0) AS TCREDITO_IE');
+    fdqTotalICreditadoEstadual_IE.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalICreditadoEstadual_IE.SQL.Add(sWhere);
+
+    fdqTotalICreditadoEstadual_IE.SQL.Add(' AND UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalICreditadoEstadual_IE.Open;
+
+    edtCreditoInter.Text := FormatFloat
+      ('#,##0.00', fdqTotalICreditadoEstadual_IE.FieldByName('TCREDITO_IE').AsCurrency);
+
+    //TOTALIZA ISENTAS INTER_ESTADUAL
+    fdqTotalIsentasNTEstadual_IE.Close;
+    fdqTotalIsentasNTEstadual_IE.SQL.Clear;
+    fdqTotalIsentasNTEstadual_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TISENTAS_IE');
+    fdqTotalIsentasNTEstadual_IE.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalIsentasNTEstadual_IE.SQL.Add(sWhere);
+
+    fdqTotalIsentasNTEstadual_IE.SQL.Add(' AND UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalIsentasNTEstadual_IE.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 2');
+
+    fdqTotalIsentasNTEstadual_IE.Open;
+
+    edtIsentasNTInter.Text := FormatFloat('#,##0.00', fdqTotalIsentasNTEstadual_IE.FieldByName('TISENTAS_IE').AsCurrency);
+
+
+    //TOTALIZA OUTRAS ESTADUAL
+    fdqTotalOutrasEstadual_IE.Close;
+    fdqTotalOutrasEstadual_IE.SQL.Clear;
+    fdqTotalOutrasEstadual_IE.SQL.Add('SELECT COALESCE(SUM(LIVRO_ENTRADA.VALOR_CONTABIL),0) AS TOUTRAS_IE');
+    fdqTotalOutrasEstadual_IE.SQL.Add('FROM LIVRO_ENTRADA');
+
+    if sWhere <> '' then
+      fdqTotalOutrasEstadual_IE.SQL.Add(sWhere);
+
+    fdqTotalOutrasEstadual_IE.SQL.Add(' AND UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalOutrasEstadual_IE.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 3');
+
+    fdqTotalOutrasEstadual_IE.Open;
+
+    edtOutrasInter.Text := FormatFloat('#,##0.00', fdqTotalOutrasEstadual_IE.FieldByName('TOUTRAS_IE').AsCurrency);
+
+
+end;
+
+procedure TfrmApuracaoICMS.Totalizar_Valores_Saidas(pOpcao: smallint);
+var
+  i:integer;
+begin
+
+  for i := 0 to stgTotaisCfopEstadualS.RowCount - 1 do
+    stgTotaisCfopEstadualS.Rows[i].Clear;
+
+  stgTotaisCfopEstadualS.RowCount := 2;
+
+  stgTotaisCfopEstadualS.Cols[0].Text := 'Cfop';
+  stgTotaisCfopEstadualS.Cols[1].Text := 'Descrição Cfop';
+  stgTotaisCfopEstadualS.Cols[2].Text := 'Vlr Contábil';
+  stgTotaisCfopEstadualS.Cols[3].Text := 'B.Cálculo';
+  stgTotaisCfopEstadualS.Cols[4].Text := 'Débito';
+  stgTotaisCfopEstadualS.Cols[5].Text := 'Isentas/NT';
+  stgTotaisCfopEstadualS.Cols[6].Text := 'Outras';
+
+  case pOpcao of
+    0: // data
+      sWhere := 'WHERE LIVRO_SAIDA.DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy', StrToDate(edtDataInicial.Text)))
+        + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrToDate(edtDataFinal.Text)));
+    1:// mes/ano
+      sWhere := 'WHERE LIVRO_SAIDA.MES_ANO = ' + QuotedStr(cboPeriodoApuracao.Text);
+    2:// documento
+      sWhere := 'WHERE LIVRO_SAIDA.NUMERO_DOCUMENTO = ' + QuotedStr(edtPesquisa.Text);
+  end;
+
+  fdqTotalizaVContabilS.Close;
+  fdqTotalizaVContabilS.SQL.Clear;
+  fdqTotalizaVContabilS.SQL.Add('SELECT LIVRO_SAIDA.CFOP, CFOP.DESCRICAO, COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS VC_S');
+  fdqTotalizaVContabilS.SQL.Add('FROM LIVRO_SAIDA LIVRO_SAIDA');
+  fdqTotalizaVContabilS.SQL.Add('JOIN CFOP CFOP');
+  fdqTotalizaVContabilS.SQL.Add('ON(LIVRO_SAIDA.CFOP = CFOP.CFOP)');
+
+  if sWhere <> '' then
+    fdqTotalizaVContabilS.SQL.Add(sWhere);
+
+  fdqTotalizaVContabilS.SQL.Add('GROUP BY LIVRO_SAIDA.CFOP, CFOP.DESCRICAO');
+  fdqTotalizaVContabilS.SQL.Add('ORDER BY LIVRO_SAIDA.CFOP, CFOP.DESCRICAO');
+
+  fdqTotalizaVContabilS.Open;
+
+    while not fdqTotalizaVContabilS.Eof do
+    begin
+
+      // TOTALIZA BASE POR CFOP
+      fdqTotalizaBCalculoS.Close;
+      fdqTotalizaBCalculoS.SQL.Clear;
+      fdqTotalizaBCalculoS.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.BASE_CALCULO),0) AS BC_S');
+      fdqTotalizaBCalculoS.SQL.Add('FROM LIVRO_SAIDA');
+
+      if sWhere <> '' then
+        fdqTotalizaBCalculoS.SQL.Add(sWhere);
+
+      fdqTotalizaBCalculoS.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+      fdqTotalizaBCalculoS.SQL.Add('AND ALIQUOTA > 0');
+
+      fdqTotalizaBCalculoS.Open;
+
+      // TOTALIZA IMPOSTO DEBITADO POR CFOP
+      fdqTotalizaDebito_S.Close;
+      fdqTotalizaDebito_S.SQL.Clear;
+      fdqTotalizaDebito_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.IMPOSTO_DEBITADO),0) AS ID_S');
+      fdqTotalizaDebito_S.SQL.Add('FROM LIVRO_SAIDA');
+
+      if sWhere <> '' then
+        fdqTotalizaDebito_S.SQL.Add(sWhere);
+
+      fdqTotalizaDebito_S.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+      fdqTotalizaDebito_S.SQL.Add('AND IMPOSTO_DEBITADO > 0');
+
+      fdqTotalizaDebito_S.Open;
+
+      // TOTALIZA ISENTAS NT POR CFOP
+      fdqTotalizaIsentasNT_S.Close;
+      fdqTotalizaIsentasNT_S.SQL.Clear;
+      fdqTotalizaIsentasNT_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS ISENTAS_NT_S');
+      fdqTotalizaIsentasNT_S.SQL.Add('FROM LIVRO_SAIDA');
+
+      if sWhere <> '' then
+        fdqTotalizaIsentasNT_S.SQL.Add(sWhere);
+
+      fdqTotalizaIsentasNT_S.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+      fdqTotalizaIsentasNT_S.SQL.Add('AND ISENTAS_NAO_TRIBUTADAS > 0');
+
+      fdqTotalizaIsentasNT_S.Open;
+
+      edtIsentasNTEst_S.Text := FormatFloat('#,##0.00', fdqTotalizaIsentasNT_S.FieldByName('ISENTAS_NT_S').AsCurrency);
+
+      // TOTALIZA OUTRAS POR CFOP
+      fdqTotalizaOutras_S.Close;
+      fdqTotalizaOutras_S.SQL.Clear;
+      fdqTotalizaOutras_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS OUTRAS_S');
+      fdqTotalizaOutras_S.SQL.Add('FROM LIVRO_SAIDA');
+
+      if sWhere <> '' then
+        fdqTotalizaOutras_S.SQL.Add(sWhere);
+
+      fdqTotalizaOutras_S.SQL.Add('AND CFOP = ' + QuotedStr(fdqTotalizaVContabilS.FieldByName('CFOP').Value));
+      fdqTotalizaOutras_S.SQL.Add('AND OUTRAS > 0');
+
+      fdqTotalizaOutras_S.Open;
+
+      edtOutrasEst_S.Text := FormatFloat('#,##0.00', fdqTotalizaOutras_S.FieldByName('OUTRAS_S').AsCurrency);
+
+      stgTotaisCfopEstadualS.Cells[0, stgTotaisCfopEstadualS.RowCount - 1] := fdqTotalizaVContabilS.FieldByName('CFOP').Value;
+      stgTotaisCfopEstadualS.Cells[1, stgTotaisCfopEstadualS.RowCount - 1] := Format('%-30.30s',[fdqTotalizaVContabilS.FieldByName('DESCRICAO').Value]);
+      stgTotaisCfopEstadualS.Cells[2, stgTotaisCfopEstadualS.RowCount - 1] := Format('%12.12s', [FormatFloat('#,##0.00',fdqTotalizaVContabilS.FieldByName('VC_S').Value)]);
+      stgTotaisCfopEstadualS.Cells[3, stgTotaisCfopEstadualS.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaBCalculoS.FieldByName('BC_S').Value)]);
+      stgTotaisCfopEstadualS.Cells[4, stgTotaisCfopEstadualS.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaDebito_S.FieldByName('ID_S').Value)]);
+      stgTotaisCfopEstadualS.Cells[5, stgTotaisCfopEstadualS.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaIsentasNT_S.FieldByName('ISENTAS_NT_S').Value)]);
+      stgTotaisCfopEstadualS.Cells[6, stgTotaisCfopEstadualS.RowCount - 1] := Format('%11.11s', [FormatFloat('#,##0.00',fdqTotalizaOutras_S.FieldByName('OUTRAS_S').Value)]);
+
+      if not fdqTotalizaVContabilS.Eof then
+        stgTotaisCfopEstadualS.RowCount := stgTotaisCfopEstadualS.RowCount + 1;
+
+      fdqTotalizaVContabilS.Next;
+
+    end;
+
+    //TOTALIZA VLCONTABIL ESTADUAL
+    fdqTotalVLContEstadual_S.Close;
+    fdqTotalVLContEstadual_S.SQL.Clear;
+    fdqTotalVLContEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS TVC_S');
+    fdqTotalVLContEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalVLContEstadual_S.SQL.Add(sWhere);
+
+    fdqTotalVLContEstadual_S.SQL.Add(' AND UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalVLContEstadual_S.Open;
+
+    edtTVContalbilEST_S.Text := FormatFloat
+      ('#,##0.00', fdqTotalVLContEstadual_S.FieldByName('TVC_S').AsCurrency);
+
+    //TOTALIZA b. CALCULO ESTADUAL
+    fdqTotalBCalculoEstadual_S.Close;
+    fdqTotalBCalculoEstadual_S.SQL.Clear;
+    fdqTotalBCalculoEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.BASE_CALCULO),0) AS TBC_S');
+    fdqTotalBCalculoEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalBCalculoEstadual_S.SQL.Add(sWhere);
+
+    fdqTotalBCalculoEstadual_S.SQL.Add(' AND UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalBCalculoEstadual_S.Open;
+
+    edtTBCalculoeST_S.Text := FormatFloat
+      ('#,##0.00', fdqTotalBCalculoEstadual_S.FieldByName('TBC_S').AsCurrency);
+
+    //TOTALIZA DEBITO ESTADUAL
+    fdqTotalIDebitadoEstadual_S.Close;
+    fdqTotalIDebitadoEstadual_S.SQL.Clear;
+    fdqTotalIDebitadoEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.IMPOSTO_DEBITADO),0) AS TDEBITO_S');
+    fdqTotalIDebitadoEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalIDebitadoEstadual_S.SQL.Add(sWhere);
+
+    fdqTotalIDebitadoEstadual_S.SQL.Add(' AND UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalIDebitadoEstadual_S.Open;
+
+    edtDebitoEst.Text := FormatFloat
+      ('#,##0.00', fdqTotalIDebitadoEstadual_S.FieldByName('TDEBITO_S').AsCurrency);
+
+    //TOTALIZA ISENTAS ESTADUAL
+    fdqTotalIsentasNTEstadual_S.Close;
+    fdqTotalIsentasNTEstadual_S.SQL.Clear;
+    fdqTotalIsentasNTEstadual_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.ISENTAS_NAO_TRIBUTADAS),0) AS TISENTAS_S');
+    fdqTotalIsentasNTEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalIsentasNTEstadual_S.SQL.Add(sWhere);
+
+    fdqTotalIsentasNTEstadual_S.SQL.Add(' AND UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalIsentasNTEstadual_S.SQL.Add(' AND ISENTAS_NAO_TRIBUTADAS > 0');
+
+    fdqTotalIsentasNTEstadual_S.Open;
+
+    edtIsentasNTEst_S.Text := FormatFloat('#,##0.00', fdqTotalIsentasNTEstadual_S.FieldByName('TISENTAS_S').AsCurrency);
+
+    //TOTALIZA OUTRAS ESTADUAL
+    fdqTotalOutrasEstadual_S.Close;
+    fdqTotalOutrasEstadual_S.SQL.Clear;
+    fdqTotalOutrasEstadual_S.SQL.Add('SELECT COALESCE(SUM(VALOR_CONTABIL),0) AS TOUTRAS_S');
+    fdqTotalOutrasEstadual_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalOutrasEstadual_S.SQL.Add(sWhere);
+
+    fdqTotalOutrasEstadual_S.SQL.Add(' AND UF_DESTINATARIO = ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalOutrasEstadual_S.SQL.Add(' AND OUTRAS > 0');
+
+    fdqTotalOutrasEstadual_S.Open;
+
+    edtOutrasEst_S.Text := FormatFloat('#,##0.00', fdqTotalOutrasEstadual_S.FieldByName('TOUTRAS_S').AsCurrency);
+
+
+///*/*/*/*/*/**
+
+    //TOTALIZA VLCONTABIL INTER_ESTADUAL
+    fdqTotalizaVContabil_IE_S.Close;
+    fdqTotalizaVContabil_IE_S.SQL.Clear;
+    fdqTotalizaVContabil_IE_S.SQL.Add('SELECT COALESCE(SUM(LIVRO_SAIDA.VALOR_CONTABIL),0) AS TVC_IE_S');
+    fdqTotalizaVContabil_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalizaVContabil_IE_S.SQL.Add(sWhere);
+
+    fdqTotalizaVContabil_IE_S.SQL.Add(' AND UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalizaVContabil_IE_S.Open;
+
+    edtTVContalbilinter_S.Text := FormatFloat
+      ('#,##0.00', fdqTotalizaVContabil_IE_S.FieldByName('TVC_IE_S').AsCurrency);
+
+    //TOTALIZA b. CALCULO INTER_ESTADUAL
+    fdqTotalizaBCalculo_IE_S.Close;
+    fdqTotalizaBCalculo_IE_S.SQL.Clear;
+    fdqTotalizaBCalculo_IE_S.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO),0) AS TBC_IE_S');
+    fdqTotalizaBCalculo_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalizaBCalculo_IE_S.SQL.Add(sWhere);
+
+    fdqTotalizaBCalculo_IE_S.SQL.Add(' AND UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalizaBCalculo_IE_S.SQL.Add(' AND ALIQUOTA > 0');
+    fdqTotalizaBCalculo_IE_S.Open;
+
+    edtTBCalculoInter.Text := FormatFloat
+      ('#,##0.00', fdqTotalizaBCalculo_IE.FieldByName('TBC_IE').AsCurrency);
+
+    //TOTALIZA CREDITO INTER_ESTADUAL
+    fdqTotalIDebitadoEstadual_IE_S.Close;
+    fdqTotalIDebitadoEstadual_IE_S.SQL.Clear;
+    fdqTotalIDebitadoEstadual_IE_S.SQL.Add('SELECT COALESCE(SUM(IMPOSTO_DEBITADO),0) AS TDEBITO_IE');
+    fdqTotalIDebitadoEstadual_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalIDebitadoEstadual_IE_S.SQL.Add(sWhere);
+
+    fdqTotalIDebitadoEstadual_IE_S.SQL.Add(' AND UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+
+    fdqTotalIDebitadoEstadual_IE_S.Open;
+
+    edtDebitoInter.Text := FormatFloat
+      ('#,##0.00', fdqTotalIDebitadoEstadual_IE_S.FieldByName('TDEBITO_IE').AsCurrency);
+
+    //TOTALIZA ISENTAS INTER_ESTADUAL
+    fdqTotalIsentasNTEstadual_IE_S.Close;
+    fdqTotalIsentasNTEstadual_IE_S.SQL.Clear;
+    fdqTotalIsentasNTEstadual_IE_S.SQL.Add('SELECT COALESCE(SUM(ISENTAS_NAO_TRIBUTADAS),0) AS TISENTAS_IE_S');
+    fdqTotalIsentasNTEstadual_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalIsentasNTEstadual_IE_S.SQL.Add(sWhere);
+
+    fdqTotalIsentasNTEstadual_IE_S.SQL.Add(' AND UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalIsentasNTEstadual_IE_S.SQL.Add(' AND ISENTAS_NAO_TRIBUTADAS > 0');
+
+    fdqTotalIsentasNTEstadual_IE_S.Open;
+
+    edtIsentasNTInter_S.Text := FormatFloat('#,##0.00', fdqTotalIsentasNTEstadual_IE_S.FieldByName('TISENTAS_IE_S').AsCurrency);
+
+    //TOTALIZA OUTRAS ESTADUAL
+    fdqTotalOutrasEstadual_IE_S.Close;
+    fdqTotalOutrasEstadual_IE_S.SQL.Clear;
+    fdqTotalOutrasEstadual_IE_S.SQL.Add('SELECT COALESCE(SUM(VALOR_CONTABIL),0) AS TOUTRAS_IE_S');
+    fdqTotalOutrasEstadual_IE_S.SQL.Add('FROM LIVRO_SAIDA');
+
+    if sWhere <> '' then
+      fdqTotalOutrasEstadual_IE_S.SQL.Add(sWhere);
+
+    fdqTotalOutrasEstadual_IE_S.SQL.Add(' AND UF_DESTINATARIO <> ' + QuotedStr(dmCDSMaster.cdsFilial.FieldByName('ESTADO').Value));
+    fdqTotalOutrasEstadual_IE_S.SQL.Add(' AND OUTRAS > 0');
+
+    fdqTotalOutrasEstadual_IE_S.Open;
+
+    edtOutrasInter_S.Text := FormatFloat('#,##0.00', fdqTotalOutrasEstadual_IE_S.FieldByName('TOUTRAS_IE_S').AsCurrency);
+
+end;
+
+end.

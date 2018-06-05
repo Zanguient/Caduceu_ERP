@@ -1,0 +1,467 @@
+object frmControleCaixa: TfrmControleCaixa
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'CONTROLE CAIXA LOJA'
+  ClientHeight = 476
+  ClientWidth = 1074
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object imgCancelar: TImage
+    Left = 1018
+    Top = 420
+    Width = 48
+    Height = 48
+    Cursor = crHandPoint
+    Hint = 'Fechar'
+    ParentShowHint = False
+    Picture.Data = {
+      0954506E67496D61676589504E470D0A1A0A0000000D49484452000000300000
+      003008060000005702F987000000097048597300000EC400000EC401952B0E1B
+      000003504944415478DAED594D4C1341147ED31F502F852218201B84A4128F5A
+      12BDD51BA870152F5E4C80C49F048C241EA418F00068E4A2085EBC78F0A2174D
+      40BCF973B2F5E0A94204ACD61A14A89828D09FF1CDDA42BBCC6EB795FDA9E94B
+      A6F33AB3B33BDF9B6FDF37BB4B28A550C8468A008A008A00FE7300FEB6A67AAC
+      AE60398EA5968D491F8F85FEA32F6D4B60096199C432E47EE29BCF1B80AFD5DD
+      8CD5434248191E47B166C76F0E48FF9FAF9FA53F82EEE9A6A7FE6739036091C7
+      BEB7E83A7817D30900F37FA07B586E2594008C63D505E6B07B08803B1725009F
+      B0AF562E5A3AAE00F3430840C815409C9DDF24002802B0E60AC054F91501105E
+      BB2200A568E9BC020C80453300F6F20A884556D04FA89D34D81C4E128D2C690B
+      40CDD296560BE0BA3E06ABBED7109C1841194A280FC0C9081D97A1ECA80766AE
+      9E83F52F41E328B4AB4620AEC1315A52552D1EF67DF2114D82E047D2622542C7
+      255AD9DA2EB6AF2F86E96CDF79B216FAA8FF0AD89D7BA1F1C67D28FD3B79D1D8
+      B9100404EF0EC3D6EE60CB84AE5EA83C794A9C50CA36BE7D8540EF59882E2DEA
+      BB02C46A85FD3D03C4E969DE163104417025288DC7C576FCA18C36556DEDDB22
+      BCF2EA3999BFD987C7C6F4BF892D363BA9EBEEA74E4F0B48FAB6E844218336E9
+      E75C7E314D1746BD24118D1A771313AB0DEABAAF41C5B1968C76914E538F8145
+      564A1B66CB2FA761E19617682CA6E632DAEA80129D783ED206903604C1994307
+      94E824431B1679ED854CD5DAAAA053BEB449375DB61262B6E9C46CD3DACE8D24
+      DE1324383EBC999D4CB395107D8948F126021CB1330D857822C5B354760A8E0D
+      014FECE44C330A6511294CA309BED825E924BBEDD085420AB449651B2664B262
+      3785741A1FC1741A37864272B491669B6C62A7864E3B4EA192CA7D7070F401B1
+      39CA65452A63AC8CD8C5562324D07386E2CE547F0AED696824AE81DB14417045
+      4A3A11A9D84523CB74B6FF22F9F521605C16DA5D7F005C8377E0E7BB37AA442A
+      4527C7A12330E3BD00BFE7DEABB98CB642C69ECA3616C3DB6823E7333AE17304
+      590B7F36919015F243BD5901C4B1E20E32C012F9BCD82AF8578B1358751A1DFA
+      A4E5F572B701FBFC608ED7EB6E04309713006605FD81236D25529F984E60A901
+      ED6FEC9DFBC45408560460B41501186D050FE00F1A0E0EFB81E63A6500000000
+      49454E44AE426082}
+    ShowHint = True
+    Stretch = True
+    OnClick = imgCancelarClick
+  end
+  object imgLancamento: TImage
+    Left = 1018
+    Top = 36
+    Width = 48
+    Height = 48
+    Cursor = crHandPoint
+    Hint = 'Incluir Lan'#231'amento'
+    ParentShowHint = False
+    Picture.Data = {
+      0954506E67496D61676589504E470D0A1A0A0000000D49484452000000300000
+      003008060000005702F987000000097048597300000EC400000EC401952B0E1B
+      000006194944415478DAED596B4C1457143EB3C042B02020142BABF44113D860
+      68178D41AC4280564A791941DA42D29AA69AD6344D6B4A2BA45A52A99250FB40
+      6AFC616C4B5245DB157C618082D0121F856AE46178B495050A148A40A0BAB03B
+      3D777666985976DD59D96543C2490E73E7DE3BF77EDF3DDF7D2D144DD3B0908D
+      5A24B0486091C022814502362310A4CE8EC647317AB0A38159B0DBE86F75A61E
+      AC3126D0B600C0F3249040883101B37AC2CAF38E30A4EC2398D2EBCD9623264A
+      12016FD72570FDC58FE79D405C7521FC3936387702DB43A361CFD39BADEAFCD4
+      D04DA8F8EB0674DEED37B4EDB51C363FFE0CA4F986496E23BFA3028E35D7CC8D
+      C02A8F65F073EC07923BAD9DBC03EFD71C8351ED3D93E54BE56E5018BD1DA2DC
+      032DB63581AE4219E9CCC8C82C0137276708F4F483A4A0B5B0431129197CC940
+      23EC6B2815E59D49C90677CA059E577F2ACADFB73E1D32FDC32DB6598703B2A3
+      F288C9B96096C0C34CD8A6E901483FFB39930EF0F0818CE00D10E61708EB5D15
+      4CDE35EDDF50DFDB0A25AD7530CE46A734F13D5039FB5B6C9BD4FEB2AB126A35
+      CDA0191B827BBA69DB1388BC940F0393A3B02D3812F68724317943A0035F7062
+      D223E8DE6CDDE4BAAFA165B807FCDD97C2AF2FECB1BA2FC4695B0255E35DB0B3
+      EA2878E16AF51BBB5A7DD8AC86D31D57F8B648A7F9CFBD02E938899BE97F21E5
+      8C21FF9BD83721CEE329C712D8D9540255776E81725900946F7C87C95B579107
+      C3FF4D8808B8BBB882AFDB23D03D3ECC7F1B1BB81A8EA8321D4B60CD854FE0EE
+      FD4990010557530F3052219229682D83CF94C9A24E8DCDCBD51DA3B6D7B10484
+      E0C8A6971BB11592BD95A23A8450FD481B14DFA8E0F706CE1EB63FBB10E04C8E
+      4B71944209C5AA579977D230C596E5B55F80EF5A2EDB8540143EBEC70285350D
+      7212E2CC03372BB2541249B5A3A4B84E5F7A321CBE084B177D636B0991410AC4
+      827A7C5A438212A437A2D7615BE47959388965F86C67DFE36B0F41C748BF8D26
+      71553C39706441ECC51EB6CE63E857D05749686F257A8FA90265794E406BD27E
+      A62CB43C17F23664C0169F50663EAC6541D86619AD4EB80FB4BE1BF3A205247C
+      D0AF92FA52479F4A2EA541EE52479F4ADD6414115EF05D300E5997BE82C1C931
+      1B6E64D509341220878D3EF44824D1CDD65D825E87AE3233F2C08D3E82D7E063
+      0512908176AA972E4B174A902EEEAE875F7A6FC3B5FE4E3EF3241E25C2251C25
+      A411603B422264978940125C4F72F473E87182369CD175A230A4A98D4FB27C24
+      DA60844E541F1015EE8D4883ACE56B248326C7F3737F3442379E8534EC46681C
+      0103004A46617A1C535148A289FD9E1C688EA3671A8347E01A04BA5244423B45
+      A229C32850EC88F1E4C80A7528FA353C4E3F21197C4A7D11340F6966E53F8800
+      496B319D0831E72B39ACE89EE8A33CF8E4D269869CDC059004C593D04EF52078
+      4E62B0A9F2201DE4ED8F179A67ADBAD0103BDAD30005D7CB4C96999290D868FD
+      3492781D4994181721D069363233D55912A65AB20AB5C0B8E5D63281D91110A6
+      73514EF902F0249E0A1C69F2AAC308383169B94B0F2727D6C844D6C01C4C8937
+      32ADC51B9990C0CCB2480B08504880938806B84D4E4C80970D6A7ECEC02598E0
+      67950711201673DE00DEB0542A88E68D4C34F2F340C0E8872DD373806C62EB78
+      F0C291E7CC1001D1849D6F331701925E8AB2196732C8C8CB5D88E6C9F2E9C447
+      00DF11BCB3A3C08B0988AD0F473E80056F2823A0C50474281B87821713104600
+      272CB5E5F40AFAA7AD7D4C469A9A009709BE9BD17C55FC49FCBB1BBFB1F7A495
+      4CE0770413CEEEAA0508349B27A19D928150F386C8916FC9EF7FEFE277271C47
+      80339CB4281B15CAA49179D74EE523E01CA632CA893B1ECC921DAD1FC0BFD948
+      E25BC710E022107B5166E260568891D8CDBF99DBF800C6D073B08DC38E2180E0
+      994CC37946CF1C8D39D34D7BD26F1FEFC594079F47BE99BD73931FD21AB0AD98
+      F925408CC8C7001E044BE5A3289B7FD8911F2BFAE1A6C7AE972D1EC8C80589CC
+      A588798F00271FE1C1ACE80DC52082F623758A4EDCA27665AC66EA30694286CB
+      67D36C3448BA055309820B92FD09884AD9FC5940A511E0A43504E446377355B5
+      0B81097B8D10E903899C4502DB162E01722DA5F53FDA83C482FF3FF1FF6975D4
+      CE70B3F9D50000000049454E44AE426082}
+    ShowHint = True
+    Stretch = True
+    OnClick = imgLancamentoClick
+  end
+  object grpInfoCaixa: TGroupBox
+    Left = 8
+    Top = 8
+    Width = 553
+    Height = 105
+    Caption = 'Informa'#231#245'es do Caixa'
+    TabOrder = 0
+    object txtDataAbertura: TDBText
+      Left = 130
+      Top = 26
+      Width = 116
+      Height = 17
+      DataField = 'DATA_ABERTURA'
+      DataSource = dmMSource.dtsCaixaLoja
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object txtHoraAbertura: TDBText
+      Left = 130
+      Top = 52
+      Width = 116
+      Height = 17
+      DataField = 'HORA_ABERTURA'
+      DataSource = dmMSource.dtsCaixaLoja
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object txtFuncionario: TDBText
+      Left = 16
+      Top = 79
+      Width = 168
+      Height = 17
+      DataField = 'NOME_FUNCIONARIO'
+      DataSource = dmMSource.dtsCaixaLoja
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object txtValorAbertura: TDBText
+      Left = 410
+      Top = 26
+      Width = 126
+      Height = 17
+      Alignment = taRightJustify
+      DataField = 'VALOR_ABERTURA'
+      DataSource = dmMSource.dtsCaixaLoja
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object txtValorMovimento: TDBText
+      Left = 410
+      Top = 52
+      Width = 126
+      Height = 17
+      Alignment = taRightJustify
+      DataField = 'VALOR_MOVIMENTO'
+      DataSource = dmMSource.dtsCaixaLoja
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lblDataAbertura: TLabel
+      Left = 16
+      Top = 26
+      Width = 93
+      Height = 16
+      Caption = 'Data abertura'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lblHoraAbertura: TLabel
+      Left = 16
+      Top = 52
+      Width = 93
+      Height = 16
+      Caption = 'Hora abertura'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lblValorAbertura: TLabel
+      Left = 288
+      Top = 26
+      Width = 96
+      Height = 16
+      Caption = 'Valor abertura'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lblValorMovimento: TLabel
+      Left = 288
+      Top = 52
+      Width = 109
+      Height = 16
+      Caption = 'Valor movimento'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+  end
+  object grpMovimentoCaixa: TGroupBox
+    Left = 8
+    Top = 169
+    Width = 1001
+    Height = 292
+    Caption = 'Fluxo CAIXA LOJA'
+    TabOrder = 1
+    object grdFluxoCXLoja: TDBGrid
+      Left = 2
+      Top = 15
+      Width = 997
+      Height = 275
+      Align = alClient
+      DataSource = dmMSource.dtsItemCaixaLoja
+      DrawingStyle = gdsClassic
+      Options = [dgTitles, dgIndicator, dgColLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+      ReadOnly = True
+      TabOrder = 0
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'Tahoma'
+      TitleFont.Style = []
+      OnDrawColumnCell = grdFluxoCXLojaDrawColumnCell
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'HORA'
+          Title.Alignment = taCenter
+          Title.Caption = 'HOR'#193'RIO'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'DOCUMENTO'
+          Title.Alignment = taCenter
+          Width = 103
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'FAVORECIDO'
+          Title.Alignment = taCenter
+          Title.Caption = 'IDENTIFICA'#199#195'O'
+          Width = 322
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'DEBITO'
+          Title.Alignment = taCenter
+          Title.Caption = 'D'#201'BITO'
+          Width = 100
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'CREDITO'
+          Title.Alignment = taCenter
+          Title.Caption = 'CR'#201'DITO'
+          Width = 100
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'CREDITO_DEBITO'
+          Title.Alignment = taCenter
+          Title.Caption = 'C/D'
+          Width = 41
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'SALDO'
+          Title.Alignment = taCenter
+          Width = 102
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'S_TIPO_LANCAMENTO'
+          Title.Alignment = taCenter
+          Title.Caption = 'TIPO LAN'#199'AMENTO'
+          Visible = True
+        end>
+    end
+  end
+  object grpTotais: TGroupBox
+    Left = 561
+    Top = 8
+    Width = 446
+    Height = 105
+    Caption = 'Detalhes movimenta'#231#227'o'
+    TabOrder = 2
+    object lblEspecie: TLabel
+      Left = 16
+      Top = 19
+      Width = 53
+      Height = 13
+      Caption = 'Em esp'#233'cie'
+    end
+    object lblCheques: TLabel
+      Left = 16
+      Top = 41
+      Width = 57
+      Height = 13
+      Caption = 'Em cheques'
+    end
+    object lblCartoes: TLabel
+      Left = 16
+      Top = 63
+      Width = 53
+      Height = 13
+      Caption = 'Em cart'#245'es'
+    end
+    object lblOutros: TLabel
+      Left = 16
+      Top = 85
+      Width = 36
+      Height = 13
+      Caption = 'Outros '
+    end
+    object txtEmEspecie: TDBText
+      Left = 80
+      Top = 19
+      Width = 86
+      Height = 17
+      Alignment = taRightJustify
+      BiDiMode = bdLeftToRight
+      DataField = 'VALOR_DINHEIRO'
+      DataSource = dmMSource.dtsCaixaLoja
+      ParentBiDiMode = False
+    end
+    object txtEmCheques: TDBText
+      Left = 80
+      Top = 41
+      Width = 86
+      Height = 17
+      Alignment = taRightJustify
+      BiDiMode = bdLeftToRight
+      DataField = 'VALOR_CHEQUE'
+      DataSource = dmMSource.dtsCaixaLoja
+      ParentBiDiMode = False
+    end
+    object txtEmCartoes: TDBText
+      Left = 80
+      Top = 63
+      Width = 86
+      Height = 17
+      Alignment = taRightJustify
+      BiDiMode = bdLeftToRight
+      DataField = 'VALOR_CARTAO'
+      DataSource = dmMSource.dtsCaixaLoja
+      ParentBiDiMode = False
+    end
+    object txtOutros: TDBText
+      Left = 80
+      Top = 85
+      Width = 86
+      Height = 17
+      Alignment = taRightJustify
+      BiDiMode = bdLeftToRight
+      DataField = 'OUTROS_VALORES'
+      DataSource = dmMSource.dtsCaixaLoja
+      ParentBiDiMode = False
+    end
+    object Label1: TLabel
+      Left = 264
+      Top = 19
+      Width = 37
+      Height = 13
+      Caption = 'A prazo'
+    end
+    object txtValorPrazo: TDBText
+      Left = 328
+      Top = 19
+      Width = 86
+      Height = 17
+      Alignment = taRightJustify
+      BiDiMode = bdLeftToRight
+      DataField = 'VALOR_PRAZO'
+      DataSource = dmMSource.dtsCaixaLoja
+      ParentBiDiMode = False
+    end
+  end
+  object grpHistorico: TGroupBox
+    Left = 8
+    Top = 114
+    Width = 999
+    Height = 52
+    Caption = 'Hist'#243'rico'
+    TabOrder = 3
+    object txtHistorico: TDBText
+      Left = 16
+      Top = 22
+      Width = 809
+      Height = 17
+      DataField = 'HISTORICO'
+      DataSource = dmMSource.dtsItemCaixaLoja
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = -15
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+  end
+end

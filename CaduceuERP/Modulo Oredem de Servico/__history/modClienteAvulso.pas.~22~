@@ -1,0 +1,94 @@
+unit modClienteAvulso;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls;
+
+type
+  TfrmModClienteAvulso = class(TForm)
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpInfoCliente: TGroupBox;
+    lblCNPJ_CPF: TLabel;
+    lblNome: TLabel;
+    Label3: TLabel;
+    lblEndereco: TLabel;
+    lblNumero: TLabel;
+    lblCEP: TLabel;
+    lblBairro: TLabel;
+    lblCidade: TLabel;
+    lblUF: TLabel;
+    lblContato: TLabel;
+    lblDDD: TLabel;
+    lblTelefone: TLabel;
+    lblEmail: TLabel;
+    edtCNPJ_CPF: TEdit;
+    edtIE_RG: TEdit;
+    edtNome: TEdit;
+    edtEndereco: TEdit;
+    edtNumero: TEdit;
+    edtCEP: TEdit;
+    edtUF: TEdit;
+    edtBairro: TEdit;
+    edtCidade: TEdit;
+    edtContato: TEdit;
+    edtDDD: TEdit;
+    edtTelefone: TEdit;
+    edtEmail: TEdit;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    procedure imgSairClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure imgConfirmarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmModClienteAvulso: TfrmModClienteAvulso;
+
+implementation
+
+{$R *.dfm}
+
+uses uFuncoes, dataDBEXMaster, uConstantes_Padrao;
+
+procedure TfrmModClienteAvulso.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(Handle);
+
+end;
+
+procedure TfrmModClienteAvulso.imgConfirmarClick(Sender: TObject);
+begin
+
+  LimparMSG_ERRO(lblMsg,nil);
+
+  if Length(Trim(edtNome.Text)) <= 0 then
+  begin
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CAMPO_OBRIGATORIO;
+    edtNome.SetFocus;
+
+    ModalResult   := mrNone;
+
+  end
+  else
+    ModalResult := mrOk;
+
+end;
+
+procedure TfrmModClienteAvulso.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

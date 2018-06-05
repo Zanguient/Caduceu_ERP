@@ -1,0 +1,359 @@
+unit modAutomacaoTOLEDO;
+
+interface
+
+uses SysUtils, Windows, Forms;
+
+procedure ExportarProdutoMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+procedure ExportarReceitaMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+procedure ExportarTecladoMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+procedure ExportarInfNutricionalMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+
+implementation
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure, modAutomacao,
+  uFuncoes, uConstantes_Padrao;
+
+procedure ExportarProdutoMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+var
+  txtArq: TextFile;
+  sLinha: string;
+begin
+
+  dmMProvider.cdsSelProdExpBalanca.Close;
+  dmMProvider.cdsSelProdExpBalanca.ProviderName     := 'dspSelProdExpBalanca';
+
+  dmDBEXMaster.fdqSelProdExpBalanca.Params[0].Value := dmDBEXMaster.iIdFilial;
+
+  dmMProvider.cdsSelProdExpBalanca.OPen;
+  dmMProvider.cdsSelProdExpBalanca.ProviderName     := '';
+
+  frmAutomacao.edtPastaExpBalanca.Text              := sPath;
+  frmAutomacao.edtArqExpBalanca.Text                := sArquivo;
+
+  if dmMProvider.cdsSelProdExpBalanca.IsEmpty then
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+      + MSG_ARQ_EXP_PRO_VAZIO), 'Atenção!', mb_IconWarning + mb_Ok)
+
+  else
+  begin
+    frmAutomacao.pgbProgressoArqBalanca.Max  := dmMProvider.cdsSelProdExpBalanca.RecordCount;
+
+    with dmMProvider.cdsSelProdExpBalanca do
+    begin
+
+      First;
+
+      if not EOF then
+      begin
+
+        AssignFile(txtArq, sPath + sArquivo);
+        ReWrite(txtArq);
+
+        repeat
+
+          frmAutomacao.pgbProgressoArqBalanca.Position  := dmMProvider.cdsSelProdExpBalanca.RecNo;
+          Application.ProcessMessages;
+
+          if ValidarBarras(dmMProvider.cdsSelProdExpBalancaOP_BARRAS.Value) then
+          begin
+
+            sLinha := FormatFloat('00', dmMProvider.cdsSelProdExpBalancaOP_SETOR_BALANCA.Value);
+
+            case pExportarDigito of
+              0:begin
+
+                  case dmMProvider.cdsSelProdExpBalancaOP_PESADO.Value of
+                    0: sLinha := sLinha + '1' + Copy(dmMProvider.cdsSelProdExpBalancaOP_BARRAS.Value, 7, 6);
+                    1: sLinha := sLinha + '0' + Copy(dmMProvider.cdsSelProdExpBalancaOP_BARRAS.Value, 7, 6);
+                  end;
+
+                end;
+              1:begin
+
+                  case dmMProvider.cdsSelProdExpBalancaOP_PESADO.Value of
+                    0: sLinha := sLinha + '1' + Copy(dmMProvider.cdsSelProdExpBalancaOP_BARRAS.Value, 8, 6);
+                    1: sLinha := sLinha + '0' + Copy(dmMProvider.cdsSelProdExpBalancaOP_BARRAS.Value, 8, 6);
+                  end;
+
+                end;
+            end;
+
+            //verifica produto em promoção
+            case dmMProvider.cdsSelProdExpBalancaOP_PROMOCAO.Value of
+              0: sLinha := sLinha + FormatFloat('000000', (dmMProvider.cdsSelProdExpBalancaOP_PRECO_VENDA.Value * dmMProvider.cdsSelProdExpBalancaOP_QUANTIDADE.Value) * 100);
+              1: sLinha := sLinha + FormatFloat('000000', (dmMProvider.cdsSelProdExpBalancaOP_PRECO_PROMOCAO.Value * dmMProvider.cdsSelProdExpBalancaOP_QUANTIDADE.Value) * 100);
+            end;
+
+            sLinha := sLinha + FormatFloat('000', dmMProvider.cdsSelProdExpBalancaOP_VALIDADE.Value)
+                             + Format('%-25.25s',[RetirarAcentuacaoString(dmMProvider.cdsSelProdExpBalancaOP_DESCRICAO_BALANCA.Value)])
+                             + Format('%-25.25s',[RetirarAcentuacaoString(dmMProvider.cdsSelProdExpBalancaOP_DESCRICAO_BALANCA.Value)])
+                             + FormatFloat('000000', dmMProvider.cdsSelProdExpBalancaOP_PRODUCAO.Value)
+                             + '000'
+                             + FormatFloat('0000', dmMProvider.cdsSelProdExpBalancaOP_INF_NUTRICIONAL.Value)
+                             + '110000000000000000              ';
+
+            WriteLn(txtArq, sLinha);
+
+          end;
+
+          Next;
+
+        until EOF;
+
+        CloseFile(txtArq);
+
+        Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+          + 'O arquivo de PRODUTOS foi gerado com sucesso!'), 'Atenção!', mb_IconInformation + mb_Ok);
+
+        frmAutomacao.pgbProgressoArqBalanca.Position := 0;
+
+      end;
+
+    end;
+
+  end;
+
+end;
+procedure ExportarReceitaMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+var
+  txtArq: TextFile;
+  sLinha: string;
+begin
+
+  dmMProvider.cdsSelReceitaExpBalanca.Close;
+  dmMProvider.cdsSelReceitaExpBalanca.ProviderName      := 'dspSelReceitaExpBalanca';
+
+  dmDBEXMaster.fdqSelReceitaExpBalanca.Params[0].Value  := dmDBEXMaster.iIdFilial;
+
+  dmMProvider.cdsSelReceitaExpBalanca.Open;
+  dmMProvider.cdsSelReceitaExpBalanca.ProviderName      := '';
+
+  frmAutomacao.edtPastaExpBalanca.Text                  := sPath;
+  frmAutomacao.edtArqExpBalanca.Text                    := sArquivo;
+
+  if dmMProvider.cdsSelReceitaExpBalanca.IsEmpty then
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+      + MSG_ARQ_EXP_REC_VAZIO), 'Atenção!', mb_IconWarning + mb_Ok)
+
+  else
+  begin
+    frmAutomacao.pgbProgressoArqBalanca.Max  := dmMProvider.cdsSelReceitaExpBalanca.RecordCount;
+
+    with dmMProvider.cdsSelReceitaExpBalanca do
+    begin
+
+      First;
+
+      if not EOF then
+      begin
+
+        AssignFile(txtArq, sPath + sArquivo);
+        ReWrite(txtArq);
+
+        repeat
+
+          frmAutomacao.pgbProgressoArqBalanca.Position  := dmMProvider.cdsSelReceitaExpBalanca.RecNo;
+          Application.ProcessMessages;
+
+          if ValidarBarras(dmMProvider.cdsSelReceitaExpBalancaOP_BARRAS.Value) then
+          begin
+
+            sLinha := FormatFloat('000000', dmMProvider.cdsSelReceitaExpBalancaOP_PRODUCAO.Value)
+                      + Format('%-100.100s', [' ']) + Format('%-56.56s', [RetirarAcentuacaoString(dmMProvider.cdsSelReceitaExpBalancaOP_INGREDIENTE_1.Value)])
+                      + Format('%-56.56s', [RetirarAcentuacaoString(dmMProvider.cdsSelReceitaExpBalancaOP_INGREDIENTE_2.Value)])
+                      + Format('%-56.56s', [RetirarAcentuacaoString(dmMProvider.cdsSelReceitaExpBalancaOP_INGREDIENTE_3.Value)])
+                      + Format('%-56.56s', [RetirarAcentuacaoString(dmMProvider.cdsSelReceitaExpBalancaOP_INGREDIENTE_4.Value)])
+                      + Format('%-56.56s', [RetirarAcentuacaoString(dmMProvider.cdsSelReceitaExpBalancaOP_INGREDIENTE_5.Value)])
+                      + Format('%-56.56s', [RetirarAcentuacaoString(dmMProvider.cdsSelReceitaExpBalancaOP_INGREDIENTE_6.Value)])
+                      + Format('%-56.56s', [RetirarAcentuacaoString(dmMProvider.cdsSelReceitaExpBalancaOP_INGREDIENTE_7.Value)]);
+
+            WriteLn(txtArq, sLinha);
+
+          end;
+
+          Next;
+
+        until EOF;
+
+        CloseFile(txtArq);
+
+        Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+          + 'O arquivo de RECEITAS foi gerado com sucesso!'), 'Atenção!', mb_IconInformation + mb_Ok);
+
+        frmAutomacao.pgbProgressoArqBalanca.Position := 0;
+
+      end;
+
+    end;
+
+  end;
+end;
+procedure ExportarTecladoMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+var
+  txtArq: TextFile;
+  sLinha: string;
+begin
+
+  dmMProvider.cdsSelTecladoExpBalanca.Close;
+  dmMProvider.cdsSelTecladoExpBalanca.ProviderName  := 'dspSelTecladoExpBalanca';
+
+  dmMProvider.cdsSelTecladoExpBalanca.Open;
+  dmMProvider.cdsSelTecladoExpBalanca.ProviderName  := '';
+
+  frmAutomacao.edtPastaExpBalanca.Text              := sPath;
+  frmAutomacao.edtArqExpBalanca.Text                := sArquivo;
+
+  if dmMProvider.cdsSelTecladoExpBalanca.IsEmpty then
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+      + MSG_ARQ_EXP_TCL_VAZIO), 'Atenção!', mb_IconWarning + mb_Ok)
+
+  else
+  begin
+
+    frmAutomacao.pgbProgressoArqBalanca.Max  := dmMProvider.cdsSelTecladoExpBalanca.RecordCount;
+
+    with dmMProvider.cdsSelTecladoExpBalanca do
+    begin
+
+      First;
+
+      if not EOF then
+      begin
+
+        AssignFile(txtArq, sPath + sArquivo);
+        ReWrite(txtArq);
+
+        repeat
+
+          frmAutomacao.pgbProgressoArqBalanca.Position  := dmMProvider.cdsSelTecladoExpBalanca.RecNo;
+          Application.ProcessMessages;
+
+          if ValidarBarras(dmMProvider.cdsSelTecladoExpBalancaOP_BARRAS.Value) then
+          begin
+            sLinha := FormatFloat('00', dmMProvider.cdsSelTecladoExpBalancaOP_TECLADO.Value)
+                        + IntToStr(dmMProvider.cdsSelTecladoExpBalancaOP_TECLADO.Value)
+                        + FormatFloat('00', dmMProvider.cdsSelTecladoExpBalancaOP_TECLA.Value);
+
+            case pExportarDigito of
+              0:sLinha := sLinha + Copy(dmMProvider.cdsSelTecladoExpBalancaOP_BARRAS.Value, 7, 6);
+              1:sLinha := sLinha + Copy(dmMProvider.cdsSelTecladoExpBalancaOP_BARRAS.Value, 8, 6);
+            end;
+
+            sLinha := '0' + Format('%-8.8s', [RetirarAcentuacaoString(dmMProvider.cdsSelTecladoExpBalancaOP_TEXTOBOTAO1.Value)])
+                      + Format('%-8.8s', [RetirarAcentuacaoString(dmMProvider.cdsSelTecladoExpBalancaOP_TEXTOBOTAO2.Value)])
+                      + Format('%-8.8s', [RetirarAcentuacaoString(dmMProvider.cdsSelTecladoExpBalancaOP_TEXTOBOTAO3.Value)]);
+
+            WriteLn(txtArq, sLinha);
+
+          end;
+
+          Next;
+
+        until EOF;
+
+      end;
+
+      CloseFile(txtArq);
+
+      Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+        + 'O arquivo de CONFIGURAÇÕES DE TECLADO foi gerado com sucesso!'), 'Atenção!', mb_IconInformation + mb_Ok);
+
+      frmAutomacao.pgbProgressoArqBalanca.Position := 0;
+
+    end;
+
+  end;
+
+end;
+procedure ExportarInfNutricionalMGV5(sArquivo, sPath: string; iFilial, pExportarDigito: integer);
+var
+  txtArq: TextFile;
+  sLinha: string;
+begin
+
+  dmMProvider.cdsSelInfNutriExpBal.Close;
+  dmMProvider.cdsSelInfNutriExpBal.ProviderName := 'dspSelInfNutriExpBal';
+
+  dmMProvider.cdsSelInfNutriExpBal.Open;
+  dmMProvider.cdsSelInfNutriExpBal.ProviderName := '';
+
+  frmAutomacao.edtPastaExpBalanca.Text          := sPath;
+  frmAutomacao.edtArqExpBalanca.Text            := sArquivo;
+
+  if dmMProvider.cdsSelInfNutriExpBal.IsEmpty  then
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+      + MSG_ARQ_EXP_INF_VAZIO), 'Atenção!', mb_IconWarning + mb_Ok)
+  else
+  begin
+    frmAutomacao.pgbProgressoArqBalanca.Max  := dmMProvider.cdsSelInfNutriExpBal.RecordCount;
+
+    with dmMProvider.cdsSelInfNutriExpBal do
+    begin
+
+      First;
+
+      if not EOF then
+      begin
+
+        AssignFile(txtArq, sPath + sArquivo);
+        ReWrite(txtArq);
+
+        repeat
+
+          frmAutomacao.pgbProgressoArqBalanca.Position  := dmMProvider.cdsSelInfNutriExpBal.RecNo;
+          Application.ProcessMessages;
+
+            sLinha := 'N' + FormatFloat('000000', dmMProvider.cdsSelInfNutriExpBalOP_INF_NUTRICIONAL.Value)
+                      + '0' + FormatFloat('000', dmMProvider.cdsSelInfNutriExpBalOP_QUANTIDADE.Value);
+
+            if UpperCase(dmMProvider.cdsSelInfNutriExpBalOP_UND_PORCAO.Value) = 'G' then
+              sLinha := sLinha + '0'
+            else if UpperCase(dmMProvider.cdsSelInfNutriExpBalOP_UND_PORCAO.Value)  = 'ML' then
+              sLinha := sLinha + '1'
+            else if UpperCase(dmMProvider.cdsSelInfNutriExpBalOP_UND_PORCAO.Value) = 'UN' then
+              sLinha := sLinha + '2';
+
+            sLinha := sLinha + FormatFloat('00', dmMProvider.cdsSelInfNutriExpBalOP_PARTE_INT_MED_CAS.Value);
+
+            if Trim(dmMProvider.cdsSelInfNutriExpBalOP_PARTE_DEC_MED_CAS.Value) = '0' then
+              sLinha := sLinha + '0'
+            else if Trim(dmMProvider.cdsSelInfNutriExpBalOP_PARTE_DEC_MED_CAS.Value) = '1/4' then
+              sLinha := sLinha + '1'
+            else if Trim(dmMProvider.cdsSelInfNutriExpBalOP_PARTE_DEC_MED_CAS.Value) = '1/3' then
+              sLinha := sLinha + '2'
+            else if  Trim(dmMProvider.cdsSelInfNutriExpBalOP_PARTE_DEC_MED_CAS.Value) = '1/2' then
+              sLinha := sLinha + '3'
+            else if  Trim(dmMProvider.cdsSelInfNutriExpBalOP_PARTE_DEC_MED_CAS.Value) = '2/3' then
+              sLinha := sLinha + '4'
+            else if  Trim(dmMProvider.cdsSelInfNutriExpBalOP_PARTE_DEC_MED_CAS.Value) = '3/4' then
+              sLinha := sLinha + '5';
+
+            sLinha := sLinha + Copy(dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_MEDIDA_CAS_UTIL').AsString, 1, 2) +
+              FormatFloat('0000', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_VALOR_ENERGETICO_KC').AsCurrency) +
+              FormatFloat('000', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_CARBOIDRATOS').AsCurrency) +
+              IntToStr(dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_MENOR_1G_CARBO').AsInteger) +
+              FormatFloat('00', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_PROTEINAS').AsCurrency) +
+              InttoStr(dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_MENOR_1G_PROTEINA').AsInteger) +
+              FormatFloat('000', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_GORDURAS_TOT').AsCurrency * 10) +
+              FormatFloat('000', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_GORD_SATURADAS').AsCurrency * 10) +
+              FormatFloat('000', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_GORDURAS_TRANS').AsCurrency * 10) +
+              FormatFloat('00', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_FIBRA_ALIMENTAR').AsCurrency) +
+              IntToStr(dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_MENOR_1G_FIBRA').AsInteger) +
+              FormatFloat('00000', dmMProvider.cdsSelInfNutriExpBal.FieldByName('OP_SODIO').AsCurrency * 10);
+            WriteLn(txtArq, sLinha);
+//          end;
+          Next;
+        until EOF;
+      end;
+      CloseFile(txtArq);
+
+      Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario +#13 + #13
+        + 'O arquivo de INFORMAÇÕES NUTRICIONAIS foi gerado com sucesso!'), 'Atenção!',
+        mb_IconInformation + mb_Ok);
+
+      frmAutomacao.pgbProgressoArqBalanca.Position := 0;
+    end;
+  end;
+end;
+end.

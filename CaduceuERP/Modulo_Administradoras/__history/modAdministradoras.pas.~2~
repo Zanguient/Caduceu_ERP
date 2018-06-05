@@ -1,0 +1,815 @@
+unit modAdministradoras;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.DBCtrls,
+  Vcl.Mask, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Vcl.Imaging.pngimage, midaslib,
+  db, Vcl.StdActns, System.Actions, Vcl.ActnList;
+
+type
+  TfrmAdministradoras = class(TForm)
+    imgSair: TImage;
+    imgEditar: TImage;
+    imgExcluir: TImage;
+    imgSalvar: TImage;
+    imgDesfazer: TImage;
+    imgNovo: TImage;
+    lblF6: TLabel;
+    lblF5: TLabel;
+    lblF4: TLabel;
+    lblF3: TLabel;
+    lblF2: TLabel;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    pgcAdministradoras: TPageControl;
+    tbsTabela: TTabSheet;
+    grdTabela: TDBGrid;
+    tbsCadastro: TTabSheet;
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    grpCadastro: TGroupBox;
+    lblCodigo: TLabel;
+    lblRSocial: TLabel;
+    lblCnpj: TLabel;
+    lblInscEst: TLabel;
+    lblPazo: TLabel;
+    edtCodigo: TDBEdit;
+    edtNome: TDBEdit;
+    edtCNPJ: TDBEdit;
+    edtDesconto: TDBEdit;
+    edtPrazo: TDBEdit;
+    grpContaCredito: TGroupBox;
+    lblBanco: TLabel;
+    lblAgencia: TLabel;
+    lblConta: TLabel;
+    edtBanco: TDBEdit;
+    edtAgencia: TDBEdit;
+    edtConta: TDBEdit;
+    lblDiasCredito: TLabel;
+    cboConta: TDBLookupComboBox;
+    ActionList1: TActionList;
+    actEditar: TAction;
+    actDesfazer: TAction;
+    WindowClose1: TWindowClose;
+    actMinimizar: TAction;
+    actIncluir: TAction;
+    actSalvar: TAction;
+    actExcluir: TAction;
+    lblCodigoRede: TLabel;
+    edtCodigoRede: TDBEdit;
+    lblCodigoBandeira: TLabel;
+    edtCodigoBandeira: TDBEdit;
+    procedure FormCreate(Sender: TObject);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    function AbrirTabelaadministradora(pOpcao:smallint; pConteudo:string):boolean;
+    function AbrirTabelaContaCorrente(pOpcao:smallint; pConteudo:string):boolean;
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtCNPJExit(Sender: TObject);
+    procedure edtDescontoExit(Sender: TObject);
+    procedure edtPrazoExit(Sender: TObject);
+    procedure edtBancoExit(Sender: TObject);
+    procedure edtAgenciaExit(Sender: TObject);
+    procedure edtContaExit(Sender: TObject);
+    procedure edtDescontoKeyPress(Sender: TObject; var Key: Char);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    procedure actEditarExecute(Sender: TObject);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure edtNomeEnter(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    function ValidarCampos:boolean;
+    procedure actExcluirExecute(Sender: TObject);
+    procedure lblF5Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure edtCNPJKeyPress(Sender: TObject; var Key: Char);
+    procedure actIncluirExecute(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmAdministradoras: TfrmAdministradoras;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes, modPesqCnpj;
+
+function TfrmAdministradoras.AbrirTabelaadministradora(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsAdministradoras.Close;
+  dmMProvider.cdsAdministradoras.ProviderName := 'dspAdministradoras';;
+  dmDBEXMaster.fdqAdministradoras.SQL.Clear;
+  dmDBEXMaster.fdqAdministradoras.SQL.Add('SELECT * FROM ADMINISTRADORAS');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Administradoras(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqAdministradoras.SQL.Add(sWhere);
+  dmDBEXMaster.fdqAdministradoras.SQL.Add('ORDER BY NOME');
+
+  try
+
+    dmMProvider.cdsAdministradoras.Open;
+    dmMProvider.cdsAdministradoras.ProviderName := '';
+
+    if dmMProvider.cdsAdministradoras.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsAdministradoras.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+function TfrmAdministradoras.AbrirTabelaContaCorrente(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsContaCorrente.Close;
+  dmMProvider.cdsContaCorrente.ProviderName := 'dspContaCorrente';;
+  dmDBEXMaster.fdqContaCorrente.SQL.Clear;
+  dmDBEXMaster.fdqContaCorrente.SQL.Add('SELECT * FROM CONTACORRENTE');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Administradoras(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqAdministradoras.SQL.Add(sWhere);
+  dmDBEXMaster.fdqAdministradoras.SQL.Add('ORDER BY RAZAOSOCIAL');
+
+  try
+
+    dmMProvider.cdsAdministradoras.Open;
+    dmMProvider.cdsAdministradoras.ProviderName := '';
+
+    if dmMProvider.cdsAdministradoras.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsAdministradoras.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.actDesfazerExecute(Sender: TObject);
+begin
+
+  ActiveControl := nil;
+
+  if dmMProvider.cdsAdministradoras.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsAdministradoras.Cancel;
+
+  HabilitaDesabilitaControles(False);
+
+end;
+
+procedure TfrmAdministradoras.actEditarExecute(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsAdministradoras.IsEmpty then
+  begin
+
+    HabilitaDesabilitaControles(True);
+    pgcAdministradoras.ActivePageIndex := 1;
+    edtNome.SetFocus;
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.actExcluirExecute(Sender: TObject);
+begin
+  try
+
+    if dmMProvider.cdsAdministradoras.Active then
+    begin
+
+      if not (dmMProvider.cdsAdministradoras.State in [dsEdit, dsInsert]) then
+      begin
+
+
+        dmDBEXMaster.fdtMaster.StartTransaction;
+
+        LimparMSG_ERRO;
+
+        dmMSProcedure.fdspAdministradoras.Params[0].Value  := 1;
+        dmMSProcedure.fdspAdministradoras.Params[1].Value  := dmMProvider.cdsAdministradorasADMINISTRADORA.Value;
+        dmMSProcedure.fdspAdministradoras.Params[2].Value  := dmMProvider.cdsAdministradorasAGENCIA.Value;
+        dmMSProcedure.fdspAdministradoras.Params[3].Value  := dmMProvider.cdsAdministradorasBANCO.Value;
+        dmMSProcedure.fdspAdministradoras.Params[4].Value  := dmMProvider.cdsAdministradorasCNPJ.Value;
+        dmMSProcedure.fdspAdministradoras.Params[5].Value  := dmMProvider.cdsAdministradorasCONTA.Value;
+        dmMSProcedure.fdspAdministradoras.Params[6].Value  := dmMProvider.cdsAdministradorasDESCONTO.Value;
+        dmMSProcedure.fdspAdministradoras.Params[7].Value  := dmMProvider.cdsAdministradorasNOME.Value;
+        dmMSProcedure.fdspAdministradoras.Params[8].Value  := dmMProvider.cdsAdministradorasPRAZO.Value;
+        dmMSProcedure.fdspAdministradoras.Params[9].Value  := pubNomeComputador;
+        dmMSProcedure.fdspAdministradoras.Params[10].Value := RetornarIP;
+        dmMSProcedure.fdspAdministradoras.Params[11].Value := dmDBEXMaster.iIdUsuario;
+
+        dmMSProcedure.fdspAdministradoras.ExecProc;
+
+        dmDBEXMaster.fdtMaster.Commit;
+
+        dmMProvider.cdsAdministradoras.Delete;
+
+        edtConteudoPesquisa.Clear;
+
+        edtConteudoPesquisa.SetFocus;
+
+      end;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+
+end;
+
+procedure TfrmAdministradoras.actIncluirExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    if not (dmMProvider.cdsAdministradoras.State in [dsEdit, dsInsert]) then
+    begin
+
+      edtConteudoPesquisa.Clear;
+
+      frmPesqCnpj               := TfrmPesqCnpj.Create(self);
+      frmPesqCnpj.sNome_Usuario := dmDBEXMaster.sNomeUsuario;
+
+      if frmPesqCnpj.ShowModal = mrOk then
+      begin
+
+        if not AbrirTabelaadministradora(1,frmPesqCnpj.edtCNPJ.Text) then
+        begin
+
+          LimparMSG_ERRO;
+
+          pgcAdministradoras.Pages[1].TabVisible  := True;
+
+          HabilitaDesabilitaControles(True);
+
+          pgcAdministradoras.ActivePageIndex      := 1;
+
+          dmMProvider.cdsAdministradoras.Append;
+          dmMProvider.cdsAdministradorasCNPJ.Value := frmPesqCnpj.edtCNPJ.Text;
+
+          edtNome.SetFocus;
+
+        end
+        else
+        begin
+
+          pgcAdministradoras.ActivePageIndex := 0;
+          grdTabela.SetFocus;
+
+        end;
+
+      end;
+
+    end;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.actSalvarExecute(Sender: TObject);
+begin
+  try
+
+    if dmMProvider.cdsAdministradoras.Active then
+    begin
+
+      if dmMProvider.cdsAdministradoras.State in [dsEdit, dsInsert] then
+      begin
+
+        if ValidarCampos then
+        begin
+
+          dmDBEXMaster.fdtMaster.StartTransaction;
+
+          LimparMSG_ERRO;
+
+          dmMSProcedure.fdspAdministradoras.Params[0].Value  := 0;
+          dmMSProcedure.fdspAdministradoras.Params[1].Value  := dmMProvider.cdsAdministradorasADMINISTRADORA.Value;
+          dmMSProcedure.fdspAdministradoras.Params[2].Value  := dmMProvider.cdsAdministradorasAGENCIA.Value;
+          dmMSProcedure.fdspAdministradoras.Params[3].Value  := dmMProvider.cdsAdministradorasBANCO.Value;
+          dmMSProcedure.fdspAdministradoras.Params[4].Value  := dmMProvider.cdsAdministradorasCNPJ.Value;
+          dmMSProcedure.fdspAdministradoras.Params[5].Value  := dmMProvider.cdsAdministradorasCONTA.Value;
+          dmMSProcedure.fdspAdministradoras.Params[6].Value  := dmMProvider.cdsAdministradorasDESCONTO.Value;
+          dmMSProcedure.fdspAdministradoras.Params[7].Value  := dmMProvider.cdsAdministradorasNOME.Value;
+          dmMSProcedure.fdspAdministradoras.Params[8].Value  := dmMProvider.cdsAdministradorasPRAZO.Value;
+          dmMSProcedure.fdspAdministradoras.Params[9].Value  := pubNomeComputador;
+          dmMSProcedure.fdspAdministradoras.Params[10].Value := RetornarIP;
+          dmMSProcedure.fdspAdministradoras.Params[11].Value := dmDBEXMaster.iIdUsuario;
+
+          dmMSProcedure.fdspAdministradoras.ExecProc;
+
+          if dmMSProcedure.fdspAdministradoras.Params[12].Value > 0 then
+            dmMProvider.cdsAdministradorasADMINISTRADORA.Value := dmMSProcedure.fdspAdministradoras.Params[12].Value;
+
+          dmDBEXMaster.fdtMaster.Commit;
+
+          dmMProvider.cdsAdministradoras.Post;
+
+          edtConteudoPesquisa.Clear;
+
+          edtConteudoPesquisa.SetFocus;
+
+          HabilitaDesabilitaControles(false);
+
+        end
+        else
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PREENCHIMENTO_OBRIGATORIO;
+          TocarSomAlerta(ord(SystemHand));
+
+        end;
+
+      end;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.edtAgenciaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmAdministradoras.edtBancoExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmAdministradoras.edtCNPJExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmAdministradoras.edtCNPJKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+  else if not (Key in['0'..'9',Chr(8)]) then
+    Key:= #0;
+
+end;
+
+procedure TfrmAdministradoras.edtContaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsAdministradoras.State in [dsEdit, dsInsert] then
+  begin
+
+    if Length(Trim(dmMProvider.cdsAdministradorasCONTA.Value)) > 0 then
+    begin
+
+      dmDBEXMaster.fdqContaCorrente.Close;
+      dmDBEXMaster.fdqContaCorrente.SQL.Clear;
+      dmDBEXMaster.fdqContaCorrente.SQL.Add('SELECT * FROM CONTACORRENTE');
+      dmDBEXMaster.fdqContaCorrente.SQL.Add('WHERE CONTA = ' + QuotedStr(Trim(dmMProvider.cdsAdministradorasCONTA.Value)));
+      dmDBEXMaster.fdqContaCorrente.Open;
+
+      if dmDBEXMaster.fdqContaCorrente.IsEmpty then
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(dmMProvider.cdsAdministradorasCONTA.Value);
+        dmMProvider.cdsAdministradorasBANCO.Clear;
+        dmMProvider.cdsAdministradorasAGENCIA.Clear ;
+        TocarSomAlerta(ord(SystemHand));
+        edtConta.SetFocus;
+
+      end
+      else
+      begin
+
+        dmMProvider.cdsAdministradorasBANCO.Value   := dmDBEXMaster.fdqContaCorrente.FieldByName('BANCO').Value;
+        dmMProvider.cdsAdministradorasAGENCIA.Value := dmDBEXMaster.fdqContaCorrente.FieldByName('AGENCIA').Value;
+
+      end;
+
+
+    end;
+
+  end;
+
+  dmDBEXMaster.fdqContaCorrente.Close;
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmAdministradoras.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+  pgcAdministradoras.Pages[1].TabVisible   := False;
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmAdministradoras.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    if rdpOpcoesPesquisa.ItemIndex = 1 then
+    begin
+
+      if not ValidarCnpjCpf(edtConteudoPesquisa.Text) then
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CNPJ_INVALIDO;
+        Application.ProcessMessages;
+
+        edtConteudoPesquisa.SetFocus;
+        TocarSomAlerta(ord(SystemHand));
+
+      end;
+
+    end;
+
+    if AbrirTabelaadministradora(rdpOpcoesPesquisa.ItemIndex, edtConteudoPesquisa.Text) then
+      grdTabela.SetFocus
+    else
+    begin
+
+      edtConteudoPesquisa.Clear;
+      edtConteudoPesquisa.SetFocus;
+
+    end;
+
+    MudarCorEdit(Sender);
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.edtConteudoPesquisaKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+
+end;
+
+procedure TfrmAdministradoras.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmAdministradoras.edtDescontoExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmAdministradoras.edtDescontoKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = FormatoUS.DecimalSeparator then
+    Key := FormatoBR.DecimalSeparator;
+
+  if key = #13 then
+  begin
+    key := #0;
+    PostMessage(handle, WM_KEYDOWN, VK_TAB, 1);
+  end;
+
+end;
+
+procedure TfrmAdministradoras.edtNomeEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmAdministradoras.edtPrazoExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmAdministradoras.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                               := COR_PADRAO_TELAS;
+  Caption                             := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario           := ParamStr(1);
+  dmDBEXMaster.sSenha                 := paramstr(2);
+  dmDBEXMaster.iIdUsuario             := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial              := StrToInt(ParamStr(4));
+
+  pgcAdministradoras.Pages[1].TabVisible       := False;
+  pgcAdministradoras.ActivePageIndex           := 0;
+
+  dmMProvider.cdsContaCorrente.Open;
+  dmMProvider.cdsContaCorrente.ProviderName := '';
+
+end;
+
+procedure TfrmAdministradoras.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmAdministradoras.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    actExcluirExecute(self);
+
+  end
+  else   if (UpperCase(key) = 'N') and (lblMsg.Tag = -1) then
+  begin
+
+    key         := #0;
+    lblMsg.Tag  := 0;
+    LimparMSG_ERRO;
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsAdministradoras.IsEmpty then
+  begin
+
+    pgcAdministradoras.Pages[1].TabVisible  := True;
+    pgcAdministradoras.ActivePageIndex      := 1;
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.grdTabelaDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsAdministradoras.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsAdministradoras.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.grdTabelaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(Self);
+
+end;
+
+procedure TfrmAdministradoras.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+procedure TfrmAdministradoras.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsAdministradoras.Active then
+  begin
+
+    if not (dmMProvider.cdsAdministradoras.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmAdministradoras.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+procedure TfrmAdministradoras.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+procedure TfrmAdministradoras.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang:string;
+begin
+
+  if Pos('Unable',pE.Message) > 0then
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO
+  else if Pos('FOREIGN',pE.Message) > 0then
+  begin
+
+    sChave_Extrang := Trim(Copy(pE.Message,pos('ON TABLE',Uppercase(pE.Message))+ 10,Length(pE.Message)));
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_ERRO_CHAVE_ESTRANGEIRA
+                      + Copy(sChave_Extrang,1,pos('"',sChave_Extrang)-1);
+
+  end
+  else
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + pE.Message;
+
+  TocarSomAlerta(ord(SystemHand));
+
+end;
+
+function TfrmAdministradoras.ValidarCampos: boolean;
+begin
+
+  Result := true;
+
+  if Length(Trim(dmMProvider.cdsAdministradorasNOME.Value)) <= 0 then
+  begin
+
+    edtNome.SetFocus;
+    Result := false;
+
+  end
+  else if Length(Trim(dmMProvider.cdsAdministradorasCNPJ.Value)) <= 0 then
+  begin
+
+    edtCNPJ.SetFocus;
+    Result := false;
+
+  end;
+
+end;
+
+procedure TfrmAdministradoras.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

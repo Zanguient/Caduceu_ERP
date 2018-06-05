@@ -1,0 +1,148 @@
+unit modPrecoQuantidade;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ComCtrls, StdCtrls, ExtCtrls, pngimage, ActnList, IniFiles, Grids,
+  DBGrids, Mask, DBCtrls;
+
+type
+  TfrmPrecoQuatidade = class(TForm)
+    pgcPrecoQuantidade: TPageControl;
+    tbsTabela: TTabSheet;
+    tbsCadastro: TTabSheet;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    rdpOpcaoPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    edtConteudoPesquisa: TEdit;
+    imgPesquisar: TImage;
+    imgDesfazer: TImage;
+    lblF3: TLabel;
+    imgSalvar: TImage;
+    lblF4: TLabel;
+    imgExcluir: TImage;
+    lblF5: TLabel;
+    imgEditar: TImage;
+    lblF6: TLabel;
+    imgSair: TImage;
+    ActionList1: TActionList;
+    actSair: TAction;
+    actEditar: TAction;
+    actIncluir: TAction;
+    actSalvar: TAction;
+    actCancelar: TAction;
+    actExcluir: TAction;
+    grdTabela: TDBGrid;
+    grpCadastro: TGroupBox;
+    DBRadioGroup1: TDBRadioGroup;
+    lblValorunitario: TLabel;
+    lblPercentualDesconto: TLabel;
+    edtValorUnitario: TDBEdit;
+    edtpercentualDesconto: TDBEdit;
+    lblQuantidade: TLabel;
+    edtQuantidade: TDBEdit;
+    grpPrecoVenda: TGroupBox;
+    grpProduto: TGroupBox;
+    edtPrecoReal: TDBEdit;
+    lblProduto: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure actSairExecute(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+  private
+    { Private declarations }
+    ifArqIni:TIniFile;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPrecoQuatidade: TfrmPrecoQuatidade;
+
+implementation
+
+uses uFuncoes, modDBEXMaster, modDMSource, modDMCDSMaster;
+
+{$R *.dfm}
+
+procedure TfrmPrecoQuatidade.actSairExecute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+procedure TfrmPrecoQuatidade.FormCreate(Sender: TObject);
+begin
+
+  ifArqIni        := TIniFile.Create(ExtractFilePath(Application.ExeName) + 'Config.ini');
+
+  Caption         := Application.Title + ' - ' + RetornarVersao(Application.ExeName, 1);
+
+  DesabilitarBotaoFecharForm(Caption);
+
+
+{  dmDBEXMaster.sNomeUsuario := ParamStr(1);
+  dmDBEXMaster.sSenha       := paramstr(2);
+  dmDBEXMaster.iIdUsuario   := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial    := StrToInt(ParamStr(4));
+}
+  dmDBEXMaster.sqcMaster.Params.Clear;
+
+  //Carrega congurações
+  dmDBEXMaster.sqcMaster.Params.Values['DRIVERNAME']  :=  'Firebird';
+  dmDBEXMaster.sqcMaster.Params.Values['DATABASE'  ]  :=  ifArqIni.ReadString('Servidor', 'TCPIP', '') + ':' + ifArqIni.ReadString('Servidor', 'Path', 'C:\');
+  dmDBEXMaster.sqcMaster.LoginPrompt                  :=  False;
+  dmDBEXMaster.sqcMaster.Params.Values['USER_NAME' ]  :=  'SYSDBA';//dmDBEXMaster.sNomeUsuario;
+  dmDBEXMaster.sqcMaster.Params.Values['PASSWORD'  ]  :=  'mastekey';//dmDBEXMaster.sSenha;
+  dmDBEXMaster.sqcMaster.Params.Values['SQLDIALECT']  :=  '3';
+
+  pgcPrecoQuantidade.ActivePageIndex := 0;
+
+  dmCDSMaster.cdsPrecoQuantidade.CreateDataSet;
+
+  if FileExists(ExtractFilePath(Application.ExeName) + 'PQtd.cds') then
+    dmCDSMaster.cdsPrecoQuantidade.LoadFromFile(ExtractFilePath(Application.ExeName) + 'PQtd.cds');
+
+end;
+
+procedure TfrmPrecoQuatidade.grdTabelaDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmCDSMaster.cdsPrecoQuantidade.IsEmpty then
+  begin
+
+    if not odd(dmCDSMaster.cdsPrecoQuantidade.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color := clBlack;
+      grdTabela.Canvas.Brush.Color := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color := clBlack;
+      grdTabela.Canvas.Brush.Color := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmPrecoQuatidade.imgSairClick(Sender: TObject);
+begin
+
+  actSairExecute(self);
+
+end;
+
+end.

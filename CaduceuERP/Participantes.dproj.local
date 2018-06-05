@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/08/16 06:04:05.000.020,=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit4.pas</Transaction>
+    <Transaction>2017/08/16 06:04:51.000.017,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit4.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Cliente\modCliente.dfm</Transaction>
+    <Transaction>2017/08/16 06:04:51.000.017,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit4.pas=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Cliente\modCliente.pas</Transaction>
+    <Transaction>2017/08/16 06:06:27.000.379,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Projetos\Delphi_XE6\GenesisAC\Cliente.dproj</Transaction>
+    <Transaction>2017/08/16 06:59:53.000.490,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2017/08/16 06:59:56.000.324,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2017/08/16 07:00:02.000.667,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMDJPdv.pas</Transaction>
+    <Transaction>2017/08/16 07:00:02.000.689,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2017/08/16 07:00:02.000.677,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2017/08/16 07:00:05.000.512,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2017/08/16 07:00:17.000.638,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2017/08/16 07:21:44.000.794,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2017/08/16 07:22:00.000.801,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+    <Transaction>2017/08/16 07:22:00.000.825,=D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas</Transaction>
+    <Transaction>2017/08/16 07:24:53.000.842,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2017/08/16 07:58:55.000.044,=D:\Projetos\Formularios Genericos\modPesqCnpj.pas</Transaction>
+    <Transaction>2017/08/16 08:21:21.000.695,=D:\Projetos\Formularios Genericos\modCaptcha.pas</Transaction>
+    <Transaction>2017/09/17 07:46:40.000.229,D:\Projetos\Delphi_XE6\GenesisAC\Cliente.dproj=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Participantes\Participantes.dproj</Transaction>
+    <Transaction>2017/09/17 07:46:59.000.659,D:\Projetos\Delphi_XE6\GenesisAC\Modulo Cliente\modCliente.pas=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Participantes\modParticipantes.pas</Transaction>
+    <Transaction>2017/09/17 07:46:59.000.659,D:\Projetos\Delphi_XE6\GenesisAC\Modulo Cliente\modCliente.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Participantes\modParticipantes.dfm</Transaction>
+    <Transaction>2017/09/17 07:48:54.000.930,D:\Projetos\Delphi_XE6\GenesisAC\Modulo Participantes\Participantes.dproj=D:\Projetos\Delphi_XE6\GenesisAC\Participantes.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,320 @@
+unit modMVA;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, pngimage, ExtCtrls, Grids, DBGrids, Db, StdCtrls, DBCtrls, Mask;
+
+type
+  TfrmMva = class(TForm)
+    grdTabela: TDBGrid;
+    grpEstado: TGroupBox;
+    grpMVA: TGroupBox;
+    grpIcms_IE: TGroupBox;
+    grpICMS_Interno: TGroupBox;
+    edtICMS_Interno: TDBEdit;
+    edtMVA: TDBEdit;
+    edtICMS_IE: TDBEdit;
+    cboEstado: TDBLookupComboBox;
+    imgSair: TImage;
+    procedure FormCreate(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+    procedure grdTabelaKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure edtICMS_InternoKeyPress(Sender: TObject; var Key: Char);
+    procedure cboEstadoKeyPress(Sender: TObject; var Key: Char);
+    procedure edtICMS_InternoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtICMS_InternoEnter(Sender: TObject);
+    procedure edtICMS_InternoExit(Sender: TObject);
+    procedure edtMVAExit(Sender: TObject);
+    procedure edtICMS_IEExit(Sender: TObject);
+    procedure cboEstadoExit(Sender: TObject);
+    procedure cboEstadoCloseUp(Sender: TObject);
+  private
+    { Private declarations }
+    function Man_Tab_MVA(pOpcao:SmallInt):boolean;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmMva: TfrmMva;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes, dataMSProcedure;
+
+procedure TfrmMva.cboEstadoCloseUp(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsMva.Locate('ESTADO',cboEstado.Text,[]) then
+    dmMProvider.cdsMva.Append;
+
+end;
+
+procedure TfrmMva.cboEstadoExit(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsMva.Locate('ESTADO',cboEstado.Text,[]) then
+    dmMProvider.cdsMva.Append;
+
+end;
+
+procedure TfrmMva.cboEstadoKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmMva.edtICMS_IEExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+  if dmMProvider.cdsMva.State in [dsEdit, dsInsert] then
+  begin
+
+    if (cboEstado.Text <> '')  and (dmMProvider.cdsMvaPRODUTO.Value > 0)
+      and (dmMProvider.cdsMvaMARGEM_MVA.Value > 0) and (dmMProvider.cdsMvaICMS_INTERESTADUAL.Value > 0)
+      and (dmMProvider.cdsMvaICMS_INTERNO.Value > 0) then
+    begin
+
+      dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_OPCAO').Value              := 0;
+      dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_PRODUTO').Value            := dmMProvider.cdsMvaPRODUTO.Value;
+      dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_ESTADO').Value             := cboEstado.Text;
+      dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_MVA').Value                := dmMProvider.cdsMvaMARGEM_MVA.Value;
+      dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_ICMS_INTERESTADUAL').Value := dmMProvider.cdsMvaICMS_INTERESTADUAL.Value;
+      dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_ICMS_INTERNO').Value       := dmMProvider.cdsMvaICMS_INTERNO.Value;
+      dmSSPMaster.sspMan_Tab_MVA.ExecProc;
+
+      cboEstado.SetFocus;
+
+    end;
+
+    dmDBEXMaster.sqqMva.Close;
+    dmDBEXMaster.sqqMva.SQL.Clear;
+    dmDBEXMaster.sqqMva.SQL.Add('SELECT * FROM MVA');
+    dmDBEXMaster.sqqMva.SQL.Add('WHERE PRODUTO = ' + IntToStr(dmMProvider.cdsProdutosPRODUTO.Value));
+    dmDBEXMaster.sqqMva.SQL.Add('ORDER BY ESTADO');
+    dmDBEXMaster.sqqMva.Open;
+
+    dmMProvider.PovoarDataSetMVA;
+  end;
+
+end;
+
+procedure TfrmMva.edtICMS_InternoEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmMva.edtICMS_InternoExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmMva.edtICMS_InternoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+end;
+
+procedure TfrmMva.edtICMS_InternoKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = DecimalSeparator then
+    Key := ',';
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmMva.edtMVAExit(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmMva.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(handle);
+
+  dmDBEXMaster.sqqMva.Close;
+  dmDBEXMaster.sqqMva.SQL.Clear;
+  dmDBEXMaster.sqqMva.SQL.Add('SELECT * FROM MVA');
+  dmDBEXMaster.sqqMva.SQL.Add('WHERE PRODUTO = ' + IntToStr(dmMProvider.cdsProdutosPRODUTO.Value));
+  dmDBEXMaster.sqqMva.SQL.Add('ORDER BY ESTADO');
+  dmDBEXMaster.sqqMva.Open;
+
+  dmMProvider.PovoarDataSetMVA;
+
+  dmDBEXMaster.sqqEstados.Close;
+  dmDBEXMaster.sqqEstados.SQL.Clear;
+  dmDBEXMaster.sqqEstados.SQL.Add('SELECT * FROM ESTADOS');
+  dmDBEXMaster.sqqEstados.SQL.Add('ORDER BY SIGLA');
+  dmDBEXMaster.sqqEstados.Open;
+
+  dmMProvider.PovoarDataSetEstado;
+
+end;
+
+procedure TfrmMva.grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsMva.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsMva.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color := clBlack;
+      grdTabela.Canvas.Brush.Color := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color := clBlack;
+      grdTabela.Canvas.Brush.Color := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmMva.grdTabelaKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = 38 then
+  begin
+
+    if dmMProvider.cdsMva.State in [dsEdit, dsInsert] then
+      dmMProvider.cdsMva.Cancel;
+
+  end
+  else if (shift = [ssctrl]) and (key = 46) then
+  begin
+
+    key := 0;
+    exit;
+
+  end
+  else if key = 46 then
+  begin
+
+    if Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario + ', ' + MSG_EXCLUIR),
+      'Atenção!', mb_IconQuestion + mb_DefButton2 + mb_YesNo) = idYes then
+    begin
+
+      if not dmMProvider.cdsMva.IsEmpty then
+      begin
+
+        dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_OPCAO').Value              := 1;
+        dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_ESTADO').AsString          := dmMProvider.cdsMvaESTADO.Value;
+        dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_PRODUTO').Value            := dmMProvider.cdsMvaPRODUTO.Value;
+        dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_MVA').Value                := 0;
+        dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_ICMS_INTERESTADUAL').Value := 0;
+        dmSSPMaster.sspMan_Tab_MVA.ParamByName('IP_ICMS_INTERNO').Value       := 0;
+        dmSSPMaster.sspMan_Tab_MVA.ExecProc;
+
+        dmMProvider.cdsMva.Delete;
+
+      end;
+    end;
+  end;
+
+end;
+
+procedure TfrmMva.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+function TfrmMva.Man_Tab_MVA(pOpcao: SmallInt): boolean;
+begin
+
+  try
+
+    if not dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.StartTransaction;
+
+    dmMSProcedure.fdspMVA.Params[0].Value   := pOpcao;
+    dmMSProcedure.fdspMVA.Params[1].Value   := dmMProvider.cdsMVAPRODUTO.AsInteger;
+    dmMSProcedure.fdspMVA.Params[2].Value   := dmMProvider.cdsMVAESTADO.AsString;
+    dmMSProcedure.fdspMVA.Params[3].Value   := dmMProvider.cdsMVAMVA.AsInteger;
+    dmMSProcedure.fdspMVA.Params[4].Value   := dmMProvider.cdsMVAICMS_INTERESTADUAL.AsCurrency;
+    dmMSProcedure.fdspMVA.Params[5].Value   := dmMProvider.cdsMVAICMS_INTERNO.AsCurrency;
+    dmMSProcedure.fdspMVA.ExecProc;
+
+    if dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.Commit;
+
+    Result := true;
+
+  except
+
+    if dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    Result := false;
+
+  end;
+
+
+end;
+
+end.

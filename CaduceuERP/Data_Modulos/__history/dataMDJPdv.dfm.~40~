@@ -1,0 +1,829 @@
+object dmMDJPdv: TdmMDJPdv
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 452
+  Width = 935
+  object fdcDJPdv: TFDConnection
+    Params.Strings = (
+      'Database=C:\DJSYSTEM\MONITOR\DJPDV.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'CharacterSet=ISO8859_1'
+      'DriverID=FB')
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvBackup, rvAutoReconnect]
+    ResourceOptions.AutoReconnect = True
+    UpdateOptions.AssignedValues = [uvLockMode, uvRefreshMode, uvFetchGeneratorsPoint]
+    UpdateOptions.LockMode = lmOptimistic
+    UpdateOptions.RefreshMode = rmAll
+    TxOptions.AutoStop = False
+    LoginPrompt = False
+    Left = 704
+    Top = 20
+  end
+  object fdwDJPdv: TFDGUIxWaitCursor
+    Provider = 'Forms'
+    Left = 704
+    Top = 116
+  end
+  object fddFBDJPdv: TFDPhysFBDriverLink
+    Left = 704
+    Top = 68
+  end
+  object fdqPesqProdutoDJPdv: TFDQuery
+    Connection = fdcDJPdv
+    SQL.Strings = (
+      'select * from produto')
+    Left = 80
+    Top = 16
+    object fdqPesqProdutoDJPdvCODPRODUTO: TIntegerField
+      FieldName = 'CODPRODUTO'
+      Origin = 'CODPRODUTO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object fdqPesqProdutoDJPdvCODEXTERNO: TStringField
+      FieldName = 'CODEXTERNO'
+      Origin = 'CODEXTERNO'
+    end
+    object fdqPesqProdutoDJPdvCODBARRAS: TStringField
+      FieldName = 'CODBARRAS'
+      Origin = 'CODBARRAS'
+      Required = True
+      FixedChar = True
+    end
+    object fdqPesqProdutoDJPdvDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Required = True
+      Size = 40
+    end
+    object fdqPesqProdutoDJPdvCOMPLEMENTO: TStringField
+      FieldName = 'COMPLEMENTO'
+      Origin = 'COMPLEMENTO'
+      Size = 40
+    end
+    object fdqPesqProdutoDJPdvUN: TStringField
+      FieldName = 'UN'
+      Origin = 'UN'
+      FixedChar = True
+      Size = 4
+    end
+    object fdqPesqProdutoDJPdvPRECO_VENDA: TBCDField
+      FieldName = 'PRECO_VENDA'
+      Origin = 'PRECO_VENDA'
+      Precision = 18
+      Size = 3
+    end
+    object fdqPesqProdutoDJPdvDESCONTO: TCurrencyField
+      FieldName = 'DESCONTO'
+      Origin = 'DESCONTO'
+    end
+    object fdqPesqProdutoDJPdvSITU_TRIBUTA: TStringField
+      FieldName = 'SITU_TRIBUTA'
+      Origin = 'SITU_TRIBUTA'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object fdqPesqProdutoDJPdvICMS: TCurrencyField
+      FieldName = 'ICMS'
+      Origin = 'ICMS'
+    end
+    object fdqPesqProdutoDJPdvOBS_POPUP: TStringField
+      FieldName = 'OBS_POPUP'
+      Origin = 'OBS_POPUP'
+      Size = 65
+    end
+    object fdqPesqProdutoDJPdvALTERADO: TSQLTimeStampField
+      FieldName = 'ALTERADO'
+      Origin = 'ALTERADO'
+    end
+    object fdqPesqProdutoDJPdvCALCULA_QTD: TStringField
+      FieldName = 'CALCULA_QTD'
+      Origin = 'CALCULA_QTD'
+      FixedChar = True
+      Size = 1
+    end
+    object fdqPesqProdutoDJPdvBLOQ_QTD_FRAC: TStringField
+      FieldName = 'BLOQ_QTD_FRAC'
+      Origin = 'BLOQ_QTD_FRAC'
+      FixedChar = True
+      Size = 1
+    end
+    object fdqPesqProdutoDJPdvBLOQUEIA_QTD: TStringField
+      FieldName = 'BLOQUEIA_QTD'
+      Origin = 'BLOQUEIA_QTD'
+      FixedChar = True
+      Size = 1
+    end
+    object fdqPesqProdutoDJPdvARREDONDA: TStringField
+      FieldName = 'ARREDONDA'
+      Origin = 'ARREDONDA'
+      FixedChar = True
+      Size = 1
+    end
+    object fdqPesqProdutoDJPdvPRODUCAO_PROPRIA: TStringField
+      FieldName = 'PRODUCAO_PROPRIA'
+      Origin = 'PRODUCAO_PROPRIA'
+      FixedChar = True
+      Size = 1
+    end
+    object fdqPesqProdutoDJPdvCODGRUPO: TStringField
+      FieldName = 'CODGRUPO'
+      Origin = 'CODGRUPO'
+      FixedChar = True
+      Size = 6
+    end
+    object fdqPesqProdutoDJPdvCODDEPARTAMENTO: TStringField
+      FieldName = 'CODDEPARTAMENTO'
+      Origin = 'CODDEPARTAMENTO'
+      FixedChar = True
+      Size = 6
+    end
+    object fdqPesqProdutoDJPdvCODMARCA: TStringField
+      FieldName = 'CODMARCA'
+      Origin = 'CODMARCA'
+      FixedChar = True
+      Size = 6
+    end
+    object fdqPesqProdutoDJPdvFLAG: TSmallintField
+      FieldName = 'FLAG'
+      Origin = 'FLAG'
+    end
+    object fdqPesqProdutoDJPdvTIPOVASILHAME: TSmallintField
+      FieldName = 'TIPOVASILHAME'
+      Origin = 'TIPOVASILHAME'
+    end
+    object fdqPesqProdutoDJPdvCODANIMACAO: TSmallintField
+      FieldName = 'CODANIMACAO'
+      Origin = 'CODANIMACAO'
+    end
+    object fdqPesqProdutoDJPdvNCM: TStringField
+      FieldName = 'NCM'
+      Origin = 'NCM'
+    end
+    object fdqPesqProdutoDJPdvQTD_ESTOQUE: TBCDField
+      FieldName = 'QTD_ESTOQUE'
+      Origin = 'QTD_ESTOQUE'
+      Precision = 18
+      Size = 3
+    end
+    object fdqPesqProdutoDJPdvDATA_ESTOQUE: TSQLTimeStampField
+      FieldName = 'DATA_ESTOQUE'
+      Origin = 'DATA_ESTOQUE'
+    end
+    object fdqPesqProdutoDJPdvHASH: TLargeintField
+      FieldName = 'HASH'
+      Origin = '"HASH"'
+    end
+    object fdqPesqProdutoDJPdvCODDESCADICPROD: TSmallintField
+      FieldName = 'CODDESCADICPROD'
+      Origin = 'CODDESCADICPROD'
+    end
+    object fdqPesqProdutoDJPdvGTINCOM: TStringField
+      FieldName = 'GTINCOM'
+      Origin = 'GTINCOM'
+    end
+    object fdqPesqProdutoDJPdvEXTIPI: TStringField
+      FieldName = 'EXTIPI'
+      Origin = 'EXTIPI'
+    end
+    object fdqPesqProdutoDJPdvGTINTRIB: TStringField
+      FieldName = 'GTINTRIB'
+      Origin = 'GTINTRIB'
+    end
+    object fdqPesqProdutoDJPdvID_ICMS: TSmallintField
+      FieldName = 'ID_ICMS'
+      Origin = 'ID_ICMS'
+    end
+    object fdqPesqProdutoDJPdvID_IPI: TSmallintField
+      FieldName = 'ID_IPI'
+      Origin = 'ID_IPI'
+    end
+    object fdqPesqProdutoDJPdvID_ISSQN: TSmallintField
+      FieldName = 'ID_ISSQN'
+      Origin = 'ID_ISSQN'
+    end
+    object fdqPesqProdutoDJPdvID_II: TSmallintField
+      FieldName = 'ID_II'
+      Origin = 'ID_II'
+    end
+    object fdqPesqProdutoDJPdvID_PIS: TSmallintField
+      FieldName = 'ID_PIS'
+      Origin = 'ID_PIS'
+    end
+    object fdqPesqProdutoDJPdvID_PISST: TSmallintField
+      FieldName = 'ID_PISST'
+      Origin = 'ID_PISST'
+    end
+    object fdqPesqProdutoDJPdvID_COFINS: TSmallintField
+      FieldName = 'ID_COFINS'
+      Origin = 'ID_COFINS'
+    end
+    object fdqPesqProdutoDJPdvID_COFINSST: TSmallintField
+      FieldName = 'ID_COFINSST'
+      Origin = 'ID_COFINSST'
+    end
+    object fdqPesqProdutoDJPdvKIT: TSmallintField
+      FieldName = 'KIT'
+      Origin = 'KIT'
+    end
+    object fdqPesqProdutoDJPdvPRAZO_DEVOLUCAO: TSmallintField
+      FieldName = 'PRAZO_DEVOLUCAO'
+      Origin = 'PRAZO_DEVOLUCAO'
+    end
+    object fdqPesqProdutoDJPdvCEST: TStringField
+      FieldName = 'CEST'
+      Origin = 'CEST'
+      Size = 7
+    end
+    object fdqPesqProdutoDJPdvCONTROLA_ESTOQUE: TSmallintField
+      FieldName = 'CONTROLA_ESTOQUE'
+      Origin = 'CONTROLA_ESTOQUE'
+      Required = True
+    end
+    object fdqPesqProdutoDJPdvCODIGO_ANP: TIntegerField
+      FieldName = 'CODIGO_ANP'
+      Origin = 'CODIGO_ANP'
+    end
+  end
+  object fdqReducaoZ: TFDQuery
+    Connection = fdcDJPdv
+    SQL.Strings = (
+      'select * from reducaoz')
+    Left = 80
+    Top = 64
+  end
+  object dspReducaoZ: TDataSetProvider
+    DataSet = fdqReducaoZ
+    Left = 198
+    Top = 64
+  end
+  object cdsReducaoZ: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspReducaoZ'
+    Left = 310
+    Top = 64
+    object cdsReducaoZCODLOJA: TSmallintField
+      FieldName = 'CODLOJA'
+      Required = True
+    end
+    object cdsReducaoZCODECF: TSmallintField
+      FieldName = 'CODECF'
+      Required = True
+    end
+    object cdsReducaoZCRO: TSmallintField
+      FieldName = 'CRO'
+      Required = True
+    end
+    object cdsReducaoZCOO: TIntegerField
+      FieldName = 'COO'
+      Required = True
+    end
+    object cdsReducaoZCRZ: TSmallintField
+      FieldName = 'CRZ'
+      Required = True
+    end
+    object cdsReducaoZDATAHORA_EMISSAO: TSQLTimeStampField
+      FieldName = 'DATAHORA_EMISSAO'
+      Required = True
+    end
+    object cdsReducaoZDATA_MOVIMENTO: TDateField
+      FieldName = 'DATA_MOVIMENTO'
+    end
+    object cdsReducaoZVENDA_BRUTA: TBCDField
+      FieldName = 'VENDA_BRUTA'
+      Precision = 18
+      Size = 2
+    end
+    object cdsReducaoZGRANDE_TOTAL: TBCDField
+      FieldName = 'GRANDE_TOTAL'
+      Precision = 18
+      Size = 2
+    end
+    object cdsReducaoZDADOS: TMemoField
+      FieldName = 'DADOS'
+      BlobType = ftMemo
+    end
+    object cdsReducaoZHASH: TLargeintField
+      FieldName = 'HASH'
+    end
+    object cdsReducaoZDADOS_HASH: TMemoField
+      FieldName = 'DADOS_HASH'
+      BlobType = ftMemo
+    end
+    object cdsReducaoZTIPOCAPTURA: TStringField
+      FieldName = 'TIPOCAPTURA'
+      FixedChar = True
+      Size = 1
+    end
+  end
+  object fdqItemCupom: TFDQuery
+    Connection = fdcDJPdv
+    SQL.Strings = (
+      'select * from doc_item')
+    Left = 80
+    Top = 154
+  end
+  object dspItemCupom: TDataSetProvider
+    DataSet = fdqItemCupom
+    Left = 198
+    Top = 154
+  end
+  object cdsItemCupom: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspItemCupom'
+    Left = 310
+    Top = 154
+    object cdsItemCupomCODLOJA: TSmallintField
+      FieldName = 'CODLOJA'
+      Required = True
+    end
+    object cdsItemCupomCODTERMINAL: TSmallintField
+      FieldName = 'CODTERMINAL'
+      Required = True
+    end
+    object cdsItemCupomCODTURNO: TSmallintField
+      FieldName = 'CODTURNO'
+      Required = True
+    end
+    object cdsItemCupomCOO: TIntegerField
+      FieldName = 'COO'
+      Required = True
+    end
+    object cdsItemCupomSEQUENCIA: TSmallintField
+      FieldName = 'SEQUENCIA'
+      Required = True
+    end
+    object cdsItemCupomCODPRODUTO: TIntegerField
+      FieldName = 'CODPRODUTO'
+      Required = True
+    end
+    object cdsItemCupomQTD: TCurrencyField
+      FieldName = 'QTD'
+      Required = True
+    end
+    object cdsItemCupomPRECO_UNITARIO: TBCDField
+      FieldName = 'PRECO_UNITARIO'
+      Required = True
+      Precision = 18
+      Size = 3
+    end
+    object cdsItemCupomDESCONTO_ACRESCIMO: TBCDField
+      FieldName = 'DESCONTO_ACRESCIMO'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object cdsItemCupomSITU_TRIBUTA: TStringField
+      FieldName = 'SITU_TRIBUTA'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsItemCupomICMS: TCurrencyField
+      FieldName = 'ICMS'
+      Required = True
+    end
+    object cdsItemCupomCANCELADO: TStringField
+      FieldName = 'CANCELADO'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsItemCupomHASH: TLargeintField
+      FieldName = 'HASH'
+    end
+    object cdsItemCupomSEQ_ALIQ_ECF: TSmallintField
+      FieldName = 'SEQ_ALIQ_ECF'
+    end
+    object cdsItemCupomDESCADICPROD: TStringField
+      FieldName = 'DESCADICPROD'
+      Size = 40
+    end
+    object cdsItemCupomCODVENDEDOR: TStringField
+      FieldName = 'CODVENDEDOR'
+      FixedChar = True
+      Size = 6
+    end
+    object cdsItemCupomCONTADOR: TIntegerField
+      FieldName = 'CONTADOR'
+    end
+    object cdsItemCupomVALIQFED: TBCDField
+      FieldName = 'VALIQFED'
+      Precision = 18
+      Size = 2
+    end
+    object cdsItemCupomID_MOTIVO_CANC: TSmallintField
+      FieldName = 'ID_MOTIVO_CANC'
+    end
+    object cdsItemCupomID_MOTIVO_DESC: TSmallintField
+      FieldName = 'ID_MOTIVO_DESC'
+    end
+    object cdsItemCupomVALIQEST: TSingleField
+      FieldName = 'VALIQEST'
+    end
+    object cdsItemCupomVALIQMUN: TSingleField
+      FieldName = 'VALIQMUN'
+    end
+    object cdsItemCupomCONTROLA_ESTOQUE: TSmallintField
+      FieldName = 'CONTROLA_ESTOQUE'
+      Required = True
+    end
+  end
+  object fdqCupom: TFDQuery
+    Connection = fdcDJPdv
+    SQL.Strings = (
+      'select * from documento'
+      'where codloja = 1'
+      
+        'and datahora_inicio between '#39'14.07.17 00:01'#39' and '#39'14.07.17 23:59' +
+        #39
+      'and denominacao = '#39'RV'#39
+      'order by coo')
+    Left = 80
+    Top = 111
+  end
+  object dspCupom: TDataSetProvider
+    DataSet = fdqCupom
+    Left = 198
+    Top = 111
+  end
+  object cdsCupom: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspCupom'
+    Left = 310
+    Top = 111
+    object cdsCupomCODLOJA: TSmallintField
+      FieldName = 'CODLOJA'
+      Required = True
+    end
+    object cdsCupomCODTERMINAL: TSmallintField
+      FieldName = 'CODTERMINAL'
+      Required = True
+    end
+    object cdsCupomCODTURNO: TSmallintField
+      FieldName = 'CODTURNO'
+      Required = True
+    end
+    object cdsCupomCOO: TIntegerField
+      FieldName = 'COO'
+      Required = True
+    end
+    object cdsCupomDENOMINACAO: TStringField
+      FieldName = 'DENOMINACAO'
+      Required = True
+      FixedChar = True
+      Size = 2
+    end
+    object cdsCupomCONTADOR: TIntegerField
+      FieldName = 'CONTADOR'
+    end
+    object cdsCupomDATAHORA_INICIO: TSQLTimeStampField
+      FieldName = 'DATAHORA_INICIO'
+      Required = True
+    end
+    object cdsCupomDATAHORA_FIM: TSQLTimeStampField
+      FieldName = 'DATAHORA_FIM'
+    end
+    object cdsCupomDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Size = 60
+    end
+    object cdsCupomCODCLIENTE: TIntegerField
+      FieldName = 'CODCLIENTE'
+    end
+    object cdsCupomCODAUTORIZADO: TIntegerField
+      FieldName = 'CODAUTORIZADO'
+    end
+    object cdsCupomDOCUMENTO_CLI: TStringField
+      FieldName = 'DOCUMENTO_CLI'
+    end
+    object cdsCupomNOME_CLI: TStringField
+      FieldName = 'NOME_CLI'
+      Size = 50
+    end
+    object cdsCupomSUBTOTAL: TBCDField
+      FieldName = 'SUBTOTAL'
+      Precision = 18
+      Size = 2
+    end
+    object cdsCupomDESCONTO_ACRESCIMO: TBCDField
+      FieldName = 'DESCONTO_ACRESCIMO'
+      Precision = 18
+      Size = 2
+    end
+    object cdsCupomTOTAL_PAGO: TBCDField
+      FieldName = 'TOTAL_PAGO'
+      Precision = 18
+      Size = 2
+    end
+    object cdsCupomTROCO: TBCDField
+      FieldName = 'TROCO'
+      Precision = 18
+      Size = 2
+    end
+    object cdsCupomCODPLANOPAGTO: TStringField
+      FieldName = 'CODPLANOPAGTO'
+      FixedChar = True
+      Size = 2
+    end
+    object cdsCupomCANCELADO: TStringField
+      FieldName = 'CANCELADO'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsCupomTRUNCA: TStringField
+      FieldName = 'TRUNCA'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsCupomCODEXPORTACAO: TIntegerField
+      FieldName = 'CODEXPORTACAO'
+    end
+    object cdsCupomENTREGAR: TStringField
+      FieldName = 'ENTREGAR'
+      FixedChar = True
+      Size = 1
+    end
+    object cdsCupomNUMGNF: TIntegerField
+      FieldName = 'NUMGNF'
+    end
+    object cdsCupomHASH: TLargeintField
+      FieldName = 'HASH'
+    end
+    object cdsCupomVIMPALIQFED: TBCDField
+      FieldName = 'VIMPALIQFED'
+      Precision = 18
+      Size = 2
+    end
+    object cdsCupomID_MOTIVO_CANC: TSmallintField
+      FieldName = 'ID_MOTIVO_CANC'
+    end
+    object cdsCupomID_MOTIVO_DESC: TSmallintField
+      FieldName = 'ID_MOTIVO_DESC'
+    end
+    object cdsCupomOBS: TMemoField
+      FieldName = 'OBS'
+      BlobType = ftMemo
+    end
+    object cdsCupomNOTA_REF_TIPO: TStringField
+      FieldName = 'NOTA_REF_TIPO'
+      FixedChar = True
+      Size = 2
+    end
+    object cdsCupomNOTA_REF_SERIE: TIntegerField
+      FieldName = 'NOTA_REF_SERIE'
+    end
+    object cdsCupomNOTA_REF_NUMERO: TIntegerField
+      FieldName = 'NOTA_REF_NUMERO'
+    end
+    object cdsCupomVIMPALIQEST: TSingleField
+      FieldName = 'VIMPALIQEST'
+    end
+    object cdsCupomVIMPALIQMUN: TSingleField
+      FieldName = 'VIMPALIQMUN'
+    end
+    object cdsCupomNOTA_REF_TPAMB: TSmallintField
+      FieldName = 'NOTA_REF_TPAMB'
+    end
+    object cdsCupomNOTA_REF_TPNF: TSmallintField
+      FieldName = 'NOTA_REF_TPNF'
+    end
+    object cdsCupomDFE_CHAVE: TStringField
+      FieldName = 'DFE_CHAVE'
+      Size = 100
+    end
+    object cdsCupomDFE_PROTOCOLO: TStringField
+      FieldName = 'DFE_PROTOCOLO'
+      Size = 30
+    end
+    object cdsCupomDFE_MODELO: TStringField
+      FieldName = 'DFE_MODELO'
+      Size = 2
+    end
+    object cdsCupomIDFATURA: TLargeintField
+      FieldName = 'IDFATURA'
+    end
+  end
+  object fdqTerminal: TFDQuery
+    Connection = fdcDJPdv
+    SQL.Strings = (
+      'select * from terminal')
+    Left = 198
+    Top = 16
+    object fdqTerminalCODLOJA: TSmallintField
+      FieldName = 'CODLOJA'
+      Origin = 'CODLOJA'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object fdqTerminalCODTERMINAL: TSmallintField
+      FieldName = 'CODTERMINAL'
+      Origin = 'CODTERMINAL'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object fdqTerminalCODEXTERNO: TStringField
+      FieldName = 'CODEXTERNO'
+      Origin = 'CODEXTERNO'
+      Size = 10
+    end
+    object fdqTerminalDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Required = True
+    end
+    object fdqTerminalESTADO: TStringField
+      FieldName = 'ESTADO'
+      Origin = 'ESTADO'
+      FixedChar = True
+      Size = 3
+    end
+    object fdqTerminalENDERECO_VNC: TStringField
+      FieldName = 'ENDERECO_VNC'
+      Origin = 'ENDERECO_VNC'
+      Size = 30
+    end
+    object fdqTerminalIP_ATUAL: TStringField
+      FieldName = 'IP_ATUAL'
+      Origin = 'IP_ATUAL'
+    end
+    object fdqTerminalCMD_SERV_TER: TStringField
+      FieldName = 'CMD_SERV_TER'
+      Origin = 'CMD_SERV_TER'
+      FixedChar = True
+      Size = 4
+    end
+    object fdqTerminalMSG_TER_SERV: TStringField
+      FieldName = 'MSG_TER_SERV'
+      Origin = 'MSG_TER_SERV'
+      Size = 250
+    end
+    object fdqTerminalCMD_TER_SERV: TStringField
+      FieldName = 'CMD_TER_SERV'
+      Origin = 'CMD_TER_SERV'
+      FixedChar = True
+      Size = 4
+    end
+    object fdqTerminalMSG_SERV_TER: TStringField
+      FieldName = 'MSG_SERV_TER'
+      Origin = 'MSG_SERV_TER'
+      Size = 250
+    end
+    object fdqTerminalULT_CONTATO: TSQLTimeStampField
+      FieldName = 'ULT_CONTATO'
+      Origin = 'ULT_CONTATO'
+    end
+    object fdqTerminalULT_ATUALIZA: TSQLTimeStampField
+      FieldName = 'ULT_ATUALIZA'
+      Origin = 'ULT_ATUALIZA'
+    end
+    object fdqTerminalSKIN: TStringField
+      FieldName = 'SKIN'
+      Origin = 'SKIN'
+      Size = 250
+    end
+    object fdqTerminalOFF_LINE: TStringField
+      FieldName = 'OFF_LINE'
+      Origin = 'OFF_LINE'
+      FixedChar = True
+      Size = 1
+    end
+    object fdqTerminalCODECF: TSmallintField
+      FieldName = 'CODECF'
+      Origin = 'CODECF'
+    end
+    object fdqTerminalPARAMS: TMemoField
+      FieldName = 'PARAMS'
+      Origin = 'PARAMS'
+      BlobType = ftMemo
+    end
+    object fdqTerminalMD5: TStringField
+      FieldName = 'MD5'
+      Origin = 'MD5'
+      FixedChar = True
+      Size = 32
+    end
+  end
+  object fdqFinalizaroaCupom: TFDQuery
+    Connection = fdcDJPdv
+    SQL.Strings = (
+      'select * from doc_pagto')
+    Left = 80
+    Top = 199
+  end
+  object dspFinalizaroaCupom: TDataSetProvider
+    DataSet = fdqFinalizaroaCupom
+    Left = 198
+    Top = 199
+  end
+  object cdsFinalizaroaCupom: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspFinalizaroaCupom'
+    Left = 310
+    Top = 199
+    object cdsFinalizaroaCupomCODLOJA: TSmallintField
+      FieldName = 'CODLOJA'
+      Required = True
+    end
+    object cdsFinalizaroaCupomCODTERMINAL: TSmallintField
+      FieldName = 'CODTERMINAL'
+      Required = True
+    end
+    object cdsFinalizaroaCupomCODTURNO: TSmallintField
+      FieldName = 'CODTURNO'
+      Required = True
+    end
+    object cdsFinalizaroaCupomCOO: TIntegerField
+      FieldName = 'COO'
+      Required = True
+    end
+    object cdsFinalizaroaCupomSEQUENCIA: TSmallintField
+      FieldName = 'SEQUENCIA'
+      Required = True
+    end
+    object cdsFinalizaroaCupomCODFORMAPAGTO: TStringField
+      FieldName = 'CODFORMAPAGTO'
+      Required = True
+      FixedChar = True
+      Size = 2
+    end
+    object cdsFinalizaroaCupomVALOR_PAGO: TBCDField
+      FieldName = 'VALOR_PAGO'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object cdsFinalizaroaCupomHASH: TLargeintField
+      FieldName = 'HASH'
+    end
+    object cdsFinalizaroaCupomCONTADOR: TIntegerField
+      FieldName = 'CONTADOR'
+    end
+    object cdsFinalizaroaCupomNUMGNF: TIntegerField
+      FieldName = 'NUMGNF'
+    end
+  end
+  object fdqCST_PIS: TFDQuery
+    Connection = dmDBEXMaster.fdcMaster
+    SQL.Strings = (
+      'select distinct pis.*, pro.aliquota_pis from cst_pis_pasep pis'
+      'join produto pro'
+      'on(pro.cst_pis = pis.cst_pis_pasep)')
+    Left = 80
+    Top = 247
+  end
+  object dspCST_PIS: TDataSetProvider
+    DataSet = fdqCST_PIS
+    Left = 198
+    Top = 247
+  end
+  object cdsCST_PIS: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspCST_PIS'
+    Left = 310
+    Top = 247
+    object cdsCST_PISCST_PIS_PASEP: TIntegerField
+      FieldName = 'CST_PIS_PASEP'
+      Required = True
+    end
+    object cdsCST_PISDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Size = 200
+    end
+    object cdsCST_PISENTRADA_SAIDA: TSmallintField
+      FieldName = 'ENTRADA_SAIDA'
+      Required = True
+    end
+    object cdsCST_PISGERA_CREDITO: TSmallintField
+      FieldName = 'GERA_CREDITO'
+      Required = True
+    end
+    object cdsCST_PISALIQUOTA_PIS: TBCDField
+      FieldName = 'ALIQUOTA_PIS'
+      ReadOnly = True
+      Precision = 18
+    end
+  end
+  object fdmTemp_PIS: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 400
+    Top = 248
+  end
+end

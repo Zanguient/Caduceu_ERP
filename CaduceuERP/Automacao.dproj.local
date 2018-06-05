@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/10/25 06:50:04.000.403,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoZEUSFREE.pas=</Transaction>
+    <Transaction>2016/10/25 06:50:06.000.523,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoTOLEDO.pas=</Transaction>
+    <Transaction>2016/10/25 06:50:10.000.440,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoTFC.pas=</Transaction>
+    <Transaction>2016/10/25 06:50:12.000.581,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoFILIZOLA.pas=</Transaction>
+    <Transaction>2016/10/25 06:50:14.000.673,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoFLEXPDV.pas=</Transaction>
+    <Transaction>2016/10/25 06:50:16.000.684,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoIBPT.pas=</Transaction>
+    <Transaction>2016/10/25 06:50:33.000.796,=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoIBPT.pas</Transaction>
+    <Transaction>2016/10/25 06:50:33.000.760,=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoFLEXPDV.pas</Transaction>
+    <Transaction>2016/10/25 06:50:33.000.723,=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoFILIZOLA.pas</Transaction>
+    <Transaction>2016/10/25 06:50:33.000.978,=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoTOLEDO.pas</Transaction>
+    <Transaction>2016/10/25 06:50:33.000.939,=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoTFC.pas</Transaction>
+    <Transaction>2016/10/25 06:50:34.000.016,=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoZEUSFREE.pas</Transaction>
+    <Transaction>2016/10/25 06:50:55.000.589,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2016/10/25 06:50:55.000.675,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2016/10/25 06:50:55.000.560,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2016/10/25 06:50:55.000.615,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2016/10/25 06:51:04.000.059,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2016/10/25 06:51:17.000.443,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2016/10/25 06:51:48.000.010,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+    <Transaction>2016/10/25 06:52:36.000.211,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2016/10/25 08:14:02.000.668,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoFLEXPDV.pas=</Transaction>
+    <Transaction>2016/10/25 08:15:43.000.628,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoIBPT.pas=</Transaction>
+    <Transaction>2016/10/25 08:16:28.000.789,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoSYSPDV.pas=</Transaction>
+    <Transaction>2016/10/25 08:16:32.000.833,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoTFC.pas=</Transaction>
+    <Transaction>2016/11/09 15:47:27.000.827,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoFILIZOLA.pas=</Transaction>
+    <Transaction>2016/12/19 07:59:09.000.387,=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoFILIZOLA.pas</Transaction>
+    <Transaction>2017/06/30 17:02:59.000.337,=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+    <Transaction>2017/06/30 17:03:53.000.058,D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas=D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoDJPDV.pas</Transaction>
+    <Transaction>2017/06/30 17:12:09.000.870,=D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas</Transaction>
+    <Transaction>2017/06/30 17:12:44.000.389,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2017/07/14 10:19:26.000.565,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMDJPdv.pas</Transaction>
+    <Transaction>2017/09/26 04:36:44.000.994,=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+    <Transaction>2017/09/26 04:37:01.000.842,D:\Projetos\Delphi_XE6\GenesisAC\Automação\modAutomacaoImportarSintegra.pas=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

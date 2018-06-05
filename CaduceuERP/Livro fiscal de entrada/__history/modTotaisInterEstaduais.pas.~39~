@@ -1,0 +1,224 @@
+unit modTotaisInterEstaduais;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, FMTBcd, StdCtrls, ExtCtrls,  DB, SqlExpr, Grids;
+
+type
+  TfrmTotaisInterEstaduais = class(TForm)
+    stgTotaisInterEstadual: TStringGrid;
+    sqqTotalizaValorContabil: TSQLQuery;
+    Panel1: TPanel;
+    edtTVContalbil: TEdit;
+    edtTBCalculo: TEdit;
+    edtIsentas: TEdit;
+    edtOutras: TEdit;
+    edtICMSRetido: TEdit;
+    btnSair: TButton;
+    edtBaseICMSR: TEdit;
+    sqqTotalizaIsentas: TSQLQuery;
+    sqqTotalizaOutras: TSQLQuery;
+    procedure FormCreate(Sender: TObject);
+    procedure btnSairClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+    sWhere:string;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmTotaisInterEstaduais: TfrmTotaisInterEstaduais;
+
+implementation
+
+uses modLivroFiscalEntrada, uFuncoes, dataMProvider;
+
+{$R *.dfm}
+
+procedure TfrmTotaisInterEstaduais.btnSairClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmTotaisInterEstaduais.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+
+  Action := caFree;
+
+end;
+
+procedure TfrmTotaisInterEstaduais.FormCreate(Sender: TObject);
+var
+  iContador:integer;
+  sUf_Origem:string;
+begin
+
+  iContador := 1;
+
+  DesabilitarBotaoFecharForm(Handle);
+
+  stgTotaisInterEstadual.Cols[0].Text := 'UF Origem';
+  stgTotaisInterEstadual.Cols[1].Text := 'Valor Contábil';
+  stgTotaisInterEstadual.Cols[2].Text := 'Base Cálculo';
+  stgTotaisInterEstadual.Cols[3].Text := 'Isentas';
+  stgTotaisInterEstadual.Cols[4].Text := 'Outras';
+  stgTotaisInterEstadual.Cols[5].Text := 'ICMS Retido';
+  stgTotaisInterEstadual.Cols[6].Text := 'Base Cálculo';
+
+  if not dmMProvider.cdsLivroFiscalEntrada.IsEmpty then
+  begin
+
+    sqqTotalizaValorContabil.Close;
+    sqqTotalizaValorContabil.SQL.Clear;
+    sqqTotalizaValorContabil.SQL.Add('SELECT UF_ORIGEM, COALESCE(SUM(VALOR_CONTABIL),0) AS VC FROM LIVRO_ENTRADA');
+    sqqTotalizaValorContabil.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+
+    if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+      sWhere := ' AND LIVRO_ENTRADA.DATA_ENTRADA BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text))) + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+    else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+      sWhere :=' AND LIVRO_ENTRADA.MES_ANO = ' + QuotedStr(dmMProvider.cdsLivroFiscalEntradaMES_ANO.Value)
+    else
+      sWhere :=' AND LIVRO_ENTRADA.NUMERO_DOCUMENTO = ' + QuotedStr(dmMProvider.cdsLivroFiscalEntradaNUMERO_DOCUMENTO.Value);
+
+    sqqTotalizaValorContabil.SQL.Add(sWhere);
+
+//    sqqTotalizaValorContabil.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+    sqqTotalizaValorContabil.SQL.Add('GROUP BY UF_ORIGEM');
+    sqqTotalizaValorContabil.Open;
+
+    while not sqqTotalizaValorContabil.Eof do
+    begin
+
+      stgTotaisInterEstadual.Cells[0,stgTotaisInterEstadual.RowCount-1] := Format('%2.2s',[sqqTotalizaValorContabil.FieldByName('UF_ORIGEM').AsString]);
+      stgTotaisInterEstadual.Cells[1,stgTotaisInterEstadual.RowCount-1] := Format('%13.13s',[FormatFloat('#,##0.00',sqqTotalizaValorContabil.FieldByName('VC').AsCurrency)]);
+
+      sqqTotalizaValorContabil.Next;
+      if not sqqTotalizaValorContabil.Eof then
+        stgTotaisInterEstadual.RowCount := stgTotaisInterEstadual.RowCount + 1;
+
+    end;
+
+    sqqTotalizaValorContabil.Close;
+    sqqTotalizaValorContabil.SQL.Clear;
+    sqqTotalizaValorContabil.SQL.Add('SELECT COALESCE(SUM(VALOR_CONTABIL),0) AS VC FROM LIVRO_ENTRADA');
+    sqqTotalizaValorContabil.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmMProvider.cdsFilialESTADO.AsString));
+    sqqTotalizaValorContabil.SQL.Add(sWhere);
+//    sqqTotalizaValorContabil.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+    sqqTotalizaValorContabil.Open;
+
+    edtTVContalbil.Text := FormatFloat('#,##0.00',sqqTotalizaValorContabil.FieldByName('VC').AsCurrency);
+
+    sqqTotalizaValorContabil.Close;
+
+    //base
+    sqqTotalizaValorContabil.Close;
+    sqqTotalizaValorContabil.SQL.Clear;
+    sqqTotalizaValorContabil.SQL.Add('SELECT UF_ORIGEM, COALESCE(SUM(BASE_CALCULO_VALOR_OPERACAO),0) AS BC FROM LIVRO_ENTRADA');
+    sqqTotalizaValorContabil.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilialESTADO.AsString));
+//    sqqTotalizaValorContabil.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+    sqqTotalizaValorContabil.SQL.Add('AND ALIQUOTA > 0');
+    sqqTotalizaValorContabil.SQL.Add(sWhere);
+    sqqTotalizaValorContabil.SQL.Add('GROUP BY UF_ORIGEM');
+    sqqTotalizaValorContabil.Open;
+
+    while not sqqTotalizaValorContabil.Eof do
+    begin
+
+      stgTotaisInterEstadual.Cells[2,iContador] := Format('%12.12s',[FormatFloat('#,##0.00',sqqTotalizaValorContabil.FieldByName('BC').AsCurrency)]);
+
+      //isentas
+      sqqTotalizaIsentas.Close;
+      sqqTotalizaIsentas.SQL.Clear;
+      sqqTotalizaIsentas.SQL.Add('SELECT UF_ORIGEM, COALESCE(SUM(BASE_CALCULO_VALOR_OPERACAO),0) AS BC FROM LIVRO_ENTRADA');
+      sqqTotalizaIsentas.SQL.Add('WHERE UF_ORIGEM = ' + QuotedStr(sqqTotalizaValorContabil.FieldByName('UF_ORIGEM').AsString));
+//      sqqTotalizaIsentas.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+      sqqTotalizaIsentas.SQL.Add('AND CODIGO_VALORES_FISCAIS = 2');
+      sqqTotalizaIsentas.SQL.Add(sWhere);
+      sqqTotalizaIsentas.SQL.Add('GROUP BY UF_ORIGEM');
+      sqqTotalizaIsentas.Open;
+
+      stgTotaisInterEstadual.Cells[3,iContador] := Format('%11.11s',[FormatFloat('#,##0.00',sqqTotalizaIsentas.FieldByName('BC').AsCurrency)]);
+      sqqTotalizaIsentas.Close;
+
+      //outras
+      sqqTotalizaOutras.Close;
+      sqqTotalizaOutras.SQL.Clear;
+      sqqTotalizaOutras.SQL.Add('SELECT UF_ORIGEM, COALESCE(SUM(BASE_CALCULO_VALOR_OPERACAO),0) AS BC FROM LIVRO_ENTRADA');
+      sqqTotalizaOutras.SQL.Add('WHERE UF_ORIGEM = ' + QuotedStr(sqqTotalizaValorContabil.FieldByName('UF_ORIGEM').AsString));
+//      sqqTotalizaOutras.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+      sqqTotalizaOutras.SQL.Add('AND CODIGO_VALORES_FISCAIS = 3');
+      sqqTotalizaOutras.SQL.Add(sWhere);
+      sqqTotalizaOutras.SQL.Add('GROUP BY UF_ORIGEM');
+      sqqTotalizaOutras.Open;
+
+      stgTotaisInterEstadual.Cells[4,iContador] := Format('%11.11s',[FormatFloat('#,##0.00',sqqTotalizaOutras.FieldByName('BC').AsCurrency)]);
+      stgTotaisInterEstadual.Cells[5,iContador] := Format('%11.11s',[FormatFloat('#,##0.00',0)]);
+      stgTotaisInterEstadual.Cells[6,iContador] := Format('%11.11s',[FormatFloat('#,##0.00',0)]);
+      sqqTotalizaOutras.Close;
+
+      sqqTotalizaValorContabil.Next;
+      inc(iContador);
+
+    end;
+
+    sqqTotalizaValorContabil.Close;
+    sqqTotalizaValorContabil.SQL.Clear;
+    sqqTotalizaValorContabil.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO_VALOR_OPERACAO),0) AS BC FROM LIVRO_ENTRADA');
+    sqqTotalizaValorContabil.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilialESTADO.AsString));
+//    sqqTotalizaValorContabil.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+    sqqTotalizaValorContabil.SQL.Add('AND ALIQUOTA > 0');
+    sqqTotalizaValorContabil.SQL.Add(sWhere);
+    sqqTotalizaValorContabil.Open;
+
+    edtTBCalculo.Text := FormatFloat('#,##0.00',sqqTotalizaValorContabil.FieldByName('BC').AsCurrency);
+
+    sqqTotalizaValorContabil.Close;
+
+    sqqTotalizaValorContabil.SQL.Clear;
+    sqqTotalizaValorContabil.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO_VALOR_OPERACAO),0) AS BC FROM LIVRO_ENTRADA');
+    sqqTotalizaValorContabil.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilialESTADO.AsString));
+//    sqqTotalizaValorContabil.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+    sqqTotalizaValorContabil.SQL.Add(' AND CODIGO_VALORES_FISCAIS = 2');
+    sqqTotalizaValorContabil.SQL.Add(sWhere);
+    sqqTotalizaValorContabil.Open;
+
+    edtIsentas.Text := FormatFloat('#,##0.00',sqqTotalizaValorContabil.FieldByName('BC').AsCurrency);
+
+    //isentas
+    sqqTotalizaIsentas.Close;
+    sqqTotalizaIsentas.SQL.Clear;
+    sqqTotalizaIsentas.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO_VALOR_OPERACAO),0) AS BC FROM LIVRO_ENTRADA');
+    sqqTotalizaIsentas.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilialESTADO.AsString));
+//    sqqTotalizaIsentas.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+    sqqTotalizaIsentas.SQL.Add('AND CODIGO_VALORES_FISCAIS = 2');
+    sqqTotalizaIsentas.SQL.Add(sWhere);
+    sqqTotalizaIsentas.Open;
+
+    edtIsentas.Text := FormatFloat('#,##0.00',sqqTotalizaIsentas.FieldByName('BC').AsCurrency);
+    sqqTotalizaIsentas.Close;
+
+    //outras
+    sqqTotalizaOutras.Close;
+    sqqTotalizaOutras.SQL.Clear;
+    sqqTotalizaOutras.SQL.Add('SELECT COALESCE(SUM(BASE_CALCULO_VALOR_OPERACAO),0) AS BC FROM LIVRO_ENTRADA');
+    sqqTotalizaOutras.SQL.Add('WHERE UF_ORIGEM <> ' + QuotedStr(dmCDSMaster.cdsFilialESTADO.AsString));
+//    sqqTotalizaOutras.SQL.Add('AND MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalEntradaMES_ANO.Value));
+    sqqTotalizaOutras.SQL.Add('AND CODIGO_VALORES_FISCAIS = 3');
+    sqqTotalizaOutras.SQL.Add(sWhere);
+    sqqTotalizaOutras.Open;
+
+    edtOutras.Text := FormatFloat('#,##0.00',sqqTotalizaOutras.FieldByName('BC').AsCurrency);
+    sqqTotalizaOutras.Close;
+
+    sqqTotalizaValorContabil.Close;
+
+  end;
+
+end;
+
+end.

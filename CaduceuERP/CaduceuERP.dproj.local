@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2018/01/04 16:11:17.000.275,D:\Projetos\Caduceu\CaduceuERP\GenesisAC2010.dproj=D:\Projetos\Caduceu\CaduceuERP\CaduceuERP.dproj</Transaction>
+    <Transaction>2018/01/04 16:16:31.000.465,D:\Projetos\Caduceu\CaduceuERP\Data_Modulos\dataMSProcedure.pas=</Transaction>
+    <Transaction>2018/01/04 16:16:48.000.051,D:\Projetos\Caduceu\CaduceuERP\Modulo Login\modLogin.pas=</Transaction>
+    <Transaction>2018/01/04 16:19:43.000.358,=D:\Projetos\Caduceu\CaduceuERP\Modulo Login\modLogin.pas</Transaction>
+    <Transaction>2018/01/04 16:20:50.000.671,=D:\Projetos\Caduceu\CaduceuERP\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2018/01/04 16:21:43.000.925,=D:\Projetos\Caduceu\CaduceuERP\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2018/01/04 16:21:43.000.916,=D:\Projetos\Caduceu\CaduceuERP\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2018/01/04 16:21:50.000.759,=D:\Projetos\Caduceu\CaduceuERP\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2018/01/04 16:21:53.000.571,=D:\Projetos\Caduceu\CaduceuERP\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2018/01/04 16:21:58.000.114,=D:\Projetos\Caduceu\CaduceuERP\Data_Modulos\dataSintegraSped.pas</Transaction>
+    <Transaction>2018/01/04 16:23:42.000.438,D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas=</Transaction>
+    <Transaction>2018/01/04 16:48:07.000.673,=D:\Projetos\Formularios Genericos\modProdutoEntraSaiPromocao.pas</Transaction>
+  </Transactions>
+</BorlandProject>

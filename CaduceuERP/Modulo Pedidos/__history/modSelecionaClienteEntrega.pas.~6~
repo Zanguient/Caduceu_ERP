@@ -1,0 +1,30 @@
+unit modSelecionaClienteEntrega;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls;
+
+type
+  TfrmInformacaoEntrega = class(TForm)
+    grpInfoEntrega: TGroupBox;
+    imgOk: TImage;
+    imgSair: TImage;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmInformacaoEntrega: TfrmInformacaoEntrega;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes;
+
+end.

@@ -1,0 +1,49 @@
+object frmFormasPagtoOS: TfrmFormasPagtoOS
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Forma de pagamento para a OS N'#186
+  ClientHeight = 309
+  ClientWidth = 571
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object memFormasPagtoOS: TDBMemo
+    Left = 8
+    Top = 8
+    Width = 497
+    Height = 257
+    DataField = 'ORCA_FORMAS'
+    DataSource = dmMSource.dtsOrdemServico
+    TabOrder = 0
+  end
+  object grpMensagem: TGroupBox
+    Left = 8
+    Top = 271
+    Width = 497
+    Height = 33
+    Caption = 'Mensagem'
+    TabOrder = 1
+    object lblMsg: TLabel
+      Left = 72
+      Top = 14
+      Width = 385
+      Height = 16
+      ParentCustomHint = False
+      AutoSize = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = [fsItalic]
+      ParentFont = False
+    end
+  end
+end

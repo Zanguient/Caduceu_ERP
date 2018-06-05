@@ -1,0 +1,840 @@
+unit modNcmNbs;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.DBCtrls, Vcl.Mask, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdActns, System.Actions, Vcl.ActnList, ACBrBase, ACBrSocket, ACBrIBPTax, db,
+  ACBrNCMs, StrUtils, AcbrUtil, JvExComCtrls, JvDateTimePicker, JvDBDateTimePicker,
+  Vcl.Imaging.jpeg;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+
+  TfrmNCM_NBS = class(TForm)
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    pgcNcmNbs: TPageControl;
+    tbsTabela: TTabSheet;
+    grdTabela: TDBGrid;
+    tdsCadastro: TTabSheet;
+    lblF2: TLabel;
+    imgNovo: TImage;
+    lblF3: TLabel;
+    imgDesfazer: TImage;
+    lblF4: TLabel;
+    imgSalvar: TImage;
+    lblF5: TLabel;
+    imgExcluir: TImage;
+    lblF6: TLabel;
+    imgEditar: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    ActionList1: TActionList;
+    actEditar: TAction;
+    actDesfazer: TAction;
+    WindowClose1: TWindowClose;
+    actMinimizar: TAction;
+    actIncluir: TAction;
+    actSalvar: TAction;
+    actExcluir: TAction;
+    grpCadastro: TGroupBox;
+    lblNBS_NCM: TLabel;
+    lblDescricao: TLabel;
+    lblEX_TIPI: TLabel;
+    lblCargaNacFederal: TLabel;
+    lblCargaImpFederal: TLabel;
+    lblcargaEstadual: TLabel;
+    lblCargaFederal: TLabel;
+    lblChave: TLabel;
+    lblFonte: TLabel;
+    edtNCM_NBS: TDBEdit;
+    edtDescricao: TDBEdit;
+    edtEX_TIPI: TDBEdit;
+    edtCargaNacFed: TDBEdit;
+    edtcargaImpFed: TDBEdit;
+    edtcargaEstadual: TDBEdit;
+    edtcargaMunicipal: TDBEdit;
+    edtChave: TDBEdit;
+    edtFonte: TDBEdit;
+    imgImportarIBPT: TImage;
+    ACBrIBPTax1: TACBrIBPTax;
+    actDownloadIBPT: TAction;
+    chkNCN_NBS: TDBCheckBox;
+    ACBrNCMs1: TACBrNCMs;
+    edtCodigoCEST: TDBEdit;
+    lblCodigoCEST: TLabel;
+    grpVigencia: TGroupBox;
+    lblDataInicio: TLabel;
+    lblDataTermino: TLabel;
+    JvDBDateTimePicker1: TJvDBDateTimePicker;
+    JvDBDateTimePicker2: TJvDBDateTimePicker;
+    procedure FormCreate(Sender: TObject);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure actDownloadIBPTExecute(Sender: TObject);
+    procedure edtCargaNacFedKeyPress(Sender: TObject; var Key: Char);
+    procedure edtNCM_NBSEnter(Sender: TObject);
+    procedure edtDescricaoExit(Sender: TObject);
+    procedure actEditarExecute(Sender: TObject);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure actIncluirExecute(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure lblF5Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtNCM_NBSExit(Sender: TObject);
+  private
+    { Private declarations }
+    FArquivo: TStringList;
+    FChaveArquivo: String;
+    FVersaoArquivo: String;
+    FURLDownload: String;
+    FItens: TACBrIBPTaxRegistros;
+    FVigenciaFim: TDateTime;
+    FVigenciaInicio: TDateTime;
+    FOnErroImportacao: TACBrIBPTaxErroImportacao;
+    FFonte: string;
+    FToken: String;
+    FCNPJEmpresa: String;
+    procedure LimparMSG_ERRO;
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    function PopularItensIBPT:integer;
+    function AbrirTabelaNCM_NBS(pOpcao: smallint; pConteudo: string): boolean;
+    function Man_Tab_NCM_NBS(pOpcao:smallint):boolean;
+    function ValidarNCM(pNCM:string):boolean;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmNCM_NBS: TfrmNCM_NBS;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure, uConstantes_Padrao, uFuncoes;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor; AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+function TfrmNCM_NBS.AbrirTabelaNCM_NBS(pOpcao: smallint; pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsNcmNbs.Close;
+  dmMProvider.cdsNcmNbs.ProviderName := 'dspNcmNbs';
+  dmDBEXMaster.fdqNcmNbs.SQL.Clear;
+  dmDBEXMaster.fdqNcmNbs.SQL.Add('SELECT * FROM NBM_NCM');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_NCM_NBS(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqNcmNbs.SQL.Add(sWhere);
+  dmDBEXMaster.fdqNcmNbs.SQL.Add('ORDER BY NOME_NCM');
+
+  try
+
+    dmMProvider.cdsNcmNbs.Open;
+    dmMProvider.cdsNcmNbs.ProviderName := '';
+
+    if (dmMProvider.cdsNcmNbs.IsEmpty) and (pConteudo <> '-1')then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsNcmNbs.IsEmpty;
+
+   except
+    on E: exception do
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.actDesfazerExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsNcmNbs.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsNcmNbs.Cancel;
+
+  pgcNcmNbs.Pages[1].TabVisible  := false;
+  pgcNcmNbs.ActivePageIndex      := 0;
+
+  HabilitaDesabilitaControles(false);
+
+
+end;
+
+procedure TfrmNCM_NBS.actDownloadIBPTExecute(Sender: TObject);
+var
+  tsTabelaIBPT:TStringList;
+  i, iItensIncluidos:integer;
+  sCargaFedNac, sCargaFedImp, sCargaESt, sCargaMun, cUrl, cArquivo, cPathCompleta:string;
+  bExisteTabela:boolean;
+begin
+
+  iItensIncluidos := 0;
+
+  try
+
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE;
+    Application.ProcessMessages;
+
+    ACBrNCMs1.ListarNcms();
+
+    dmMProvider.cdsNcmNbs.DisableControls;
+
+    for i := 0 to ACBrNCMs1.NCMS.Count -1 do
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + '.... ' + IntToStr(i) + '/' + IntToStr(ACBrNCMs1.NCMS.Count);
+      Application.ProcessMessages;
+
+      dmMProvider.cdsNcmNbs.Close;
+      dmMProvider.cdsNcmNbs.ProviderName := 'dspNcmNbs';
+
+      dmDBEXMaster.fdqNcmNbs.SQL.Clear;
+      dmDBEXMaster.fdqNcmNbs.SQL.Add('select * from nbm_ncm');
+      dmDBEXMaster.fdqNcmNbs.SQL.Add('where cod_ncm = ' + QuotedStr(ACBrNCMs1.NCMS[i].CodigoNcm));
+
+      dmMProvider.cdsNcmNbs.Open;
+      dmMProvider.cdsNcmNbs.ProviderName := '';
+
+      if dmMProvider.cdsNcmNbs.IsEmpty then
+      begin
+
+        inc(iItensIncluidos);
+
+        dmMProvider.cdsNcmNbs.Append;
+        dmMProvider.cdsNcmNbsCOD_NCM.Value  := ACBrNCMs1.NCMS[i].CodigoNcm;
+        dmMProvider.cdsNcmNbsNOME_NCM.Value := ACBrNCMs1.NCMS[i].DescricaoNcm;
+        dmMProvider.cdsNcmNbs.Post;
+
+        Man_Tab_NCM_NBS(0);
+
+      end;
+
+    end;
+
+    if iItensIncluidos > 0 then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', foram incluído(s): ' + IntToStr(iItensIncluidos) + ' novo(s) NCM(s)';
+      Application.ProcessMessages;
+
+    end;
+
+    dmMProvider.cdsNcmNbs.Close;
+    dmMProvider.cdsNcmNbs.ProviderName := 'dspNcmNbs';
+
+    dmMProvider.cdsNcmNbs.EnableControls;;
+
+  except
+    on E: exception do
+    begin
+
+      dmMProvider.cdsNcmNbs.Close;
+      dmMProvider.cdsNcmNbs.ProviderName := 'dspNcmNbs';
+
+      dmMProvider.cdsNcmNbs.EnableControls;;
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  Tratar_Erro_Conexao(E);
+      Application.ProcessMessages;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.actEditarExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsNcmNbs.Active then
+  begin
+
+    if not (dmMProvider.cdsNcmNbs.State in [dsEdit, dsInsert])  then
+    begin
+
+      pgcNcmNbs.Pages[1].TabVisible  := true;
+      pgcNcmNbs.ActivePageIndex      := 1;
+
+      HabilitaDesabilitaControles(True);
+      dmMProvider.cdsNcmNbs.Edit;
+      edtDescricao.SetFocus;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmNCM_NBS.actExcluirExecute(Sender: TObject);
+begin
+
+  if Man_Tab_NCM_NBS(1) then
+    dmMProvider.cdsNcmNbs.delete;
+
+  HabilitaDesabilitaControles(false);
+
+  pgcNcmNbs.Pages[1].TabVisible  := false;
+  pgcNcmNbs.ActivePageIndex      := 0;
+
+  LimparMSG_ERRO;
+  edtConteudoPesquisa.Text;
+
+end;
+
+procedure TfrmNCM_NBS.actIncluirExecute(Sender: TObject);
+begin
+
+  if not (dmMProvider.cdsNcmNbs.State in [dsEdit, dsInsert]) then
+  begin
+
+    LimparMSG_ERRO;
+
+    try
+
+      edtConteudoPesquisa.Clear;
+
+      AbrirTabelaNCM_NBS(0,'-1');
+
+      pgcNcmNbs.Pages[1].TabVisible  := True;
+
+      HabilitaDesabilitaControles(True);
+
+      pgcNcmNbs.ActivePageIndex      := 1;
+
+      dmMProvider.cdsNcmNbs.Append;
+
+      edtNCM_NBS.SetFocus;
+
+    except
+      on E: exception do
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + Tratar_Erro_Conexao(E);
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.actSalvarExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if InserindoEditando(dmMProvider.cdsNcmNbs) then
+  begin
+
+    if ValidarNCM(Trim(edtNCM_NBS.Text)) then
+    begin
+
+      if Man_Tab_NCM_NBS(0) then
+      begin
+
+        dmMProvider.cdsNcmNbs.Post;
+        HabilitaDesabilitaControles(false);
+
+      end;
+
+      pgcNcmNbs.Pages[1].TabVisible  := false;
+      pgcNcmNbs.ActivePageIndex      := 0;
+
+    end
+    else
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  MSG_NCM_NVIGENTE;
+      Application.ProcessMessages
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmNCM_NBS.edtCargaNacFedKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = FormatSettings.DecimalSeparator then
+    Key := ',';
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+   pgcNcmNbs.Pages[1].TabVisible := false;
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmNCM_NBS.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    if AbrirTabelaNCM_NBS(rdpOpcoesPesquisa.ItemIndex, edtConteudoPesquisa.Text) then
+      grdTabela.SetFocus;
+
+    edtConteudoPesquisa.Clear;
+
+  end;
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmNCM_NBS.edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmNCM_NBS.edtDescricaoExit(Sender: TObject);
+begin
+
+  if dmMProvider.cdsNcmNbs.State in [dsEdit, dsInsert] then
+    RetirarAcentuacao(sender);
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmNCM_NBS.edtNCM_NBSEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmNCM_NBS.edtNCM_NBSExit(Sender: TObject);
+begin
+
+  if Length(Trim(edtNCM_NBS.Text)) < 8 then
+  begin
+
+     lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_TAMANHO_MINIMO + ' - 8 caracteres';
+     edtNCM_NBS.SetFocus;
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                           := COR_PADRAO_TELAS;
+  Caption                         := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario       := ParamStr(1);
+  dmDBEXMaster.sSenha             := paramstr(2);
+  dmDBEXMaster.iIdUsuario         := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial          := StrToInt(ParamStr(4));
+
+  pgcNcmNbs.Pages[1].TabVisible  := false;
+
+  for i := 0 to grdTabela.Columns.Count - 1 do
+    grdTabela.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  if Length(Trim(dmMProvider.cdsConfiguracoesURL_IBPT.Value)) > 0 then
+    ACBrIBPTax1.URLDownload := Trim(dmMProvider.cdsConfiguracoesURL_IBPT.Value);
+
+end;
+
+procedure TfrmNCM_NBS.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmNCM_NBS.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  try
+
+    if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := 0;
+      actExcluirExecute(self);
+
+    end
+
+    else if (UpperCase(Key) = 'N') AND (lblMsg.Tag <> ord(nulo)) then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := ord(nulo);
+      LimparMSG_ERRO;
+
+    end;
+  except
+    on E: exception do
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+procedure TfrmNCM_NBS.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsNcmNbs.IsEmpty then
+  begin
+
+    pgcNcmNbs.Pages[1].TabVisible  := True;
+    pgcNcmNbs.ActivePageIndex      := 1;
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsNcmNbs.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsNcmNbs.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.grdTabelaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(Self);
+
+end;
+
+procedure TfrmNCM_NBS.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+procedure TfrmNCM_NBS.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsNcmNbs.Active then
+  begin
+
+    if not (dmMProvider.cdsNcmNbs.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmNCM_NBS.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+function TfrmNCM_NBS.Man_Tab_NCM_NBS(pOpcao: smallint): boolean;
+begin
+
+  try
+
+    if not dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.StartTransaction;
+
+    dmMSProcedure.fdspNCM_NBS.Params[0].Value   := pOpcao;
+    dmMSProcedure.fdspNCM_NBS.Params[1].Value   := dmMProvider.cdsNcmNbsCOD_NCM.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[2].Value   := dmMProvider.cdsNcmNbsNOME_NCM.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[3].Value   := dmMProvider.cdsNcmNbsCARGA_NAC_FEDERAL.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[4].Value   := dmMProvider.cdsNcmNbsCARGA_IMP_FEDERAL.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[5].Value   := dmMProvider.cdsNcmNbsEX_TIPI.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[6].Value   := dmMProvider.cdsNcmNbsCARGA_ESTADUAL.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[7].Value   := dmMProvider.cdsNcmNbsCARGA_MUNICIPAL.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[8].Value   := dmMProvider.cdsNcmNbsCHAVE.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[9].Value   := dmMProvider.cdsNcmNbsFONTE.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[10].Value  := dmMProvider.cdsNcmNbsNCM_NBS.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[11].Value  := dmMProvider.cdsNcmNbsTABELA_CEST.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[12].Value  := dmMProvider.cdsNcmNbsDATA_INICIO.Value;
+    dmMSProcedure.fdspNCM_NBS.Params[13].Value  := dmMProvider.cdsNcmNbsDATA_TERMINO.Value;
+
+    dmMSProcedure.fdspNCM_NBS.ExecProc;
+
+    if dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.Commit;
+
+    Result := true;
+
+  except
+    on E: exception do
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  Tratar_Erro_Conexao(E);
+
+      if dmDBEXMaster.fdtMaster.Active then
+        dmDBEXMaster.fdtMaster.Rollback;
+
+      Result := False;
+
+    end;
+
+  end;
+
+end;
+
+function TfrmNCM_NBS.PopularItensIBPT: integer;
+var
+  Item: TStringList;
+  I: Integer;
+const
+  COUNT_COLUN = 13;
+begin
+
+  FVersaoArquivo  := '';
+  FFonte          := '';
+  FChaveArquivo   := '';
+  FVigenciaFim    := 0;
+  FVigenciaInicio := 0;
+
+  FItens          := TACBrIBPTaxRegistros.Create( True );
+
+  Item            := TStringList.Create;
+
+  try
+    // primeira linha contem os cabecalhos de campo e versão do arquivo
+    // segunda linha possui os dados do primeiro item e outros dados
+    QuebrarLinha(FArquivo.Strings[1], Item);
+
+    if Item.Count = COUNT_COLUN then
+    begin
+
+      FVigenciaInicio := StrToDateDef(Item.Strings[8], 0.0);
+      FVigenciaFim    := StrToDateDef(Item.Strings[9], 0.0);
+      FChaveArquivo   := Item.Strings[10];
+      FVersaoArquivo  := Item.Strings[11];
+      FFonte          := Item.Strings[12];
+
+    end;
+
+    // proximas linhas contem os registros
+    for I := 1 to FArquivo.Count - 1 do
+    begin
+
+      QuebrarLinha(FArquivo.Strings[I], Item);
+
+      if Trim(Item.Strings[2]) <> '' then
+      begin
+
+        if Item.Count = COUNT_COLUN then
+        begin
+
+          try
+
+            // codigo;ex;tabela;descricao;aliqNac;aliqImp;0.0.2
+            with ACBrIBPTax1.Itens.New do
+            begin
+
+              NCM           := Item.Strings[0];
+              Excecao       := Item.Strings[1];
+              Tabela        := TACBrIBPTaxTabela(StrToInt(Trim(Item.Strings[2]))) ;
+              Descricao     := Item.Strings[3];
+
+              FederalNacional  := StringToFloatDef(Item.Strings[4], 0.00);
+              FederalImportado := StringToFloatDef(Item.Strings[5], 0.00);
+              Estadual         := StringToFloatDef(Item.Strings[6], 0.00);
+              Municipal        := StringToFloatDef(Item.Strings[7], 0.00);
+
+            end;
+          except
+            on E: Exception do
+            begin
+
+              lblMsg.Caption := dmDBEXMaster.sNomeUsuario + TratarMsgErroFB(E.Message);
+              Application.ProcessMessages;
+
+            end;
+
+          end;
+        end
+        else
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + Format('Linha %d: Registro inválido, quantidade de colunas "%d" diferente do esperado "%d"!', [I, Item.Count, COUNT_COLUN]);
+          Application.ProcessMessages;
+
+        end;
+      end
+      else
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + Format('Linha %d: Registro inválido, registro em branco!', [I, Item.Count, COUNT_COLUN]);
+        Application.ProcessMessages;
+
+      end;
+    end;
+  finally
+//    Item.Free;
+  end;
+
+  Result := Item.Count;
+
+end;
+
+procedure TfrmNCM_NBS.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+function TfrmNCM_NBS.ValidarNCM(pNCM: string): boolean;
+begin
+
+  try
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_VALIDA_NCM_MEDIC;
+    Result := ACBrNcms1.validar(Trim(edtNCM_NBS.Text));
+    LimparMSG_ERRO;
+
+  except
+    on E: exception do
+    begin
+
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario +  ', não foi possível validar o NCM. ' + Tratar_Erro_Conexao(E);
+      Result          := True;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmNCM_NBS.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

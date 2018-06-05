@@ -1,0 +1,174 @@
+﻿object frmDesdobramentoRentabilidade: TfrmDesdobramentoRentabilidade
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Lan'#231'amentos - Rentabilidade'
+  ClientHeight = 427
+  ClientWidth = 889
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object grpItensDesdobramento: TGroupBox
+    Left = 0
+    Top = 0
+    Width = 889
+    Height = 225
+    Align = alTop
+    Caption = 'Itens'
+    TabOrder = 0
+    object grdDesdobramento: TDBGrid
+      Left = 2
+      Top = 15
+      Width = 885
+      Height = 208
+      Align = alClient
+      DataSource = dmMSource.dtsDesdobRentabil
+      DrawingStyle = gdsClassic
+      Options = [dgTitles, dgIndicator, dgColLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+      ReadOnly = True
+      TabOrder = 0
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'Tahoma'
+      TitleFont.Style = []
+      OnDrawColumnCell = grdDesdobramentoDrawColumnCell
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'PRODUTO'
+          Title.Alignment = taCenter
+          Title.Caption = 'C'#211'DIGO'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'DESCRICAO'
+          Title.Alignment = taCenter
+          Title.Caption = 'DESCRI'#199#195'O'
+          Width = 413
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'SALDO_ATUAL'
+          Title.Alignment = taCenter
+          Title.Caption = 'SALDO ATUAL'
+          Width = 89
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'RENDIMENTO'
+          Title.Alignment = taCenter
+          Title.Caption = '(%) RENDIMENTO'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'QUANTIDADE'
+          Title.Alignment = taCenter
+          Width = 89
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'SALDO_FUTURO'
+          Title.Alignment = taCenter
+          Title.Caption = 'SALDO FUTURO'
+          Width = 89
+          Visible = True
+        end>
+    end
+  end
+  object grpDetalhesItem: TGroupBox
+    Left = 0
+    Top = 225
+    Width = 889
+    Height = 62
+    Align = alTop
+    Caption = 'Detalhes Item'
+    Enabled = False
+    TabOrder = 1
+    object lblQtdNF: TLabel
+      Left = 104
+      Top = 27
+      Width = 62
+      Height = 13
+      Caption = 'Qtd. NF (KG)'
+    end
+    object lblQtdPerda: TLabel
+      Left = 288
+      Top = 27
+      Width = 77
+      Height = 13
+      Caption = 'Qtd. Perda (KG)'
+    end
+    object lblQtdReal: TLabel
+      Left = 464
+      Top = 27
+      Width = 67
+      Height = 13
+      Caption = 'Qtd. real (KG)'
+    end
+    object edtQtdNF: TJvValidateEdit
+      Left = 184
+      Top = 24
+      Width = 81
+      Height = 21
+      CriticalPoints.MaxValueIncluded = False
+      CriticalPoints.MinValueIncluded = False
+      DisplayFormat = dfFloat
+      DecimalPlaces = 3
+      TabOrder = 0
+    end
+    object edtQtdPerda: TJvValidateEdit
+      Left = 371
+      Top = 24
+      Width = 81
+      Height = 21
+      CriticalPoints.MaxValueIncluded = False
+      CriticalPoints.MinValueIncluded = False
+      DisplayFormat = dfFloat
+      DecimalPlaces = 3
+      TabOrder = 1
+    end
+    object edtQtdReal: TJvValidateEdit
+      Left = 547
+      Top = 24
+      Width = 81
+      Height = 21
+      CriticalPoints.MaxValueIncluded = False
+      CriticalPoints.MinValueIncluded = False
+      DisplayFormat = dfFloat
+      DecimalPlaces = 3
+      TabOrder = 2
+    end
+  end
+  object pnlInformações: TPanel
+    Left = 0
+    Top = 287
+    Width = 889
+    Height = 66
+    Align = alTop
+    TabOrder = 2
+    object memInformacoes: TMemo
+      Left = 1
+      Top = 1
+      Width = 887
+      Height = 64
+      Align = alClient
+      Alignment = taCenter
+      BorderStyle = bsNone
+      TabOrder = 0
+    end
+  end
+end

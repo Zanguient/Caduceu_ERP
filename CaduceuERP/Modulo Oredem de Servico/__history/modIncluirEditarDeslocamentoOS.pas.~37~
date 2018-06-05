@@ -1,0 +1,156 @@
+unit modIncluirEditarDeslocamentoOS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls, Vcl.Mask, JvExMask, JvToolEdit, JvMaskEdit, JvCheckedMaskEdit,
+  JvDatePickerEdit, JvDBDatePickerEdit, Vcl.ComCtrls, JvExComCtrls,
+  JvDateTimePicker, JvDBDateTimePicker, Vcl.DBCtrls;
+
+type
+  TfrmIncluirEditarDeslocamentoOS = class(TForm)
+    imgSair: TImage;
+    imgSalvar: TImage;
+    lblF4: TLabel;
+    lblF3: TLabel;
+    imgDesfazer: TImage;
+    grpOrigemsaida: TGroupBox;
+    lblDataSaidaOriem: TLabel;
+    dtpDataSaidaOrigem: TJvDBDatePickerEdit;
+    lblHorarioSaidaOrigem: TLabel;
+    tmrHoraSaidaOrigem: TJvDBDateTimePicker;
+    lblKMSaidaOrigem: TLabel;
+    edtKMSaidaOrigem: TDBEdit;
+    grpChegadaDestino: TGroupBox;
+    lblChegadaDestino: TLabel;
+    lblHorarioChegadaDestino: TLabel;
+    lblKMChegadaDestino: TLabel;
+    dtpDataChegadaDestino: TJvDBDatePickerEdit;
+    tmrHoraChegadaDestino: TJvDBDateTimePicker;
+    edtKMChegadaDestino: TDBEdit;
+    grpSaidaDestino: TGroupBox;
+    lblDataSaidaDestino: TLabel;
+    lblHorarioSaidaDestino: TLabel;
+    lblKMSaidaDestino: TLabel;
+    dtpDataSaidaDestino: TJvDBDatePickerEdit;
+    tmrHorarioSaidaDestino: TJvDBDateTimePicker;
+    edtKMSaidaDestino: TDBEdit;
+    grpRegressoOrigem: TGroupBox;
+    lblDataRegressoOrigem: TLabel;
+    lblHorarioRegressoOrigem: TLabel;
+    lblKMRegressoOrigem: TLabel;
+    dtpDataRegressoOrigem: TJvDBDatePickerEdit;
+    tmrHorarioRegressoOrigem: TJvDBDateTimePicker;
+    edtRegressoOrigem: TDBEdit;
+    grpDespesas: TGroupBox;
+    lblAlimentacao: TLabel;
+    lblHospedagem: TLabel;
+    edtHospedagem: TDBEdit;
+    edtAlimentacao: TDBEdit;
+    procedure FormCreate(Sender: TObject);
+    procedure dtpDataSaidaOrigemEnter(Sender: TObject);
+    procedure edtAlimentacaoKeyPress(Sender: TObject; var Key: Char);
+    procedure dtpDataSaidaOrigemKeyPress(Sender: TObject; var Key: Char);
+    procedure lblF3Click(Sender: TObject);
+    procedure lblF4Click(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmIncluirEditarDeslocamentoOS: TfrmIncluirEditarDeslocamentoOS;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes;
+
+procedure TfrmIncluirEditarDeslocamentoOS.dtpDataSaidaOrigemEnter(
+  Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmIncluirEditarDeslocamentoOS.dtpDataSaidaOrigemKeyPress(
+  Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmIncluirEditarDeslocamentoOS.edtAlimentacaoKeyPress(
+  Sender: TObject; var Key: Char);
+begin
+
+  if Key = FormatSettings.DecimalSeparator then
+    Key := ',';
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end;
+
+end;
+
+procedure TfrmIncluirEditarDeslocamentoOS.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(Handle);
+
+end;
+
+procedure TfrmIncluirEditarDeslocamentoOS.FormKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+
+  case key of
+    VK_F3:lblF3Click(self);
+    VK_F4:lblF4Click(self);
+  end;
+
+end;
+
+procedure TfrmIncluirEditarDeslocamentoOS.imgSairClick(Sender: TObject);
+begin
+
+  lblF3Click(self);
+  Close;
+
+end;
+
+procedure TfrmIncluirEditarDeslocamentoOS.lblF3Click(Sender: TObject);
+begin
+
+  if InserindoEditando(dmMProvider.cdsDeslocamentoOS) then
+    dmMProvider.cdsDeslocamentoOS.Cancel;
+
+end;
+
+procedure TfrmIncluirEditarDeslocamentoOS.lblF4Click(Sender: TObject);
+begin
+
+  if InserindoEditando(dmMProvider.cdsDeslocamentoOS) then
+    dmMProvider.cdsDeslocamentoOS.Post;
+
+end;
+
+end.

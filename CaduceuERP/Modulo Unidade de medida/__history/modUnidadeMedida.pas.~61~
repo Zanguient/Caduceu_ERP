@@ -1,0 +1,678 @@
+unit modUnidadeMedida;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Mask,
+  Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Vcl.Imaging.pngimage,
+  System.Actions, Vcl.ActnList, Vcl.StdActns, Db;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmUnidadeMedida = class(TForm)
+    imgSair: TImage;
+    imgNovo: TImage;
+    imgSalvar: TImage;
+    imgDesfazer: TImage;
+    imgExcluir: TImage;
+    imgEditar: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    pgcUnidadeMedida: TPageControl;
+    tbsTabela: TTabSheet;
+    grdTabela: TDBGrid;
+    tdsCadastro: TTabSheet;
+    grpCadastro: TGroupBox;
+    lblSigla: TLabel;
+    lblDescricao: TLabel;
+    edtUnidade: TDBEdit;
+    edtDescricao: TDBEdit;
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    ActionList1: TActionList;
+    WindowClose1: TWindowClose;
+    actIncluir: TAction;
+    actDesfazer: TAction;
+    actSalvar: TAction;
+    actEditar: TAction;
+    actExcluir: TAction;
+    lblF2: TLabel;
+    lblF3: TLabel;
+    lblF4: TLabel;
+    lblF5: TLabel;
+    lblF6: TLabel;
+    chkPermiteVendaFracionada: TDBCheckBox;
+    procedure FormCreate(Sender: TObject);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure edtConteudoPesquisaKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtUnidadeExit(Sender: TObject);
+    procedure edtDescricaoExit(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure actEditarExecute(Sender: TObject);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    procedure actIncluirExecute(Sender: TObject);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure lblF5Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure chkPermiteVendaFracionadaClick(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+    function AbrirTabelaUndMedida(pOpcao:smallint; pConteudo:string):boolean;
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    function ValidarCampos:boolean;
+
+  public
+    { Public declarations }
+  end;
+
+var
+  frmUnidadeMedida: TfrmUnidadeMedida;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+function TfrmUnidadeMedida.AbrirTabelaUndMedida(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsUndMedida.Close;
+  dmMProvider.cdsUndMedida.ProviderName := 'dspUndMedida';;
+  dmDBEXMaster.fdqUnidadeMedida.SQL.Clear;
+  dmDBEXMaster.fdqUnidadeMedida.SQL.Add('SELECT * FROM UNIDADE_MEDIDA');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_UndMedida(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqUnidadeMedida.SQL.Add(sWhere);
+  dmDBEXMaster.fdqUnidadeMedida.SQL.Add('ORDER BY DESCRICAO');
+
+  try
+
+    dmMProvider.cdsUndMedida.Open;
+
+    dmMProvider.cdsUndMedida.ProviderName := '';
+
+    if dmMProvider.cdsUndMedida.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsUndMedida.IsEmpty;
+
+   except
+    on E: exception do
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + Tratar_Erro_Conexao(E);
+      Application.ProcessMessages;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.actDesfazerExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsUndMedida.Active then
+    if dmMProvider.cdsUndMedida.State in [dsEdit, dsInsert] then
+    begin
+
+      dmMProvider.cdsUndMedida.Cancel;
+
+      HabilitaDesabilitaControles(False);
+
+      pgcUnidadeMedida.Pages[1].TabVisible  := false;
+
+      pgcUnidadeMedida.ActivePageIndex      := 0;
+
+      edtConteudoPesquisa.Clear;
+      edtConteudoPesquisa.SetFocus;
+
+    end;
+
+end;
+
+procedure TfrmUnidadeMedida.actEditarExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsUndMedida.Active then
+  begin
+
+    if not (dmMProvider.cdsUndMedida.State in [dsEdit, dsInsert]) then
+    begin
+
+      HabilitaDesabilitaControles(True);
+      dmMProvider.cdsUndMedida.Edit;
+      edtDescricao.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.actExcluirExecute(Sender: TObject);
+begin
+
+  try
+
+    dmDBEXMaster.fdcMaster.StartTransaction;
+    dmMSProcedure.fdspUndMedida.Params[0].Value := 1;
+    dmMSProcedure.fdspUndMedida.Params[1].Value := dmMProvider.cdsUndMedidaUNIDADE.Value;
+    dmMSProcedure.fdspUndMedida.Params[2].Value := dmMProvider.cdsUndMedidaDESCRICAO.Value;
+    dmMSProcedure.fdspUndMedida.ExecProc;
+
+    dmMProvider.cdsUndMedida.Delete;
+
+    dmDBEXMaster.fdcMaster.Commit;
+    dmDBEXMaster.fdcMaster.Close;;
+
+  except
+    on E: exception do
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdcMaster.Rollback;
+      Application.ProcessMessages;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+
+end;
+
+procedure TfrmUnidadeMedida.actIncluirExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    edtConteudoPesquisa.Clear;
+
+    AbrirTabelaUndMedida(2,'-1');
+
+    pgcUnidadeMedida.Pages[1].TabVisible  := True;
+
+    HabilitaDesabilitaControles(True);
+
+    pgcUnidadeMedida.ActivePageIndex      := 1;
+
+    dmMProvider.cdsUndMedida.Append;
+
+    edtUnidade.SetFocus;
+
+  except
+    on E: exception do
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.actSalvarExecute(Sender: TObject);
+begin
+
+  try
+
+    if dmMProvider.cdsUndMedida.Active then
+    begin
+
+      if dmMProvider.cdsUndMedida.State in [dsInsert] then
+      begin
+
+        if ValidarCampos then
+        begin
+
+          dmDBEXMaster.fdcMaster.StartTransaction;
+
+          LimparMSG_ERRO;
+
+          //verifica se o estado já existe
+          dmDBEXMaster.fdqUnidadeMedida.Close;
+          dmDBEXMaster.fdqUnidadeMedida.SQL.Clear;
+          dmDBEXMaster.fdqUnidadeMedida.SQL.Add('SELECT * FROM UNIDADE_MEDIDA');
+          dmDBEXMaster.fdqUnidadeMedida.SQL.Add('WHERE UNIDADE = ' +QuotedStr(dmMProvider.cdsUndMedidaUNIDADE.Value));
+          dmDBEXMaster.fdqUnidadeMedida.Open;
+
+          if not dmDBEXMaster.fdqUnidadeMedida.IsEmpty then
+          begin
+
+            dmDBEXMaster.fdqUnidadeMedida.Close;
+            dmDBEXMaster.fdcMaster.Close;
+
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_REGISTRO_JA_EXISTE;
+            TocarSomAlerta(ord(SystemHand));
+
+          end
+          else
+          begin
+
+            dmMSProcedure.fdspUndMedida.Params[0].Value := 0;
+            dmMSProcedure.fdspUndMedida.Params[1].Value := dmMProvider.cdsUndMedidaUNIDADE.Value;
+            dmMSProcedure.fdspUndMedida.Params[2].Value := dmMProvider.cdsUndMedidaDESCRICAO.Value;
+            dmMSProcedure.fdspUndMedida.Params[3].Value := dmMProvider.cdsUndMedidaPERMITE_VENDA_FRACIONADA.Value;
+            dmMSProcedure.fdspUndMedida.ExecProc;
+
+            dmMProvider.cdsUndMedida.Post;
+
+            HabilitaDesabilitaControles(false);
+            edtConteudoPesquisa.Clear;
+            edtConteudoPesquisa.SetFocus;
+
+          end;
+
+        end
+        else
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PREENCHIMENTO_OBRIGATORIO;
+          TocarSomAlerta(ord(SystemHand));
+
+        end;
+
+      end
+      else if dmMProvider.cdsUndMedida.State in [dsEdit] then
+      begin
+
+        if ValidarCampos then
+        begin
+
+          dmMSProcedure.fdspUndMedida.Params[0].Value := 0;
+          dmMSProcedure.fdspUndMedida.Params[1].Value := dmMProvider.cdsUndMedidaUNIDADE.Value;
+          dmMSProcedure.fdspUndMedida.Params[2].Value := dmMProvider.cdsUndMedidaDESCRICAO.Value;
+          dmMSProcedure.fdspUndMedida.ExecProc;
+
+          dmMProvider.cdsUndMedida.Post;
+
+          dmDBEXMaster.fdcMaster.Commit;
+          dmDBEXMaster.fdcMaster.Close;;
+
+          HabilitaDesabilitaControles(false);
+          edtConteudoPesquisa.Clear;
+          edtConteudoPesquisa.SetFocus;
+
+        end
+        else
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PREENCHIMENTO_OBRIGATORIO;
+          TocarSomAlerta(ord(SystemHand));
+
+        end;
+
+      end;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdcMaster.Rollback;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmUnidadeMedida.chkPermiteVendaFracionadaClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsUndMedida.State in [dsEdit, dsInsert] then
+  begin
+
+    if chkPermiteVendaFracionada.Checked then
+      dmMProvider.cdsUndMedidaPERMITE_VENDA_FRACIONADA.Value := 1
+    else
+      dmMProvider.cdsUndMedidaPERMITE_VENDA_FRACIONADA.Value := 0;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+   MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmUnidadeMedida.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+  MudarCorEdit(Sender);
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    if AbrirTabelaUndMedida(rdpOpcoesPesquisa.ItemIndex, edtConteudoPesquisa.Text) then
+    begin
+
+      pgcUnidadeMedida.ActivePageIndex := 0;
+      grdTabela.SetFocus;
+
+    end;
+
+    edtConteudoPesquisa.Clear;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.edtConteudoPesquisaKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmUnidadeMedida.edtDescricaoExit(Sender: TObject);
+begin
+
+  if dmMProvider.cdsUndMedida.State in [dsEdit, dsInsert] then
+  begin
+
+    if Length(Trim(dmMProvider.cdsUndMedidaDESCRICAO.Text)) > 0 then
+      dmMProvider.cdsUndMedidaDESCRICAO.Value  := RetirarAcentuacao(sender)
+    else
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CAMPO_OBRIGATORIO;
+      Application.ProcessMessages;
+      edtDescricao.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.edtUnidadeExit(Sender: TObject);
+begin
+
+  if dmMProvider.cdsUndMedida.State in [dsEdit, dsInsert] then
+  begin
+
+    if Length(Trim(dmMProvider.cdsUndMedidaUNIDADE.Text)) > 0 then
+      dmMProvider.cdsUndMedidaUNIDADE.Value  := RetirarAcentuacao(sender)
+    else
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CAMPO_OBRIGATORIO;
+      Application.ProcessMessages;
+      edtUnidade.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(Handle);
+
+  Color                           := COR_PADRAO_TELAS;
+  Caption                         := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario       := ParamStr(1);
+  dmDBEXMaster.sSenha             := paramstr(2);
+  dmDBEXMaster.iIdUsuario         := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial          := StrToInt(ParamStr(4));
+
+  pgcUnidadeMedida.ActivePageIndex   := 0;
+
+  for i := 0 to grdTabela.Columns.Count - 1 do
+    grdTabela.Columns[i].Title.Color := COR_TITULO_GRADE;     ]
+
+  AbrirTabelaUndMedida(2, '');
+
+
+end;
+
+procedure TfrmUnidadeMedida.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmUnidadeMedida.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    actExcluirExecute(self);
+
+  end
+  else   if (UpperCase(key) = 'N') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    LimparMSG_ERRO;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsUndMedida.IsEmpty then
+  begin
+
+    pgcUnidadeMedida.Pages[1].TabVisible  := True;
+    pgcUnidadeMedida.ActivePageIndex      := 1;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.grdTabelaDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsUndMedida.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsUndMedida.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.grdTabelaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(Self);
+
+end;
+
+procedure TfrmUnidadeMedida.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+procedure TfrmUnidadeMedida.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsUndMedida.Active then
+  begin
+
+    if not (dmMProvider.cdsUndMedida.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+procedure TfrmUnidadeMedida.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+function TfrmUnidadeMedida.ValidarCampos: boolean;
+begin
+
+  Result := true;
+
+  if Length(Trim(dmMProvider.cdsUndMedidaUNIDADE.Value)) <= 0 then
+  begin
+
+    edtUnidade.SetFocus;
+    Result := false;
+
+  end
+  else if Length(Trim(dmMProvider.cdsUndMedidaDESCRICAO.Value)) <= 0 then
+  begin
+
+    edtDescricao.SetFocus;
+    Result := false;
+
+  end;
+
+end;
+
+procedure TfrmUnidadeMedida.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+end;
+
+end.

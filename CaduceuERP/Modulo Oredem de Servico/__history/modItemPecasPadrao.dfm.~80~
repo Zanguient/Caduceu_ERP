@@ -1,0 +1,401 @@
+object frmItemPecaPadrao: TfrmItemPecaPadrao
+  Left = 0
+  Top = 0
+  ActiveControl = edtConteudoPesquisa
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Inclus'#227'o de pa'#231'as padr'#227'o'
+  ClientHeight = 359
+  ClientWidth = 967
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
+  PixelsPerInch = 96
+  TextHeight = 13
+  object imgIncluir: TImage
+    Left = 903
+    Top = 13
+    Width = 51
+    Height = 44
+    Cursor = crHandPoint
+    Hint = 'Incluir'
+    ParentShowHint = False
+    Picture.Data = {
+      0954506E67496D61676589504E470D0A1A0A0000000D49484452000000280000
+      002808060000008CFEB86D000000097048597300000EC400000EC401952B0E1B
+      0000022E4944415478DAED985F2843511CC7CF65DBBB070F5E1079F0B64268E1
+      7DB118695EA4B82929BC4AF2E0C1F24AA9DB1EBC983C6C2D43F953A8A166F222
+      E4490A2F5A34C5D8E67B6AE676B37677EF3D769B9DFAF6FBDD73CEAFF3E97CCF
+      CE6E974B241244CF8D1303960C6EE68436ECB272F9078822E660584F1EA02008
+      71FAC0F33C1708045283168BA500280B5054A04F8BE500FAFD7E128944540139
+      1C0E6580BAB758F780A282B4167B3C1E128D46550129B6580E604E7750F716CB
+      01946BB1C9642276BB5D5B4051813E2DD63D605E9CC19C028A0A0AF7A022C03F
+      B2F813DA87B6A013E80E80B4AF0C8067AA01555ABCB66B78583E2F7E6A43DE0A
+      9527FB0DD07D1278F5B46BF6E05740D1966B6DF1DB3B21E316EF540BF23EA828
+      C37C0AC803F4E62F00DF42D1477E7863610679751675CF900D90872940161687
+      8B3E465CC6EB09A435D2312C9ECA1B7DD324168F4BA7BCD021CCBB62F523D9AC
+      F74EDD210EFF36280390B613CC6B666271E0F5D63AB62DF8901A5500D266D5E4
+      A2965CC067D83D37E27CBA55B3005C6161B11380B588360D006F590076037012
+      B14E0A23B7A1FE3B8DB138830D5860E97F016A6CB11D0B0C101D9FC139008611
+      9D1A00BA59581C04602F22FD3F35A804EC60F501D35CDD7E348A38A402304887
+      5901AE03B01F3104552900A45FA99A30EF8263F9111D56D317851DA8228B320A
+      D709B83DFAC0143009598AB008F5D0F5324C3F86060177F9DDC11C50046A4618
+      80E8CB6B65B2BB98FCBC51BB01B623ADFB025DEE461A5808A3B2000000004945
+      4E44AE426082}
+    ShowHint = True
+    Stretch = True
+    OnClick = imgIncluirClick
+  end
+  object imgSair: TImage
+    Left = 907
+    Top = 306
+    Width = 51
+    Height = 44
+    Cursor = crHandPoint
+    Hint = 'Sair'
+    ParentShowHint = False
+    Picture.Data = {
+      0954506E67496D61676589504E470D0A1A0A0000000D49484452000000280000
+      002808060000008CFEB86D000000097048597300000EC400000EC401952B0E1B
+      0000025C4944415478DA63FCFFFF3FC360068CA30E1C75E06075E02D15467620
+      5508C40940AC02C44C600D4C8C0CFFFF51C553FF80F80E102F00E27EB53BFF7F
+      12ED40A8E33603B12B86068803A91DEC7B80D8179B237139B01C487560F5116D
+      1C08029540077612EBC09B404A8DCE0EBC0D74A03AB10EFC03A498E9ECC07F40
+      07B210EB409C0EA0A10319800E641A190E0482FFB269A50CEF8FEC65F87CE52C
+      5E4B79B50D18046DDD191ECFEA22583C51CD81F279F5FFD972EAC1FCE741260C
+      9F2F617724C871921BCF83D9BFA635333C9C508FD7915471A05C66050347713B
+      8AFCF300138C9044761C0CFC9C50C3F0704A2B6D1DC86F6AC320BEFC30863C72
+      4862731C08BC8CB167F878E2106D1D088A623E139BFFE2CB302D7A0174E4FFBF
+      7FB13AEE75AC23C3FBE30718F001AAE662684832100308851C4D1C0862F39BD9
+      32600B4994908B0186DC09FC21473307127224298EA399037165081000A5C94F
+      97F097933475203EC7211C690A74E419FA3B9018C7C100BEC29C260EE4D1D4FF
+      8FB52801A6B97FFFFE32602F82088724551C080D390C79E40C812BE3100A49AA
+      3850A9B8858125B31A451E5B3987AD9CFC33AB83E15E57256D1D088A6295BA89
+      FF196372212187A7864009C9A553186E37E651A7B1705B8D89607B4FA9BC83E1
+      CDFEAD0C9F4EE1AF4DF88CAD19445C7C19EE75561032F2BFEAAD7FD4712095BA
+      9D18C6522D0407830371769A68E8C0BF44779A800EC4D9EDA4A1036F11DDED04
+      3A1094A2DBE9EC4050C71D63B0009703710E7DD0C881BB194819FA40722468F0
+      281188951990D224951CF81788EF02F17C0652078F06131875E0A803071A0000
+      506AF3C058DC002D0000000049454E44AE426082}
+    ShowHint = True
+    Stretch = True
+    OnClick = imgSairClick
+  end
+  object rdgOpcoesPesquisa: TRadioGroup
+    Left = 8
+    Top = 8
+    Width = 490
+    Height = 49
+    Caption = 'Op'#231#245'es para pesquisa'
+    Columns = 3
+    ItemIndex = 2
+    Items.Strings = (
+      'C'#243'digo'
+      'Complemento'
+      'Descri'#231#227'o')
+    TabOrder = 0
+    OnClick = rdgOpcoesPesquisaClick
+  end
+  object grpConteudoPesquisa: TGroupBox
+    Left = 501
+    Top = 8
+    Width = 392
+    Height = 50
+    Caption = 'Conte'#250'do para pesquisa'
+    TabOrder = 1
+    object impPesquisar: TImage
+      Left = 356
+      Top = 17
+      Width = 27
+      Height = 22
+      Cursor = crHandPoint
+      Hint = 'pesquisar'
+      ParentShowHint = False
+      Picture.Data = {
+        0954506E67496D61676589504E470D0A1A0A0000000D49484452000000280000
+        002808060000008CFEB86D000000097048597300000EC400000EC401952B0E1B
+        000004F34944415478DAE5D87F4C94751C07F0CFF739100B995C0988B24012BC
+        1C4D5C6A9DFD746612BAD658F9E38F52764C9BCD5A9BD619E6DC1A9BB3326D85
+        66A8A12E755009CB8B0409A4719B2D70A3302B31A94D0D8C8414D0EE9EDEDFE7
+        B9E77C787C9EBBE77E046E7DB7CF3E77CFDD3DDF179FEFF3FD3EDF07268A22DD
+        CA8DFDAF8056874B40CA444C418C43C4202E23CE22DA7B76E5F78F0810303B52
+        21620122D5E06B1CD788D88FF814D8C1FF1C08D874A477108FF27385F0D34E44
+        31E213400302C202FA86D289D848F230DE38213386A22B6D675F200A81BC1435
+        E01D4535B1A2E8FD082F9FD783DD3D612CD9B393E9AEA431641118FD71B99F5A
+        3B2E51CB996EFAC7E3D5839E423C096467C4406B910B0E613780CBD4308B2090
+        63DE14723E3B89127DC52279C887E472770F95549CA4EEDE7E2DF467C4434076
+        450A7C19C07701F4E36C1313A9EA8DD99414E3C7180295CF5EDCF7133BD0F88B
+        1659EBABA4372C207093914E02180FA0C871765B0A1D59735F58B36C73CD79B6
+        A9B2558B7C01C09DE1020F212D02903830737C02FBAEE461BD6A05ADA072EC95
+        036758F9B1D36AE0454416907F8704046E12C9D7898503F9D9DD6FE589D9D670
+        6A37B4E53A9B5867779F1AB90AC01DA102D723BD29FD00C00533D368DFCA1CE5
+        E3B02BC8F391F6017A6E4BBD1AE806F0C15081CD487605585F9227E6A6186242
+        02F203E9ABEBA8AFFF9A82F420C62B6B63502070A391F8F41FC3DFC7C78D127F
+        FFE0F1C8C756D58A769D629FB9CFAAABF8048075668119481DCA5F3B637232D5
+        3A6704AC48A815FCF07837ADDB7B4277369B01F2FB6D8BF27EE1CC0C5C7F53A3
+        BA47AB6ABB4A85DB1A980AE80470B359602E52ABF2FEA9591954BE626A542BF8
+        79DB15D1B1AD510D7C15C0B7CD02D349DECF49279B9E394EAC7F7D56340B48A5
+        0D5D6CFDFE6FD543EC00708F59601CC9932481BF1F1D13EB3DBF631E8B660597
+        EF6CA7EA13BFAA818F00F88D29A00F791C49BA6DF065E6CB8DF3C5FBD358D480
+        69AB6AE9CAE0750532804856EE266681AF216D528073A7A57A2B564F0B65836A
+        D82A5AFA68656993FAFA3B0A5C9EF2B959601AC94B4D2C071279B158E71316EB
+        882B78CF9A06BAF8D755F5F02E05F05048401FF263A465CA662179EC6D9ED35B
+        E65822A9DE8ADD3FB2CAE60EEDBE3007C0EBE100E722D529407E2C27DDEA69DA
+        60B78453C1E2CA73B4BDE607EDEEFA69E0AAD5FD9A1D621BD231C4043590B754
+        EBED9EC3C58FC56067631AB8B4B48D7DD5F29B16B7073887B66F33CB0CC7F1FB
+        E244E9071AA0740C5D3F333B93D616D8282B51FF3C7C6A6EAFBDC0B6567FAFDE
+        18288D2F29F3F59E9B0302F180340417AC31CC1F6B7C9CE781EC244B7A4A0236
+        8F7868EA1DA0563C30755CE8238F57B72F3E32057F96E5F5EA9ED30818082792
+        97A2D0F8B6EA3DC4BA9E32E387785D60B0CAF980D7102F21F8DEAB00219884F1
+        0EDD88B5803507FBF24D403C94DB1813A40961DC83975F524BD04195F49B2257
+        36D27292FFF5C1FFB8513AD5E2CFBD47117BCDC07481D28410B1943021D03537
+        08E06205A76D38079F267C8371A7AFAAFC9F47E7105DF84DC8DB343FD03F5B45
+        2C254C30BA8DF16B65312EE82AB31D44DA2420705978FD35F16B0ED3DF00280D
+        EB70E2D4C083BC32D2117D209F108B861B7703E8706D257946EA353EAC4BB088
+        0E3B4E0D8CC76B7E0F9C231FF5DF96645C59FEE191C0F981BC0D41CA40694218
+        CDD66107AA90EF83772FF206E05C2389BB09782BB67F01FB7FBFCFED5D938500
+        00000049454E44AE426082}
+      ShowHint = True
+      Stretch = True
+      OnClick = edtConteudoPesquisaExit
+    end
+    object edtConteudoPesquisa: TEdit
+      Left = 10
+      Top = 18
+      Width = 336
+      Height = 21
+      CharCase = ecUpperCase
+      TabOrder = 0
+      OnEnter = edtConteudoPesquisaEnter
+      OnExit = edtConteudoPesquisaExit
+      OnKeyDown = edtConteudoPesquisaKeyDown
+      OnKeyPress = edtConteudoPesquisaKeyPress
+    end
+  end
+  object grpMensagem: TGroupBox
+    Left = 8
+    Top = 308
+    Width = 885
+    Height = 39
+    Caption = 'Mensagem'
+    TabOrder = 4
+    object lblMsg: TLabel
+      Left = 67
+      Top = 17
+      Width = 783
+      Height = 16
+      ParentCustomHint = False
+      AutoSize = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = [fsItalic]
+      ParentFont = False
+    end
+  end
+  object grpInformacoesItem: TGroupBox
+    Left = 8
+    Top = 63
+    Width = 885
+    Height = 154
+    Caption = 'Informa'#231#245'es do item'
+    TabOrder = 2
+    object grdPecas: TDBGrid
+      Left = 2
+      Top = 15
+      Width = 881
+      Height = 137
+      Align = alClient
+      DataSource = dmMSource.dtsPesqProdutos
+      DrawingStyle = gdsClassic
+      Options = [dgTitles, dgIndicator, dgColLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+      ReadOnly = True
+      TabOrder = 0
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'Tahoma'
+      TitleFont.Style = []
+      OnDrawColumnCell = grdPecasDrawColumnCell
+      OnDblClick = grdPecasDblClick
+      OnKeyPress = grdPecasKeyPress
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'PRODUTO'
+          Title.Alignment = taCenter
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'DESCRICAO'
+          Title.Alignment = taCenter
+          Title.Caption = 'DESCRI'#199#195'O'
+          Width = 340
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'UNIDADE'
+          Title.Alignment = taCenter
+          Title.Caption = 'UND'
+          Width = 31
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'SALDO_ALMOXARIFADO'
+          Title.Alignment = taCenter
+          Title.Caption = 'S. ALMOX'
+          Width = 75
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'LOJA'
+          Title.Alignment = taCenter
+          Title.Caption = 'S. LOJA'
+          Width = 81
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'SALDO_ATUAL'
+          Title.Alignment = taCenter
+          Title.Caption = 'SALDO'
+          Width = 81
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'PRECODEVENDA'
+          Title.Alignment = taCenter
+          Title.Caption = 'P.VENDA'
+          Width = 78
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'CUSTOLIQUIDO'
+          Title.Alignment = taCenter
+          Title.Caption = 'C. L'#205'QUIDO'
+          Width = 91
+          Visible = True
+        end>
+    end
+  end
+  object grpInformacoesGerais: TGroupBox
+    Left = 8
+    Top = 223
+    Width = 657
+    Height = 74
+    Caption = 'Quantidades / valores / respons'#225'vel'
+    TabOrder = 3
+    object grpQuantidade: TGroupBox
+      Left = 8
+      Top = 16
+      Width = 101
+      Height = 43
+      Caption = 'Quantidade'
+      TabOrder = 0
+      object edtQuantidade: TJvValidateEdit
+        Left = 16
+        Top = 16
+        Width = 75
+        Height = 21
+        CriticalPoints.MaxValueIncluded = False
+        CriticalPoints.MinValueIncluded = False
+        DisplayFormat = dfFloatFixed
+        DecimalPlaces = 3
+        TabOrder = 0
+        OnEnter = edtConteudoPesquisaEnter
+        OnExit = edtConteudoPesquisaEnter
+        OnKeyDown = edtConteudoPesquisaKeyDown
+        OnKeyPress = edtQuantidadeKeyPress
+      end
+    end
+    object grpValorUnitario: TGroupBox
+      Left = 109
+      Top = 16
+      Width = 103
+      Height = 43
+      Caption = 'Valor unit'#225'rio'
+      Enabled = False
+      TabOrder = 1
+      object edtValorUnitario: TJvValidateEdit
+        Left = 8
+        Top = 16
+        Width = 74
+        Height = 21
+        CriticalPoints.MaxValueIncluded = False
+        CriticalPoints.MinValueIncluded = False
+        DisplayFormat = dfFloatFixed
+        DecimalPlaces = 2
+        TabOrder = 0
+        OnEnter = edtConteudoPesquisaEnter
+        OnExit = edtConteudoPesquisaEnter
+        OnKeyDown = edtConteudoPesquisaKeyDown
+        OnKeyPress = edtQuantidadeKeyPress
+      end
+    end
+    object grpDataUtilizacao: TGroupBox
+      Left = 210
+      Top = 16
+      Width = 114
+      Height = 43
+      Caption = 'Data de utiliza'#231#227'o'
+      TabOrder = 2
+      object dtpDataUtilizacao: TDateTimePicker
+        Left = 8
+        Top = 16
+        Width = 98
+        Height = 21
+        Date = 41989.355031180550000000
+        Time = 41989.355031180550000000
+        TabOrder = 0
+        OnKeyPress = edtConteudoPesquisaKeyPress
+      end
+    end
+    object grpTecnicoResponsavel: TGroupBox
+      Left = 327
+      Top = 16
+      Width = 330
+      Height = 43
+      Caption = 'T'#233'cnico respons'#225'vel'
+      TabOrder = 3
+      object cboTecnicoResponsavel: TDBLookupComboBox
+        Left = 8
+        Top = 16
+        Width = 313
+        Height = 21
+        KeyField = 'FUNCIONARIO'
+        ListField = 'NOME'
+        ListSource = dmMSource.dtsFuncionarios
+        TabOrder = 0
+        OnKeyPress = edtConteudoPesquisaKeyPress
+      end
+    end
+  end
+  object rdgTipoPeca: TRadioGroup
+    Left = 671
+    Top = 223
+    Width = 222
+    Height = 74
+    Caption = 'Tipo pe'#231'a'
+    Columns = 3
+    Items.Strings = (
+      'insumos'
+      'consumo'
+      'revenda')
+    TabOrder = 5
+  end
+end

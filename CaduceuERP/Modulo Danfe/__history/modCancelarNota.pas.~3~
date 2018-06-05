@@ -1,0 +1,45 @@
+unit modCancelarNota;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls, Vcl.StdCtrls;
+
+type
+  TfrmCancelamentoNFe = class(TForm)
+    grpInutilizacao: TGroupBox;
+    lblNumeroInicial: TLabel;
+    lblNumeroFinal: TLabel;
+    lblAno: TLabel;
+    grpJustificativa: TGroupBox;
+    memJustificativa: TMemo;
+    edtNumeroInicial: TEdit;
+    edtNumeroFinal: TEdit;
+    cboAno: TComboBox;
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    procedure imgSairClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCancelamentoNFe: TfrmCancelamentoNFe;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmCancelamentoNFe.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

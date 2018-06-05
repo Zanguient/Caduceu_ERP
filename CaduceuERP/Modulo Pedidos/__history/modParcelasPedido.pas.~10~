@@ -1,0 +1,78 @@
+unit modParcelasPedido;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmParcelasPedido = class(TForm)
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpParcelas: TGroupBox;
+    grdParcelas: TDBGrid;
+    procedure imgSairClick(Sender: TObject);
+    procedure imgConfirmarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmParcelasPedido: TfrmParcelasPedido;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource;
+
+procedure TfrmParcelasPedido.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  for i := 0 to grdParcelas.Columns.Count - 1 do
+    grdParcelas.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+end;
+
+procedure TfrmParcelasPedido.imgConfirmarClick(Sender: TObject);
+begin
+
+  ModalResult := mrOk;
+
+end;
+
+procedure TfrmParcelasPedido.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+end.

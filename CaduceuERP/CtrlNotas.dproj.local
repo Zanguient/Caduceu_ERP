@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/02/08 17:28:24.000.333,=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
+    <Transaction>2017/02/08 17:29:09.000.172,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit3.pas=D:\Projetos\Delphi_XE6\GenesisAC\Controle Notas\manCtrlNotas.pas</Transaction>
+    <Transaction>2017/02/08 17:29:09.000.172,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit3.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Controle Notas\manCtrlNotas.dfm</Transaction>
+    <Transaction>2017/02/08 17:29:24.000.798,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Projetos\Delphi_XE6\GenesisAC\CtrlNotas.dproj</Transaction>
+    <Transaction>2017/02/08 17:30:36.000.723,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2017/02/08 17:30:36.000.735,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2017/02/08 17:30:36.000.712,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2017/02/08 17:30:36.000.700,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2017/02/08 17:30:41.000.175,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2017/02/08 17:31:02.000.164,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2017/02/08 17:42:39.000.796,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+    <Transaction>2017/02/08 17:42:50.000.953,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2017/02/08 18:10:39.000.313,=D:\Projetos\Formularios Genericos\modPesquisaFornecedorCNPJRSocial.pas</Transaction>
+    <Transaction>2017/02/10 17:09:44.000.523,=D:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2017/02/10 17:10:25.000.485,D:\Projetos\Delphi_XE6\GenesisAC\Unit3.dfm=D:\Projetos\Formularios Genericos\modPesquisaFornecedorNota.dfm</Transaction>
+    <Transaction>2017/02/10 17:10:25.000.485,D:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas=D:\Projetos\Formularios Genericos\modPesquisaFornecedorNota.pas</Transaction>
+    <Transaction>2017/02/13 16:55:36.000.514,=D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas</Transaction>
+    <Transaction>2017/02/14 17:26:58.000.146,=D:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2017/02/14 17:28:02.000.624,D:\Projetos\Delphi_XE6\GenesisAC\Controle Notas\modTipoUilidade.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Unit3.dfm</Transaction>
+    <Transaction>2017/02/14 17:28:02.000.624,D:\Projetos\Delphi_XE6\GenesisAC\Controle Notas\modTipoUilidade.pas=D:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2017/02/14 17:33:15.000.627,=D:\Projetos\Delphi_XE6\GenesisAC\Unit4.pas</Transaction>
+    <Transaction>2017/02/14 17:33:23.000.655,D:\Projetos\Delphi_XE6\GenesisAC\Controle Notas\modSetor.pas=D:\Projetos\Delphi_XE6\GenesisAC\Unit4.pas</Transaction>
+    <Transaction>2017/02/14 17:33:23.000.655,D:\Projetos\Delphi_XE6\GenesisAC\Controle Notas\modSetor.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Unit4.dfm</Transaction>
+    <Transaction>2017/04/04 10:28:40.000.169,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+  </Transactions>
+</BorlandProject>

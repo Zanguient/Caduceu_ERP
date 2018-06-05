@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/12/08 17:43:08.000.753,=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit4.pas</Transaction>
+    <Transaction>2017/12/08 17:44:04.000.715,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit4.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Log_Sys\modLogSys.dfm</Transaction>
+    <Transaction>2017/12/08 17:44:04.000.715,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit4.pas=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Log_Sys\modLogSys.pas</Transaction>
+    <Transaction>2017/12/08 17:44:21.000.427,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Projetos\Delphi_XE6\GenesisAC\LogSys.dproj</Transaction>
+    <Transaction>2017/12/08 17:45:02.000.816,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2017/12/08 17:45:05.000.903,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2017/12/08 17:45:14.000.338,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2017/12/08 17:45:14.000.317,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMDJPdv.pas</Transaction>
+    <Transaction>2017/12/08 17:45:14.000.329,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2017/12/08 17:45:14.000.348,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2017/12/08 17:45:20.000.750,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2017/12/08 17:45:39.000.297,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2017/12/08 17:47:55.000.403,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2017/12/08 17:48:08.000.919,=D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas</Transaction>
+    <Transaction>2017/12/08 17:48:08.000.908,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,338 @@
+unit modCalculoCLD_NFE;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.DBCtrls, Vcl.Grids,
+  Vcl.DBGrids, Vcl.Imaging.pngimage, Vcl.ExtCtrls, db, Datasnap.DBClient;
+
+type
+
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+
+  TfrmCalculoCLD_NFE = class(TForm)
+    grpInformacoesProduto: TGroupBox;
+    lblCodigoProduto: TLabel;
+    lblDescricaoProduto: TLabel;
+    lblUnidadeProduto: TLabel;
+    lblCustoBrutoAntProduto: TLabel;
+    lblCustoLiquidoAntProduto: TLabel;
+    txtCodigoProduto: TDBText;
+    txtDescricaoProduto: TDBText;
+    txtUnidProduto: TDBText;
+    txtCustoBrutoAntProduto: TDBText;
+    txtCustoLiquidoAntProduto: TDBText;
+    grdCLD_NFE: TDBGrid;
+    imgImprimir: TImage;
+    imgOk: TImage;
+    grpMemoriaCalculo: TGroupBox;
+    lblCustoBrutoProduto: TLabel;
+    lblDesconto: TLabel;
+    lblCredICMS: TLabel;
+    lblIPI: TLabel;
+    lblOutrosCustos: TLabel;
+    txtCustoBrutoProduto: TDBText;
+    txtDescontoProduto: TDBText;
+    txtCreditoICMSProduto: TDBText;
+    lxlIPIProduto: TDBText;
+    txtCustoLiquidoProduto: TDBText;
+    lblICMS_ST: TLabel;
+    lblCustoLiquido: TLabel;
+    lblSibal_SubDesconto: TLabel;
+    lblSinal_SubCredICMS: TLabel;
+    lblSinal_SomaIPI: TLabel;
+    txtOutrosCustosProduto: TDBText;
+    lblSinal_SomaOutroCustos: TLabel;
+    lblSina_SomaICS_ST: TLabel;
+    txtICMS_STProduto: TDBText;
+    lblSinal_ResiltCustoLiquido: TLabel;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure grdCLD_NFEKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure grdCLD_NFEKeyPress(Sender: TObject; var Key: Char);
+    procedure imgOkClick(Sender: TObject);
+    procedure LimparMSG_ERRO;
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure Mensagem(pAlerta: boolean; pMsg: string);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCalculoCLD_NFE: TfrmCalculoCLD_NFE;
+
+implementation
+
+{$R *.dfm}
+
+uses modVizualisarSimilar, dataDBEXMaster, dataMProvider, dataMSource,
+  dataMSProcedure, uConstantes_Padrao, uFuncoes;
+
+procedure TfrmCalculoCLD_NFE.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color := COR_PADRAO_DIALOGOS;
+
+  for i := 0 to grdCLD_NFE.Columns.Count - 1 do
+    grdCLD_NFE.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+procedure TfrmCalculoCLD_NFE.grdCLD_NFEKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if (shift = [ssctrl]) and (key = 46) then
+    key := 0
+  else if key = 46 then
+    key := 0;
+
+end;
+
+procedure TfrmCalculoCLD_NFE.grdCLD_NFEKeyPress(Sender: TObject; var Key: Char);
+var
+  cFatorMarkup, cDespesasVariaveis: Currency;
+begin
+
+  if (key = #13) and (dmMProvider.cdsCLD_NFE.State in [dsEdit, dsInsert]) then
+  begin
+
+    case dmMProvider.cdsConfiguracoesTIPOCLD.Value of
+      0:begin
+
+          dmMProvider.cdsCLD_NFEPRECOCALCULADO.Value := dmMProvider.cdsCLD_NFECUSTOLIQUIDO.Value
+                                                        + (dmMProvider.cdsCLD_NFECUSTOLIQUIDO.Value * (dmMProvider.cdsCLD_NFECUSTOOPERACIONAL.Value / 100));
+
+          dmMProvider.cdsCLD_NFEPRECOCALCULADO.Value := dmMProvider.cdsCLD_NFEPRECOCALCULADO.Value
+                                                        + (dmMProvider.cdsCLD_NFECUSTOLIQUIDO.Value * (dmMProvider.cdsCLD_NFELUCROLIQUIDO.Value / 100));
+
+        end;
+      1:begin
+          // desp variaveis -> ICMS/PIS/Cofins/Comissao/IR/ContrbSoc/Marketing
+          cDespesasVariaveis  := dmMProvider.cdsCLD_NFEICMSAPAGAR.Value
+                                  + dmMProvider.cdsCLD_NFECOMISSAOVENDA.Value + dmMProvider.cdsCLD_NFEIMPOSTOSFEDERAIS.Value;
+
+          // CustoOperacional = despesas Fixas = folha/pro-labore/tarifas/aluguel/seguros/desp gerais
+          cFatorMarkup        := (100 - (cDespesasVariaveis + dmMProvider.cdsCLD_NFECUSTOOPERACIONAL.Value + dmMProvider.cdsCLD_NFELUCROLIQUIDO.Value)) / 100;
+
+          if cFatorMarkup > 0 then
+            dmMProvider.cdsCLD_NFEPRECOCALCULADO.Value := (dmMProvider.cdsCLD_NFECUSTOLIQUIDO.Value / cFatorMarkup);
+
+          //arrredonda
+          dmMProvider.cdsCLD_NFEPRECOCALCULADO.AsString := format('%7.2f',[dmMProvider.cdsCLD_NFEPRECOCALCULADO.Value]);
+
+        end;
+    end;
+
+  end;
+
+end;
+
+procedure TfrmCalculoCLD_NFE.imgOkClick(Sender: TObject);
+var
+  cdsCloneCLD_NFE: TClientDataset;
+begin
+
+  try
+
+    dmDBEXMaster.fdtMaster.StartTransaction;
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_ATUALIZANDO_PRECOS;
+    Application.ProcessMessages;
+
+    cdsCloneCLD_NFE               := TClientDataset.Create(nil);
+    cdsCloneCLD_NFE.ProviderName  := dmMProvider.cdsCLD_NFE.ProviderName;
+
+    cdsCloneCLD_NFE.CloneCursor(dmMProvider.cdsCLD_NFE, True);
+    cdsCloneCLD_NFE.First;
+
+    while not cdsCloneCLD_NFE.Eof do
+    begin
+
+      cdsCloneCLD_NFE.Edit;
+
+      if cdsCloneCLD_NFE.FieldByName('PRECODEVENDA').NewValue <> cdsCloneCLD_NFE.FieldByName('PRECODEVENDA').Value then
+        cdsCloneCLD_NFE.FieldByName('REMARCACAO').Value := Date;
+
+      cdsCloneCLD_NFE.FieldByName('PRECOPROVISORIO').Value  := cdsCloneCLD_NFE.FieldByName('PRECOCALCULADO').Value;
+      cdsCloneCLD_NFE.FieldByName('ULTIMA_ENTRADA').Value   := Date;
+
+      FormatSettings.DecimalSeparator := '.';
+
+      dmMSProcedure.fdspMaster.StoredProcName             := 'EXECUTA_SQL';
+      dmMSProcedure.fdspMaster.Prepare;
+      dmMSProcedure.fdspMaster.ParamByName('I_SQL').Value := 'UPDATE PRODUTOFILIAL SET  ALTERACAO = ' + FormatDateTime('mm/dd/yy',cdsCloneCLD_NFE.FieldByName('ALTERACAO').Value) + ', '
+                                                             + 'COMISSAOVENDA  = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('COMISSAOVENDA').Value) + ', '
+                                                             + 'CREDITODEICMS = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('CREDITODEICMS').Value) + ', '
+                                                             + 'CUSTOBRUTO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('CUSTOBRUTO').Value) + ', '
+                                                             + 'CUSTOBRUTOANTERIOR = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('CUSTOBRUTOANTERIOR').Value) + ', '
+                                                             + 'CUSTOLIQUIDO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('CUSTOLIQUIDO').Value) + ', '
+                                                             + 'CUSTOLIQUIDOANTERIOR = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('CUSTOLIQUIDOANTERIOR').Value) + ', '
+                                                             + 'CUSTOOPERACIONAL = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('CUSTOOPERACIONAL').Value) + ', '
+                                                             + 'DESCONTONACOMPRA = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('DESCONTONACOMPRA').Value) + ', '
+                                                             + 'DESCONTONAVENDA = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('DESCONTONAVENDA').Value) + ', '
+                                                             + 'DESCONTOPROGRAMADO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('DESCONTOPROGRAMADO').Value) + ', '
+                                                             + 'FRETE = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('FRETE').Value) + ', '
+                                                             + 'ICMSAPAGAR = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('ICMSAPAGAR').Value) + ', '
+                                                             + 'IMPOSTOSFEDERAIS = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('IMPOSTOSFEDERAIS').Value) + ', '
+                                                             + 'IPI = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('IPI').Value) + ', '
+                                                             + 'LOJA = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('LOJA').Value) + ', '
+                                                             + 'LUCROICMSR = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('LUCROICMSR').Value) + ', '
+                                                             + 'LUCROLIQUIDO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('LUCROLIQUIDO').Value) + ', '
+                                                             + 'MENORPRECO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('MENORPRECO').Value) + ', '
+                                                             + 'OUTROSCUSTOS = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('OUTROSCUSTOS').Value) + ', '
+                                                             + 'PRECOCALCULADO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('PRECOCALCULADO').Value) + ', '
+                                                             + 'PRECODEVENDA = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('PRECODEVENDA').Value) + ', '
+                                                             + 'PRECODEVENDAANTERIOR = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('PRECODEVENDAANTERIOR').Value) + ', '
+                                                             + 'PRECOPROMOCAO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('PRECOPROMOCAO').Value) + ', '
+                                                             + 'PRECOPROVISORIO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('PRECOPROVISORIO').Value) + ', '
+                                                             + 'REMARCACAO = ' + FormatDateTime('mm/dd/yy',cdsCloneCLD_NFE.FieldByName('REMARCACAO').Value) + ', '
+                                                             + 'ULTIMA_ENTRADA = ' + FormatDateTime('mm/dd/yy',cdsCloneCLD_NFE.FieldByName('ULTIMA_ENTRADA').Value) + ', '
+                                                             + 'VALORDEOUTROSCUSTOS = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('VALORDEOUTROSCUSTOS').Value) + ', '
+                                                             + 'VALORDOCREDITODEICMSR = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('VALORDOCREDITODEICMSR').Value) + ', '
+                                                             + 'VALORDODESCONTONACOMPRA = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('VALORDODESCONTONACOMPRA').Value) + ', '
+                                                             + 'VALORDOFRETE = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('VALORDOFRETE').Value) + ', '
+                                                             + 'VALORDOICMSR = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('VALORDOICMSR').Value) + ', '
+                                                             + 'VALORDOIPI = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('VALORDOIPI').Value) + ', '
+                                                             + 'VALORUNITARIO = ' + FloatToStr(cdsCloneCLD_NFE.FieldByName('VALORUNITARIO').Value)
+                                                             + ' WHERE PRODUTO = ' + IntToStr(cdsCloneCLD_NFE.FieldByName('PRODUTO').Value)
+                                                             + ' AND FILIAL = '+ IntToStr(dmDBEXMaster.iIdFilial);
+      dmMSProcedure.fdspMaster.ExecProc;
+
+      dmMSProcedure.fdspMaster.StoredProcName             := 'EXECUTA_SQL';
+      dmMSProcedure.fdspMaster.Prepare;
+      dmMSProcedure.fdspMaster.ParamByName('I_SQL').Value := 'UPDATE PRODUTO SET STATUS = 1 WHERE PRODUTO = ' + IntToStr(dmMProvider.cdsCLD_NFEPRODUTO.Value);
+      dmMSProcedure.fdspMaster.ExecProc;
+
+      FormatSettings.DecimalSeparator := ',';
+
+    {if dmquery.IBQFormPrecoSIMILAR.Value > 0 then
+    begin
+      if dmQuery.IBQContaSimilares.Active then
+        dmQuery.IBQContaSimilares.Close;
+      dmQuery.IBQContaSimilares.Params[0].Value :=
+        dmquery.IBQFormPrecoSIMILAR.Value;
+      dmQuery.IBQContaSimilares.Params[1].Value := dmMaster.loja;
+      dmQuery.IBQContaSimilares.Open;
+      if dmQuery.IBQContaSimilares.RecordCount > 1 then
+      begin
+        if dmMaster.IBDConfiguracoesVER_SIMILAR_PARA_ALTERAR.Value = 1 then
+        begin
+          if frmVisualizarSimilar = nil then
+            Application.CreateForm(TfrmVisualizarSimilar, frmVisualizarSimilar);
+          frmVisualizarSimilar.ShowModal;
+          FreeAndNil(frmVisualizarSimilar);
+        end;
+        RemarcarSimilares;
+      end;
+    end;}
+
+      if dmMProvider.cdsConfiguracoesATUALIZAR_FOR_PRO_PELA_NFE.Value = 1 then
+      begin
+
+        dmMSProcedure.fdspAtualizar_ForPro_NFE.Params[0].Value := cdsCloneCLD_NFE.FieldByName('PRODUTO').Value;
+        dmMSProcedure.fdspAtualizar_ForPro_NFE.Params[1].Value := dmMProvider.cdsNFEntradaFORNECEDOR.Value;
+
+      end;
+
+      cdsCloneCLD_NFE.Next;
+
+    end;
+
+    lblMsg.Caption := 'Atualização completa!';
+    application.ProcessMessages;
+
+    sleep(3000);
+
+    ModalResult := mrOk;
+
+    dmDBEXMaster.fdtMaster.CommitRetaining;
+
+  except
+    on E: exception do
+    begin
+
+      dmDBEXMaster.fdtMaster.RollbackRetaining;
+      ModalResult := mrNone;
+      Tratar_Erro_Conexao(E);
+
+    end;
+  end;
+
+end;
+
+procedure TfrmCalculoCLD_NFE.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+procedure TfrmCalculoCLD_NFE.Mensagem(pAlerta: boolean; pMsg: string);
+begin
+
+  lblMsg.Caption := pMsg;
+  Application.ProcessMessages;
+
+  if pAlerta then
+    TocarSomAlerta(ord(SystemHand));
+
+end;
+
+procedure TfrmCalculoCLD_NFE.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang: string;
+begin
+
+  if Pos('Unable', pE.Message) > 0 then
+    Mensagem(false, dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO)
+  else if Pos('FOREIGN', pE.Message) > 0 then
+  begin
+
+    sChave_Extrang :=
+      Trim(Copy(pE.Message, Pos('ON TABLE', UpperCase(pE.Message)) + 10,
+      Length(pE.Message)));
+
+    Mensagem(false, dmDBEXMaster.sNomeUsuario + ', ' +
+      MSG_ERRO_CHAVE_ESTRANGEIRA + Copy(sChave_Extrang, 1,
+      Pos('"', sChave_Extrang) - 1));
+
+  end
+  else
+    Mensagem(false, dmDBEXMaster.sNomeUsuario + ', ' + pE.Message);
+
+  TocarSomAlerta(ord(SystemHand));
+
+
+end;
+
+end.

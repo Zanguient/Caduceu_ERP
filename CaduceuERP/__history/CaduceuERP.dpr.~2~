@@ -1,0 +1,45 @@
+program CaduceuERP;
+
+uses
+  Vcl.Forms,
+  Vcl.Themes,
+  Vcl.Styles,
+  System.SysUtils,
+  windows,
+  midaslib,
+  uConstantes_Padrao in '..\..\Constantes padrao\uConstantes_Padrao.pas',
+  uFuncoes in '..\..\Funcoes Genericas\uFuncoes.pas',
+  uFuncoes_BD in '..\..\Funcoes Genericas\uFuncoes_BD.pas',
+  modLogin in 'Modulo Login\modLogin.pas' {frmLogin};
+
+{$R *.res}
+var
+  Hwnd: integer;
+
+begin
+
+  if Windows_em_Modo_seguranca then
+    raise exception.Create('')
+  else
+  begin
+
+    Hwnd := FindWindow('TApplication', 'GenesisAC');
+
+    if Hwnd = 0 then
+    begin
+
+      Application.Initialize;
+      TStyleManager.TrySetStyle('Windows10 Blue');
+  Application.Title := 'GenesisAC';
+      Application.CreateForm(TfrmLogin, frmLogin);
+  Application.Run;
+
+    end
+    else
+      // Esta funcao traz para frente (da o foco) para a janela
+      // da aplicacao que ja esta rodando
+      ShowWindow(Hwnd, SW_SHOWNORMAL);
+
+  end;
+
+end.

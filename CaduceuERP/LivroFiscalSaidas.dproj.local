@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/08/11 15:12:48.000.677,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2016/08/11 15:13:07.000.492,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2016/08/11 15:13:07.000.597,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2016/08/11 15:13:07.000.562,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2016/08/11 15:13:07.000.529,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2016/08/11 15:13:09.000.396,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2016/08/11 15:13:10.000.002,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2016/08/11 15:15:53.000.970,D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas=</Transaction>
+    <Transaction>2016/08/11 15:18:04.000.353,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+    <Transaction>2016/08/11 15:20:06.000.988,=D:\Projetos\Constantes padrao\uConstantes_RetornoNFE.pas</Transaction>
+    <Transaction>2016/08/11 15:20:56.000.458,D:\Projetos\Constantes padrao\uConstantes_RetornoNFE.pas=</Transaction>
+    <Transaction>2016/08/11 15:21:07.000.243,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+  </Transactions>
+</BorlandProject>

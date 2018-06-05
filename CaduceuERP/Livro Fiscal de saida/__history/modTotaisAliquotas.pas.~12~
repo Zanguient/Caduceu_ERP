@@ -1,0 +1,142 @@
+unit modTotaisAliquotas;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Grids, modDBEXMaster, modDMCDSMaster, uFuncoes, FMTBcd, DB,
+  SqlExpr;
+
+type
+  TfrmTotaisAliquotas = class(TForm)
+    stgTotaisAliquotas: TStringGrid;
+    btnSair: TButton;
+    sqqTotalizaAliquotas: TSQLQuery;
+    procedure btnSairClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+    sWhere:string;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmTotaisAliquotas: TfrmTotaisAliquotas;
+
+implementation
+
+uses modLivroFiscalSaida;
+
+{$R *.dfm}
+
+procedure TfrmTotaisAliquotas.btnSairClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmTotaisAliquotas.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TfrmTotaisAliquotas.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(Caption);
+
+  stgTotaisAliquotas.Cols[0].Text := 'Alíquota';
+  stgTotaisAliquotas.Cols[1].Text := 'Total';
+
+  sqqTotalizaAliquotas.Close;
+  sqqTotalizaAliquotas.SQL.Clear;
+  sqqTotalizaAliquotas.SQL.Add('SELECT ALIQUOTA, COALESCE(SUM(BASE_CALCULO),0) AS TBC FROM LIVRO_SAIDA');
+
+  if (frmModLivrosFiscais.edtDataInicial.Text <> '  /  /    ') and (frmModLivrosFiscais.edtDataFinal.Text <> '  /  /    ') then
+    sWhere := 'WHERE DATA_DOCUMENTO BETWEEN ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataInicial.Text)))
+       + ' AND ' + QuotedStr(FormatDateTime('mm/dd/yy',StrtoDate(frmModLivrosFiscais.edtDataFinal.Text)))
+  else if frmModLivrosFiscais.cboPeriodoApuracao.Text <> '' then
+    sWhere :='WHERE MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalSaidaMES_ANO.Value)
+  else if frmModLivrosFiscais.edtPesquisa.Text <> '' then
+    sWhere :='WHERE NUMERO_DOCUMENTO = ' + QuotedStr(dmCDSMaster.cdsLivroFiscalSaidaNUMERO_DOCUMENTO.Value);
+
+  sqqTotalizaAliquotas.SQL.Add(sWhere);
+
+  sqqTotalizaAliquotas.SQL.Add('GROUP BY ALIQUOTA');
+
+  sqqTotalizaAliquotas.Open;
+
+  if not sqqTotalizaAliquotas.IsEmpty then
+  begin
+
+    while not sqqTotalizaAliquotas.Eof do
+    begin
+
+      stgTotaisAliquotas.Cells[0,stgTotaisAliquotas.RowCount-1] := Format('%8.8s',[FormatFloat('#0.00',sqqTotalizaAliquotas.FieldByName('ALIQUOTA').AsCurrency)])+' %';
+      stgTotaisAliquotas.Cells[1,stgTotaisAliquotas.RowCount-1] := Format('%15.15s',[FormatFloat('#0.00',sqqTotalizaAliquotas.FieldByName('TBC').AsCurrency)]);
+      if not sqqTotalizaAliquotas.Eof then
+        stgTotaisAliquotas.RowCount := stgTotaisAliquotas.RowCount + 1;
+
+      sqqTotalizaAliquotas.Next;
+
+    end;
+  end;
+
+  sqqTotalizaAliquotas.Close;
+
+  sqqTotalizaAliquotas.Close;
+  sqqTotalizaAliquotas.SQL.Clear;
+  sqqTotalizaAliquotas.SQL.Add('SELECT SUM(OUTRAS) AS OUTRAS FROM LIVRO_SAIDA');
+  sqqTotalizaAliquotas.SQL.Add(' WHERE MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalSaidaMES_ANO.Value));
+
+  sqqTotalizaAliquotas.Open;
+
+  if not sqqTotalizaAliquotas.IsEmpty then
+  begin
+
+    while not sqqTotalizaAliquotas.Eof do
+    begin
+
+      stgTotaisAliquotas.Cells[0,stgTotaisAliquotas.RowCount-1] := '  F';
+      stgTotaisAliquotas.Cells[1,stgTotaisAliquotas.RowCount-1] := Format('%15.15s',[FormatFloat('#,##0.00',sqqTotalizaAliquotas.FieldByName('OUTRAS').AsCurrency)]);
+      if not sqqTotalizaAliquotas.Eof then
+        stgTotaisAliquotas.RowCount := stgTotaisAliquotas.RowCount + 1;
+
+      sqqTotalizaAliquotas.Next;
+
+    end;
+  end;
+
+  sqqTotalizaAliquotas.Close;
+
+  sqqTotalizaAliquotas.Close;
+  sqqTotalizaAliquotas.SQL.Clear;
+  sqqTotalizaAliquotas.SQL.Add('SELECT SUM(ISENTAS_NAO_TRIBUTADAS) AS ISENTAS FROM LIVRO_SAIDA');
+  sqqTotalizaAliquotas.SQL.Add(' WHERE MES_ANO = ' + IntToStr(dmCDSMaster.cdsLivroFiscalSaidaMES_ANO.Value));
+
+  sqqTotalizaAliquotas.Open;
+
+  if not sqqTotalizaAliquotas.IsEmpty then
+  begin
+
+    while not sqqTotalizaAliquotas.Eof do
+    begin
+
+      stgTotaisAliquotas.Cells[0,stgTotaisAliquotas.RowCount-1] := '  I';
+      stgTotaisAliquotas.Cells[1,stgTotaisAliquotas.RowCount-1] := Format('%15.15s',[FormatFloat('#,##0.00',sqqTotalizaAliquotas.FieldByName('ISENTAS').AsCurrency)]);
+      if not sqqTotalizaAliquotas.Eof then
+        stgTotaisAliquotas.RowCount := stgTotaisAliquotas.RowCount + 1;
+
+      sqqTotalizaAliquotas.Next;
+
+    end;
+  end;
+
+  sqqTotalizaAliquotas.Close;
+
+
+end;
+
+end.

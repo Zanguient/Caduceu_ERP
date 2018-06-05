@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/06/03 16:02:19.000.516,=C:\Projetos\Delphi_XE6\GenesisAC\OrdemServico.todo</Transaction>
+    <Transaction>2016/06/03 16:34:16.000.921,=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/06/03 16:50:07.000.970,C:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modClienteAvulso.pas=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/06/03 16:50:07.000.970,C:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modClienteAvulso.dfm=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.dfm</Transaction>
+    <Transaction>2016/06/06 15:53:11.000.093,=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/06/06 15:56:13.000.686,C:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modEquipamentoAvulso.pas=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/06/06 15:56:13.000.687,C:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modEquipamentoAvulso.dfm=C:\Projetos\Delphi_XE6\GenesisAC\Unit3.dfm</Transaction>
+    <Transaction>2016/11/17 18:18:15.000.936,=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+    <Transaction>2016/11/17 18:18:45.000.372,D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modDeslocamentoOS.pas</Transaction>
+    <Transaction>2016/11/17 18:18:45.000.372,D:\Projetos\Delphi_XE6\GenesisAC\Unit1.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modDeslocamentoOS.dfm</Transaction>
+    <Transaction>2016/11/21 17:07:27.000.728,=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+    <Transaction>2016/11/21 17:08:18.000.237,D:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modIncluirEditarDeslocamentoOS.pas=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+    <Transaction>2016/11/21 17:08:18.000.237,D:\Projetos\Delphi_XE6\GenesisAC\Modulo Oredem de Servico\modIncluirEditarDeslocamentoOS.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.dfm</Transaction>
+  </Transactions>
+</BorlandProject>

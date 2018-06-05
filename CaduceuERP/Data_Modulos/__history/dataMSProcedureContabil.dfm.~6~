@@ -1,0 +1,74 @@
+object dmMSPContabil: TdmMSPContabil
+  OldCreateOrder = False
+  Height = 445
+  Width = 966
+  object fdspAtividadeEstadual: TFDStoredProc
+    Connection = dmDBEXMaster.fdcMaster
+    StoredProcName = 'MAN_TAB_ATIVIDADE_ESTADUAL'
+    Left = 56
+    Top = 8
+    ParamData = <
+      item
+        Position = 1
+        Name = 'IP_OPCAO'
+        DataType = ftInteger
+        ParamType = ptInput
+      end
+      item
+        Position = 2
+        Name = 'IP_CODIGO_ATIVIDADE_ESTADUAL'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 25
+      end
+      item
+        Position = 3
+        Name = 'IP_SIGLA_UF'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 2
+      end
+      item
+        Position = 4
+        Name = 'IP_DESCRICAO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 100
+      end>
+  end
+  object fdspAtividadeFederal: TFDStoredProc
+    Connection = dmDBEXMaster.fdcMaster
+    StoredProcName = 'MAN_TAB_ATIVIDADE_FEDERAL'
+    Left = 58
+    Top = 51
+    ParamData = <
+      item
+        Position = 1
+        Name = 'IP_OPCAO'
+        DataType = ftInteger
+        ParamType = ptInput
+      end
+      item
+        Position = 2
+        Name = 'IP_CODIGO_ATIV_FEDERAL'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 9
+      end
+      item
+        Position = 3
+        Name = 'IP_PERC_PART_ESAT'
+        DataType = ftFMTBcd
+        Precision = 15
+        NumericScale = 2
+        ParamType = ptInput
+      end
+      item
+        Position = 4
+        Name = 'IP_DESCRICAO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 200
+      end>
+  end
+end

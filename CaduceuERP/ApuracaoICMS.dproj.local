@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/10/19 08:57:56.000.372,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2016/10/19 08:58:01.000.293,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2016/10/19 08:58:01.000.411,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2016/10/19 08:58:01.000.380,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2016/10/19 08:58:01.000.349,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2016/10/19 08:58:03.000.079,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2016/10/19 08:58:03.000.425,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2016/10/19 08:58:19.000.744,D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas=</Transaction>
+    <Transaction>2016/10/19 08:58:49.000.722,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2016/10/19 08:59:06.000.350,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+  </Transactions>
+</BorlandProject>

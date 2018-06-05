@@ -1,0 +1,304 @@
+object frmItemServicoAvulso: TfrmItemServicoAvulso
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Inclus'#227'o de servi'#231'o avulso'
+  ClientHeight = 281
+  ClientWidth = 635
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object imgIncluir: TImage
+    Left = 575
+    Top = 9
+    Width = 51
+    Height = 44
+    Cursor = crHandPoint
+    Hint = 'Incluir'
+    ParentShowHint = False
+    Picture.Data = {
+      0954506E67496D61676589504E470D0A1A0A0000000D49484452000000280000
+      002808060000008CFEB86D000000097048597300000EC400000EC401952B0E1B
+      0000022E4944415478DAED985F2843511CC7CF65DBBB070F5E1079F0B64268E1
+      7DB118695EA4B82929BC4AF2E0C1F24AA9DB1EBC983C6C2D43F953A8A166F222
+      E4490A2F5A34C5D8E67B6AE676B37677EF3D769B9DFAF6FBDD73CEAFF3E97CCF
+      CE6E974B241244CF8D1303960C6EE68436ECB272F9078822E660584F1EA02008
+      71FAC0F33C1708045283168BA500280B5054A04F8BE500FAFD7E128944540139
+      1C0E6580BAB758F780A282B4167B3C1E128D46550129B6580E604E7750F716CB
+      01946BB1C9642276BB5D5B4051813E2DD63D605E9CC19C028A0A0AF7A022C03F
+      B2F813DA87B6A013E80E80B4AF0C8067AA01555ABCB66B78583E2F7E6A43DE0A
+      9527FB0DD07D1278F5B46BF6E05740D1966B6DF1DB3B21E316EF540BF23EA828
+      C37C0AC803F4E62F00DF42D1477E7863610679751675CF900D90872940161687
+      8B3E465CC6EB09A435D2312C9ECA1B7DD324168F4BA7BCD021CCBB62F523D9AC
+      F74EDD210EFF36280390B613CC6B666271E0F5D63AB62DF8901A5500D266D5E4
+      A2965CC067D83D37E27CBA55B3005C6161B11380B588360D006F590076037012
+      B14E0A23B7A1FE3B8DB138830D5860E97F016A6CB11D0B0C101D9FC139008611
+      9D1A00BA59581C04602F22FD3F35A804EC60F501D35CDD7E348A38A402304887
+      5901AE03B01F3104552900A45FA99A30EF8263F9111D56D317851DA8228B320A
+      D709B83DFAC0143009598AB008F5D0F5324C3F86060177F9DDC11C50046A4618
+      80E8CB6B65B2BB98FCBC51BB01B623ADFB025DEE461A5808A3B2000000004945
+      4E44AE426082}
+    ShowHint = True
+    Stretch = True
+    OnClick = imgIncluirClick
+  end
+  object imgSair: TImage
+    Left = 575
+    Top = 216
+    Width = 51
+    Height = 44
+    Cursor = crHandPoint
+    Hint = 'Sair'
+    ParentShowHint = False
+    Picture.Data = {
+      0954506E67496D61676589504E470D0A1A0A0000000D49484452000000280000
+      002808060000008CFEB86D000000097048597300000EC400000EC401952B0E1B
+      0000025C4944415478DA63FCFFFF3FC360068CA30E1C75E06075E02D15467620
+      5508C40940AC02C44C600D4C8C0CFFFF51C553FF80F80E102F00E27EB53BFF7F
+      12ED40A8E33603B12B86068803A91DEC7B80D8179B237139B01C487560F5116D
+      1C08029540077612EBC09B404A8DCE0EBC0D74A03AB10EFC03A498E9ECC07F40
+      07B210EB409C0EA0A10319800E641A190E0482FFB269A50CEF8FEC65F87CE52C
+      5E4B79B50D18046DDD191ECFEA22583C51CD81F279F5FFD972EAC1FCE741260C
+      9F2F617724C871921BCF83D9BFA635333C9C508FD7915471A05C66050347713B
+      8AFCF300138C9044761C0CFC9C50C3F0704A2B6D1DC86F6AC320BEFC30863C72
+      4862731C08BC8CB167F878E2106D1D088A623E139BFFE2CB302D7A0174E4FFBF
+      7FB13AEE75AC23C3FBE30718F001AAE662684832100308851C4D1C0862F39BD9
+      32600B4994908B0186DC09FC21473307127224298EA399037165081000A5C94F
+      97F097933475203EC7211C690A74E419FA3B9018C7C100BEC29C260EE4D1D4FF
+      8FB52801A6B97FFFFE32602F82088724551C080D390C79E40C812BE3100A49AA
+      3850A9B8858125B31A451E5B3987AD9CFC33AB83E15E57256D1D088A6295BA89
+      FF196372212187A7864009C9A553186E37E651A7B1705B8D89607B4FA9BC83E1
+      CDFEAD0C9F4EE1AF4DF88CAD19445C7C19EE75561032F2BFEAAD7FD4712095BA
+      9D18C6522D0407830371769A68E8C0BF44779A800EC4D9EDA4A1036F11DDED04
+      3A1094A2DBE9EC4050C71D63B0009703710E7DD0C881BB194819FA40722468F0
+      281188951990D224951CF81788EF02F17C0652078F06131875E0A803071A0000
+      506AF3C058DC002D0000000049454E44AE426082}
+    ShowHint = True
+    Stretch = True
+    OnClick = imgSairClick
+  end
+  object grpMensagem: TGroupBox
+    Left = 8
+    Top = 229
+    Width = 551
+    Height = 38
+    Caption = 'Mensagem'
+    TabOrder = 8
+    object lblMsg: TLabel
+      Left = 10
+      Top = 17
+      Width = 537
+      Height = 16
+      ParentCustomHint = False
+      AutoSize = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = [fsItalic]
+      ParentFont = False
+    end
+  end
+  object grpTecnicoResponsavel: TGroupBox
+    Left = 8
+    Top = 180
+    Width = 551
+    Height = 49
+    Caption = 'T'#233'cnico respons'#225'vel'
+    TabOrder = 7
+    object cboTecnicoResponsavel: TDBLookupComboBox
+      Left = 8
+      Top = 16
+      Width = 540
+      Height = 21
+      DataField = 'FUNCIONARIO'
+      DataSource = dmMSource.dtsItens_OS_Servico
+      KeyField = 'FUNCIONARIO'
+      ListField = 'NOME'
+      ListSource = dmMSource.dtsFuncionarios
+      TabOrder = 0
+      OnKeyPress = dtpInicioKeyPress
+    end
+  end
+  object rdpFormaCobrancaServico: TDBRadioGroup
+    Left = 8
+    Top = 84
+    Width = 137
+    Height = 94
+    Caption = 'Forma de cobran'#231'a'
+    DataField = 'TIPO_COBRANCA'
+    DataSource = dmMSource.dtsItens_OS_Servico
+    Items.Strings = (
+      'por hora'
+      'por servi'#231'o')
+    TabOrder = 2
+    Values.Strings = (
+      '0'
+      '1')
+    OnClick = rdpFormaCobrancaServicoClick
+  end
+  object GroupBox5: TGroupBox
+    Left = 147
+    Top = 84
+    Width = 186
+    Height = 47
+    Caption = 'In'#237'cio'
+    TabOrder = 3
+    object dtpInicio: TJvDBDatePickerEdit
+      Left = 7
+      Top = 20
+      Width = 89
+      Height = 21
+      AllowNoDate = True
+      DataField = 'DATA_INICIO'
+      DataSource = dmMSource.dtsItens_OS_Servico
+      TabOrder = 0
+      OnExit = dtpInicioExit
+      OnKeyPress = dtpInicioKeyPress
+    end
+    object dtpHoraInicio: TJvDBDateTimePicker
+      Left = 101
+      Top = 20
+      Width = 77
+      Height = 21
+      Date = 41982.560202997690000000
+      Format = 'HH:mm'
+      Time = 41982.560202997690000000
+      Kind = dtkTime
+      TabOrder = 1
+      OnKeyPress = dtpInicioKeyPress
+      DropDownDate = 41982.000000000000000000
+      DataField = 'HORA_INICIO'
+      DataSource = dmMSource.dtsItens_OS_Servico
+    end
+  end
+  object grpQuantidadeServico: TGroupBox
+    Left = 335
+    Top = 84
+    Width = 93
+    Height = 94
+    Caption = 'Quantidade'
+    Enabled = False
+    TabOrder = 5
+    object edtQuantidadeServico: TDBEdit
+      Left = 10
+      Top = 35
+      Width = 78
+      Height = 21
+      DataField = 'QUANTIDADE'
+      DataSource = dmMSource.dtsItens_OS_Servico
+      TabOrder = 0
+      OnEnter = memServicoEnter
+      OnKeyDown = edtValorServicoKeyDown
+      OnKeyPress = edtValorServicoKeyPress
+    end
+  end
+  object grpCustoTotal: TGroupBox
+    Left = 431
+    Top = 84
+    Width = 130
+    Height = 94
+    Caption = 'Custo total'
+    Enabled = False
+    TabOrder = 6
+    object edtCustoTotal: TDBEdit
+      Left = 10
+      Top = 35
+      Width = 103
+      Height = 21
+      DataField = 'CUSTO_TOTAL'
+      DataSource = dmMSource.dtsItens_OS_Servico
+      TabOrder = 0
+      OnEnter = memServicoEnter
+      OnKeyDown = edtValorServicoKeyDown
+      OnKeyPress = edtValorServicoKeyPress
+    end
+  end
+  object grpServicoExecutado: TGroupBox
+    Left = 8
+    Top = 1
+    Width = 436
+    Height = 72
+    Caption = 'Servi'#231'o executado'
+    TabOrder = 0
+    object memServico: TDBMemo
+      Left = 2
+      Top = 15
+      Width = 432
+      Height = 55
+      Align = alClient
+      DataField = 'DESCRICAO'
+      DataSource = dmMSource.dtsItens_OS_Servico
+      TabOrder = 0
+      OnEnter = memServicoEnter
+      OnExit = memServicoEnter
+      ExplicitLeft = 10
+      ExplicitTop = 17
+      ExplicitWidth = 538
+      ExplicitHeight = 46
+    end
+  end
+  object grpValorServico: TGroupBox
+    Left = 448
+    Top = 1
+    Width = 113
+    Height = 72
+    Caption = 'Valor'
+    TabOrder = 1
+    object edtValorServico: TDBEdit
+      Left = 8
+      Top = 29
+      Width = 99
+      Height = 21
+      DataField = 'VALOR_CUSTO'
+      DataSource = dmMSource.dtsItens_OS_Servico
+      TabOrder = 0
+      OnEnter = memServicoEnter
+      OnKeyDown = edtValorServicoKeyDown
+      OnKeyPress = edtValorServicoKeyPress
+    end
+  end
+  object GroupBox6: TGroupBox
+    Left = 147
+    Top = 131
+    Width = 186
+    Height = 47
+    Caption = 'T'#233'rmino'
+    TabOrder = 4
+    object dtpFim: TJvDBDatePickerEdit
+      Left = 7
+      Top = 16
+      Width = 89
+      Height = 21
+      AllowNoDate = True
+      DataField = 'DATA_FIM'
+      DataSource = dmMSource.dtsItens_OS_Servico
+      TabOrder = 0
+      OnKeyPress = dtpInicioKeyPress
+    end
+    object dtpHoraFim: TJvDBDateTimePicker
+      Left = 102
+      Top = 16
+      Width = 77
+      Height = 21
+      Date = 41982.560202997690000000
+      Format = 'HH:mm'
+      Time = 41982.560202997690000000
+      Kind = dtkTime
+      TabOrder = 1
+      OnKeyPress = dtpInicioKeyPress
+      DropDownDate = 41982.000000000000000000
+      DataField = 'HORA_FIM'
+      DataSource = dmMSource.dtsItens_OS_Servico
+    end
+  end
+end

@@ -1,0 +1,282 @@
+unit modPreVenda_DJPDV;
+
+interface
+
+uses SysUtils, Windows, Forms, IniFiles, Classes, StrUtils, CheckLst, Db,
+  variants, Dialogs;
+
+function GerarPreVendaDJPDV(sArquivo, sPath: string; iFilial: integer):boolean;
+
+implementation
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure, uConstantes_Padrao, uFuncoes;
+
+function GerarPreVendaDJPDV(sArquivo, sPath: string; iFilial: integer):boolean;
+var
+  txtArq: TextFile;
+  sLinha, sBarras, sBarras_Temp, sDescricao: string;
+begin
+
+  try
+
+    FormatSettings.DecimalSeparator := '.';
+
+    AssignFile(txtArq, ExtractFilepath(Application.ExeName) + 'Temp\' + sArquivo);
+    ReWrite(txtArq);
+
+    sLinha := 'PRE|' + IntToStr(dmMProvider.cdsPedidoZeusPEDIDO.Value) + '|'
+                + FormatDateTime('DDMMYYYY',dmMProvider.cdsPedidoZeusEMISSAO.Value) + FormatDateTime('HHMMSS',dmMProvider.cdsPedidoZeusHORARIO_PEDIDO.Value) + '|';
+    if dmMProvider.cdsPedidoZeusCLIENTE.Value > 0 then
+      sLinha := sLinha + IntToStr(dmMProvider.cdsPedidoZeusCLIENTE.Value) + '|'
+                  + Trim(dmMProvider.cdsPedidoZeusRAZAOSOCIAL.Value) + '|'
+                  + dmMProvider.cdsPedidoZeusCNPJ.Value + '|0|'
+
+    else
+      sLinha := sLinha + '0|||0|';
+
+    sLinha := sLinha + FormatFloat('#,##0.00',dmMProvider.cdsPedidoZeusTOTAL_MERCADORIAS.Value) + '|'
+                + FormatFloat('#,##0.00',dmMProvider.cdsPedidoZeusVALOR_DESCONTO.Value) + '|'
+                + FormatFloat('#,##0.00',dmMProvider.cdsPedidoZeusVALOR_ACRESCIMO.Value) + '|'
+                + FormatFloat('#,##0.000', dmMProvider.cdsItemPedZeus.RecordCount) + '|'
+                + IntToStr(dmMProvider.cdsPedidoZeusVENDEDOR.Value) + '|'
+                + Format('%-200.200s',[dmMProvider.cdsPedidoZeusOBSERVACOES.Value]) + '||';
+
+    if dmMProvider.cdsPedidoZeusCLIENTE.Value > 0 then
+    begin
+
+      sLinha := sLinha + dmMProvider.cdsPedidoZeusENDERECOENTREGA.Value + '|';
+
+      if dmMProvider.cdsPedidoZeusNUMEROENTREGA.Value > 0 then
+        sLinha := sLinha + IntToStr(dmMProvider.cdsPedidoZeusNUMEROENTREGA.Value) + '|'
+      else
+        sLinha := sLinha + '0|';
+
+      sLinha := sLinha + dmMProvider.cdsPedidoZeusCOMPLEMENTO.Value + '|'
+                  + dmMProvider.cdsPedidoZeusBAIRROENTREGA.Value + '|'
+                  + dmMProvider.cdsPedidoZeusCIDADE_ENTREGA.Value + '|'
+                  + dmMProvider.cdsPedidoZeusESTADOENTREGA.Value + '|'
+                  + dmMProvider.cdsPedidoZeusCEPENTREGA.Value + '|9|';
+
+    end
+    else
+      sLinha := sLinha + '|||||||9|';
+
+    WriteLn(txtArq, sLinha);
+
+    dmMProvider.cdsItemPedZeus.First;
+
+    case dmMProvider.cdsParamIntegraPDVTIPO_CODIGO_INTEGRACAO.Value of
+      0:begin
+
+          while not dmMProvider.cdsItemPedZeus.Eof do
+          begin
+
+            dmMProvider.cdsBarras.Close;
+            dmMProvider.cdsBarras.ProviderName := 'dspBarras';
+
+            dmDBEXMaster.fdqBarras.SQL.Clear;
+            dmDBEXMaster.fdqBarras.SQL.Add('select * from barras');
+            dmDBEXMaster.fdqBarras.SQL.Add('where produto = ' + IntToStr(dmMProvider.cdsItemPedZeusPRODUTO.Value));
+
+            dmMProvider.cdsBarras.Open;
+            dmMProvider.cdsBarras.ProviderName := '';
+
+            sBarras_Temp  := dmMProvider.cdsBarrasBARRAS.Value;
+
+            case dmMProvider.cdsConfiguracoesUTILIZAR_DV_EXPORTACAO_PDV.Value of
+              0:begin
+
+                  if dmMProvider.cdsBarrasGERADO.Value = 1 then
+                  begin
+
+                    if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                      sBarras := Format('%-20.20s',[FormatFloat('000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+                    else
+                      sBarras := FormatFloat('00000000000000000000',StrToFloat(Copy(sBarras_Temp, 1, 12)));
+
+                  end
+                  else
+                    sBarras := FormatFloat('00000000000000000000', StrToFloat(sBarras_Temp))
+
+                end;
+              else
+              begin
+
+                if dmMProvider.cdsBarrasPESADO.Value = 1 then
+                  sBarras := Format('%-20.20s',[FormatFloat('000000',StrToFloat(Copy(sBarras_Temp, 1, 12)))])
+                else
+                  sBarras := FormatFloat('00000000000000000000', StrToFloat(sBarras_Temp));
+
+              end;
+
+            end;
+
+            sLinha := 'PIT|' + IntToStr(dmMProvider.cdsItemPedZeus.RecNo) + '|'
+                        + FormatFloat('00000000000000000000',dmMProvider.cdsItemPedZeusPRODUTO.Value) + '|'
+                        + FormatFloat('#,##0.000',dmMProvider.cdsItemPedZeusQUANTIDADE.Value) + '|'
+                        + FormatFloat('#,##0.000',dmMProvider.cdsItemPedZeusVALOR_UNITARIO.Value) + '|'
+                        + FormatFloat('#,##0.00',dmMProvider.cdsItemPedZeusVALOR_DESCONTO.Value) + '|'
+                        + FormatFloat('#,##0.00',dmMProvider.cdsItemPedZeusVALOR_ACRESCIMO.Value) + '|'
+                        + FormatFloat('#,##0.000',dmMProvider.cdsItemPedZeusVALOR_TOTAL_ITEM.Value) + '|'
+                        + sBarras + '|'
+                        + dmMProvider.cdsItemPedZeusDESCRICAO.Value + '|'
+                        + '|'
+                        + dmMProvider.cdsItemPedZeusUNIDADE.Value + '|'
+                        + dmMProvider.cdsItemPedZeusCOD_TRIBUTACAO.Value + '|';
+
+            if dmMProvider.cdsItemPedZeusALIQUOTA_ICMS.Value > 0 then
+              sLinha := sLinha + FormatFloat('#0.00',dmMProvider.cdsItemPedZeusALIQUOTA_ICMS.Value) + '|N|N|N|N|0||'
+            else
+              sLinha := sLinha + '0|N|N|N|N|0||';
+
+            sLinha := sLinha + IntToStr(dmMProvider.cdsPedidoZeusVENDEDOR.Value) + '|'
+                        + dmMProvider.cdsPedidoZeusNOME.Value + '|'
+                        + '|||0|0|0|0|0|0|0|0|';
+
+            dmMProvider.cdsPesqProdutos.Close;
+            dmMProvider.cdsPesqProdutos.ProviderName := 'dspPesqProdutos';
+
+            dmDBEXMaster.fdqPesqProdutos.SQL.Clear;
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('SELECT PRO.*, PF.*, UND.PERMITE_VENDA_FRACIONADA  as FRACAO FROM PRODUTO PRO');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('JOIN PRODUTOFILIAL PF');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('ON(PF.PRODUTO = PRO.PRODUTO)');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('JOIN UNIDADE_MEDIDA UND');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('ON(UND.UNIDADE = PRO.UNIDADE)');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('where pro.produto = ' + IntToStr(dmMProvider.cdsItemPedZeusPRODUTO.Value));
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('and pf.filial= '+ InttoStr(dmDBEXMaster.iIdFilial));
+
+            dmMProvider.cdsPesqProdutos.Open;
+            dmMProvider.cdsPesqProdutos.ProviderName := '';
+
+            sLinha := sLinha + dmMProvider.cdsPesqProdutosNCM.Value + '|N|0|'
+                        + dmMProvider.cdsPesqProdutosCEST.Value + '|N|0|';
+
+            WriteLn(txtArq, sLinha);
+
+            dmMProvider.cdsItemPedZeus.Next;
+
+          end;
+
+        end;
+      1:begin
+
+          while not dmMProvider.cdsItemPedZeus.Eof do
+          begin
+
+            sLinha := 'PIT|' + IntToStr(dmMProvider.cdsItemPedZeus.RecNo) + '|'
+                        + FormatFloat('000000',dmMProvider.cdsItemPedZeusPRODUTO.Value) + '|'
+                        + FormatFloat('#,##0.000',dmMProvider.cdsItemPedZeusQUANTIDADE.Value) + '|'
+                        + FormatFloat('#,##0.000',dmMProvider.cdsItemPedZeusVALOR_UNITARIO.Value) + '|'
+                        + FormatFloat('#,##0.00',dmMProvider.cdsItemPedZeusVALOR_DESCONTO.Value) + '|'
+                        + FormatFloat('#,##0.00',dmMProvider.cdsItemPedZeusVALOR_ACRESCIMO.Value) + '|'
+                        + FormatFloat('#,##0.000',dmMProvider.cdsItemPedZeusVALOR_TOTAL_ITEM.Value) + '|'
+                        + sBarras + '|'
+                        + dmMProvider.cdsItemPedZeusDESCRICAO.Value + '|'
+                        + '|'
+                        + dmMProvider.cdsItemPedZeusUNIDADE.Value + '|'
+                        + dmMProvider.cdsItemPedZeusCOD_TRIBUTACAO.Value + '|';
+
+            if dmMProvider.cdsItemPedZeusALIQUOTA_ICMS.Value > 0 then
+              sLinha := sLinha + FormatFloat('#0.00',dmMProvider.cdsItemPedZeusALIQUOTA_ICMS.Value) + '|N|N|N|N|0||'
+            else
+              sLinha := sLinha + '0|N|N|N|N|0||';
+
+            sLinha := sLinha + IntToStr(dmMProvider.cdsPedidoZeusVENDEDOR.Value) + '|'
+                        + dmMProvider.cdsPedidoZeusNOME.Value + '|'
+                        + '|||0|0|0|0|0|0|0|0|';
+
+            dmMProvider.cdsPesqProdutos.Close;
+            dmMProvider.cdsPesqProdutos.ProviderName := 'dspPesqProdutos';
+
+            dmDBEXMaster.fdqPesqProdutos.SQL.Clear;
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('SELECT PRO.*, PF.*, UND.PERMITE_VENDA_FRACIONADA  as FRACAO FROM PRODUTO PRO');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('JOIN PRODUTOFILIAL PF');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('ON(PF.PRODUTO = PRO.PRODUTO)');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('JOIN UNIDADE_MEDIDA UND');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('ON(UND.UNIDADE = PRO.UNIDADE)');
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('where pro.produto = ' + IntToStr(dmMProvider.cdsItemPedZeusPRODUTO.Value));
+            dmDBEXMaster.fdqPesqProdutos.SQL.Add('and pf.filial= '+ InttoStr(dmDBEXMaster.iIdFilial));
+
+            dmMProvider.cdsPesqProdutos.Open;
+            dmMProvider.cdsPesqProdutos.ProviderName := '';
+
+            sLinha := sLinha + dmMProvider.cdsPesqProdutosNCM.Value + '|N|0|'
+                        + dmMProvider.cdsPesqProdutosCEST.Value + '|N|0|';
+
+            WriteLn(txtArq, sLinha);
+
+            dmMProvider.cdsItemPedZeus.Next;
+
+          end;
+
+        end;
+
+    end;
+
+
+    if not (dmMProvider.cdsEndEntregaPedZeus.IsEmpty) then
+    begin
+
+      sLinha := 'PEN|' + dmMProvider.cdsEndEntregaPedZeusENDERECO.Value + '|';
+
+      if dmMProvider.cdsEndEntregaPedZeusNUMERO.Value > 0 then
+        sLinha := sLinha + IntToStr(dmMProvider.cdsEndEntregaPedZeusNUMERO.Value) + '|'
+      else
+        sLinha := sLinha + '0|';
+
+      sLinha := sLinha + dmMProvider.cdsEndEntregaPedZeusCOMPLEMENTO.Value + '|'
+                  + dmMProvider.cdsEndEntregaPedZeusBAIRRO.Value + '|'
+                  + dmMProvider.cdsEndEntregaPedZeusCIDADE.Value + '|'
+                  + dmMProvider.cdsEndEntregaPedZeusESTADO.Value + '|'
+                  + dmMProvider.cdsEndEntregaPedZeusCEP.Value + '|'
+                  + dmMProvider.cdsPedidoZeusOBSERVACOES.Value + '|'
+                  + FormatDateTime('DDMMYYYY', dmMProvider.cdsPedidoZeusDATA_ENTREGA.Value) + FormatDateTime('HHMMSS', dmMProvider.cdsPedidoZeusHORARIO_PEDIDO.Value) + '|';
+
+      WriteLn(txtArq, sLinha);
+
+    end;
+
+    dmMProvider.cdsFinalizadoraPedZeus.First;
+
+    while not dmMProvider.cdsFinalizadoraPedZeus.eof do
+    begin
+
+      sLinha := 'PFP|' + dmMProvider.cdsFinalizadoraPedZeusCOD_FINALIZADORA.Value + '|'
+                  + FormatFloat('#,##0.00',dmMProvider.cdsFinalizadoraPedZeusVALOR_FINALIZADO.Value) + '|';
+
+      dmMProvider.cdsFinalizadoraPedZeus.Next;
+      WriteLn(txtArq, sLinha);
+
+    end;
+
+    CloseFile(txtArq);
+
+    FormatSettings.DecimalSeparator := ',';
+
+    if DirectoryExists(sPath) then
+      CopyFile(PChar(ExtractFilepath(Application.ExeName) + 'Temp\' + sArquivo), PChar(sPath + sArquivo), False)
+    else
+    begin
+
+      Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario + #13 + #13 + 'Caminho ' + sPath
+                              + ', não encontrado. Favor verificar!'), 'Atenção!', mb_IconWarning + mb_Ok);
+
+      Result := False;
+      exit;
+
+    end;
+
+    Result := True;
+
+  except
+  begin
+
+    FormatSettings.DecimalSeparator := ',';
+    Result := False;
+
+  end;
+
+  end;
+
+end;
+end.

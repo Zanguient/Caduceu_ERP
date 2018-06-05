@@ -1,0 +1,267 @@
+object dmMAtualizacao: TdmMAtualizacao
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
+  Height = 466
+  Width = 679
+  object fdqAtualizacao: TFDQuery
+    Connection = fdcAtualizacao
+    SQL.Strings = (
+      'select * from ATUALIZACAO')
+    Left = 40
+    Top = 16
+  end
+  object fdcAtualizacao: TFDConnection
+    Params.Strings = (
+      
+        'Database=D:\Aplicativos\GenesisAC\BBD\FDB_Atualizacao\ATUALIZACA' +
+        'O.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'CharacterSet=ISO8859_1'
+      'DriverID=FB')
+    LoginPrompt = False
+    Left = 607
+    Top = 12
+  end
+  object cdsAtualizacao: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspAtualizacao'
+    Left = 264
+    Top = 16
+    object cdsAtualizacaoNOME_ARQUIVO_ORIGINAL: TStringField
+      FieldName = 'NOME_ARQUIVO_ORIGINAL'
+      Size = 500
+    end
+    object cdsAtualizacaoNOME_ARQUIVO_COMPACTADO: TStringField
+      FieldName = 'NOME_ARQUIVO_COMPACTADO'
+      Size = 100
+    end
+    object cdsAtualizacaoDATA_ARQUIVO: TDateField
+      FieldName = 'DATA_ARQUIVO'
+    end
+    object cdsAtualizacaoVERSAO_ARQUIVO: TStringField
+      FieldName = 'VERSAO_ARQUIVO'
+    end
+    object cdsAtualizacaoTAMANHO_ARQUIVO: TStringField
+      FieldName = 'TAMANHO_ARQUIVO'
+      Size = 30
+    end
+    object cdsAtualizacaoMD5_ARQQUIVO: TStringField
+      FieldName = 'MD5_ARQQUIVO'
+      Size = 300
+    end
+    object cdsAtualizacaoCONTEUDO_ARQUIVO: TBlobField
+      FieldName = 'CONTEUDO_ARQUIVO'
+    end
+    object cdsAtualizacaoOBSERVACAO_ARQUIVO: TMemoField
+      FieldName = 'OBSERVACAO_ARQUIVO'
+      BlobType = ftMemo
+    end
+  end
+  object dtsAtualizacao: TDataSource
+    DataSet = cdsAtualizacao
+    Left = 376
+    Top = 16
+  end
+  object dspAtualizacao: TDataSetProvider
+    DataSet = fdqAtualizacao
+    Left = 152
+    Top = 16
+  end
+  object FDPhysFBDriverLink1: TFDPhysFBDriverLink
+    Left = 608
+    Top = 120
+  end
+  object FDGUIxWaitCursor1: TFDGUIxWaitCursor
+    Provider = 'Forms'
+    Left = 408
+    Top = 88
+  end
+  object fdspArquivoAtualizacao: TFDStoredProc
+    Connection = fdcAtualizacao
+    StoredProcName = 'MAN_TAB_ATUALIZACAO'
+    Left = 480
+    Top = 16
+    ParamData = <
+      item
+        Position = 1
+        Name = 'IP_OPCAO'
+        DataType = ftSmallint
+        ParamType = ptInput
+      end
+      item
+        Position = 2
+        Name = 'IP_NOME_ARQUIVO_ORIGINAL'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 500
+      end
+      item
+        Position = 3
+        Name = 'IP_NOME_ARQUIVO_COMPACTADO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 100
+      end
+      item
+        Position = 4
+        Name = 'IP_DATA_ARQUIVO'
+        DataType = ftDate
+        ParamType = ptInput
+      end
+      item
+        Position = 5
+        Name = 'IP_VERSAO_ARQUIVO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 20
+      end
+      item
+        Position = 6
+        Name = 'IP_TAMANHO_ARQUIVO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 30
+      end
+      item
+        Position = 7
+        Name = 'IP_MD5_ARQUIVO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 300
+      end
+      item
+        Position = 8
+        Name = 'IP_CONTEUDO_ARQUIVO'
+        DataType = ftBlob
+        ParamType = ptInput
+      end
+      item
+        Position = 9
+        Name = 'IP_OBSERVACAO'
+        DataType = ftMemo
+        ParamType = ptInput
+      end>
+  end
+  object fdqWSAtualizacao: TFDQuery
+    Connection = fdcWS
+    SQL.Strings = (
+      'select * from ATUALIZACAO'
+      'where status = 0')
+    Left = 40
+    Top = 192
+  end
+  object cdsWSAtualizacao: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspWSAtualizacao'
+    OnNewRecord = cdsWSAtualizacaoNewRecord
+    Left = 256
+    Top = 192
+    object cdsWSAtualizacaoDATA_ATUALIZACAO: TDateField
+      FieldName = 'DATA_ATUALIZACAO'
+      Required = True
+    end
+    object cdsWSAtualizacaoARQUIVO_SCRIPT: TStringField
+      FieldName = 'ARQUIVO_SCRIPT'
+      Size = 200
+    end
+    object cdsWSAtualizacaoBANCO_ATUALIZACAO: TStringField
+      FieldName = 'BANCO_ATUALIZACAO'
+      Size = 200
+    end
+    object cdsWSAtualizacaoMD5_SCRIPT: TStringField
+      FieldName = 'MD5_SCRIPT'
+      Size = 1024
+    end
+    object cdsWSAtualizacaoMD5_BANCO: TStringField
+      FieldName = 'MD5_BANCO'
+      Size = 1024
+    end
+    object cdsWSAtualizacaoSTATUS: TSmallintField
+      FieldName = 'STATUS'
+      Required = True
+    end
+  end
+  object dtsWSAtualizacao: TDataSource
+    DataSet = cdsWSAtualizacao
+    Left = 368
+    Top = 192
+  end
+  object dspWSAtualizacao: TDataSetProvider
+    DataSet = fdqWSAtualizacao
+    Left = 144
+    Top = 192
+  end
+  object fdspWSAtualizacao: TFDStoredProc
+    Connection = fdcWS
+    StoredProcName = 'MAN_TAB_ATUALIZACAO'
+    Left = 464
+    Top = 192
+    ParamData = <
+      item
+        Position = 1
+        Name = 'IP_OPCAO'
+        DataType = ftSmallint
+        ParamType = ptInput
+      end
+      item
+        Position = 2
+        Name = 'IP_DATA_ATUALIZACAO'
+        DataType = ftDate
+        ParamType = ptInput
+      end
+      item
+        Position = 3
+        Name = 'IP_ARQUIVO_SCRIPT'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 200
+      end
+      item
+        Position = 4
+        Name = 'IP_BANCO_ATUALIZACAO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 200
+      end
+      item
+        Position = 5
+        Name = 'IP_MD5_SCRIPT'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 1024
+      end
+      item
+        Position = 6
+        Name = 'IP_MD5_BANCO'
+        DataType = ftString
+        ParamType = ptInput
+        Size = 1024
+      end
+      item
+        Position = 7
+        Name = 'IP_STATUS'
+        DataType = ftSmallint
+        ParamType = ptInput
+      end>
+  end
+  object fdcWS: TFDConnection
+    Params.Strings = (
+      'Database=D:\Aplicativos\Genesis Cloud\GENESISSAT_WS.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'CharacterSet=ISO8859_1'
+      'DriverID=FB')
+    LoginPrompt = False
+    Left = 607
+    Top = 228
+  end
+  object fdtAtualizacao: TFDTransaction
+    Connection = fdcAtualizacao
+    Left = 608
+    Top = 64
+  end
+end

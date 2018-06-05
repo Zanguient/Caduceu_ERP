@@ -1,0 +1,70 @@
+﻿object frmAutomação: TfrmAutomação
+  BorderIcons = [biMinimize, biMaximize]
+  BorderStyle = bsSingle
+  Caption = 'Integra'#231#227'o entre aplicativos'
+  ClientHeight = 335
+  ClientWidth = 557
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Position = poScreenCenter
+  Left = 0
+  Top = 0
+  PixelsPerInch = 96
+  TextHeight = 13
+  object cpgAutomacao: TCategoryPanelGroup
+    HeaderFont.Charset = DEFAULT_CHARSET
+    HeaderFont.Color = clWindowText
+    HeaderFont.Height = -11
+    HeaderFont.Name = 'Tahoma'
+    HeaderFont.Style = []
+    Height = 335
+    TabOrder = 0
+    VertScrollBar.Tracking = True
+    Left = 0
+    Top = 0
+    object pnlExportação: TCategoryPanel
+      Caption = 'Exporta'#231#227'o'
+      TabOrder = 0
+      Top = 0
+      ExplicitWidth = 181
+      object CategoryButtons1: TCategoryButtons
+        Align = alClient
+        ButtonFlow = cbfVertical
+        Height = 174
+        Categories = <
+          item
+            Color = 16053492
+            Collapsed = False
+            Items = <>
+          end
+          item
+            Color = 15395839
+            Collapsed = False
+            Items = <>
+          end>
+        RegularButtonColor = 15660791
+        SelectedButtonColor = 13361893
+        TabOrder = 0
+        Width = 196
+        Left = 0
+        Top = 0
+        ExplicitLeft = 64
+        ExplicitTop = 48
+        ExplicitWidth = 100
+        ExplicitHeight = 100
+      end
+    end
+    object pnlImportacao: TCategoryPanel
+      Caption = 'Importacao'
+      Collapsed = True
+      Height = 30
+      TabOrder = 1
+      Top = 200
+      ExplicitWidth = 181
+    end
+  end
+end

@@ -1,0 +1,245 @@
+unit dataMDJPdv;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.FB,
+  FireDAC.Phys.FBDef, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
+  FireDAC.Phys.IBBase, FireDAC.Comp.UI, FireDAC.Stan.Param, FireDAC.DatS,
+  FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, Datasnap.DBClient,
+  Datasnap.Provider;
+
+type
+  TdmMDJPdv = class(TDataModule)
+    fdcDJPdv: TFDConnection;
+    fdwDJPdv: TFDGUIxWaitCursor;
+    fddFBDJPdv: TFDPhysFBDriverLink;
+    fdqPesqProdutoDJPdv: TFDQuery;
+    fdqReducaoZ: TFDQuery;
+    dspReducaoZ: TDataSetProvider;
+    cdsReducaoZ: TClientDataSet;
+    fdqItemCupom: TFDQuery;
+    dspItemCupom: TDataSetProvider;
+    cdsItemCupom: TClientDataSet;
+    cdsItemCupomCODLOJA: TSmallintField;
+    cdsItemCupomCODTERMINAL: TSmallintField;
+    cdsItemCupomCODTURNO: TSmallintField;
+    cdsItemCupomCOO: TIntegerField;
+    cdsItemCupomSEQUENCIA: TSmallintField;
+    cdsItemCupomCODPRODUTO: TIntegerField;
+    cdsItemCupomQTD: TCurrencyField;
+    cdsItemCupomPRECO_UNITARIO: TBCDField;
+    cdsItemCupomDESCONTO_ACRESCIMO: TBCDField;
+    cdsItemCupomSITU_TRIBUTA: TStringField;
+    cdsItemCupomICMS: TCurrencyField;
+    cdsItemCupomCANCELADO: TStringField;
+    cdsItemCupomHASH: TLargeintField;
+    cdsItemCupomSEQ_ALIQ_ECF: TSmallintField;
+    cdsItemCupomDESCADICPROD: TStringField;
+    cdsItemCupomCODVENDEDOR: TStringField;
+    cdsItemCupomCONTADOR: TIntegerField;
+    cdsItemCupomVALIQFED: TBCDField;
+    cdsItemCupomID_MOTIVO_CANC: TSmallintField;
+    cdsItemCupomID_MOTIVO_DESC: TSmallintField;
+    cdsItemCupomVALIQEST: TSingleField;
+    cdsItemCupomVALIQMUN: TSingleField;
+    cdsItemCupomCONTROLA_ESTOQUE: TSmallintField;
+    fdqCupom: TFDQuery;
+    dspCupom: TDataSetProvider;
+    cdsCupom: TClientDataSet;
+    cdsCupomCODLOJA: TSmallintField;
+    cdsCupomCODTERMINAL: TSmallintField;
+    cdsCupomCODTURNO: TSmallintField;
+    cdsCupomCOO: TIntegerField;
+    cdsCupomDENOMINACAO: TStringField;
+    cdsCupomCONTADOR: TIntegerField;
+    cdsCupomDATAHORA_INICIO: TSQLTimeStampField;
+    cdsCupomDATAHORA_FIM: TSQLTimeStampField;
+    cdsCupomDESCRICAO: TStringField;
+    cdsCupomCODCLIENTE: TIntegerField;
+    cdsCupomCODAUTORIZADO: TIntegerField;
+    cdsCupomDOCUMENTO_CLI: TStringField;
+    cdsCupomNOME_CLI: TStringField;
+    cdsCupomSUBTOTAL: TBCDField;
+    cdsCupomDESCONTO_ACRESCIMO: TBCDField;
+    cdsCupomTOTAL_PAGO: TBCDField;
+    cdsCupomTROCO: TBCDField;
+    cdsCupomCODPLANOPAGTO: TStringField;
+    cdsCupomCANCELADO: TStringField;
+    cdsCupomTRUNCA: TStringField;
+    cdsCupomCODEXPORTACAO: TIntegerField;
+    cdsCupomENTREGAR: TStringField;
+    cdsCupomNUMGNF: TIntegerField;
+    cdsCupomHASH: TLargeintField;
+    cdsCupomVIMPALIQFED: TBCDField;
+    cdsCupomID_MOTIVO_CANC: TSmallintField;
+    cdsCupomID_MOTIVO_DESC: TSmallintField;
+    cdsCupomOBS: TMemoField;
+    cdsCupomNOTA_REF_TIPO: TStringField;
+    cdsCupomNOTA_REF_SERIE: TIntegerField;
+    cdsCupomNOTA_REF_NUMERO: TIntegerField;
+    cdsCupomVIMPALIQEST: TSingleField;
+    cdsCupomVIMPALIQMUN: TSingleField;
+    cdsCupomNOTA_REF_TPAMB: TSmallintField;
+    cdsCupomNOTA_REF_TPNF: TSmallintField;
+    cdsCupomDFE_CHAVE: TStringField;
+    cdsCupomDFE_PROTOCOLO: TStringField;
+    cdsCupomDFE_MODELO: TStringField;
+    cdsCupomIDFATURA: TLargeintField;
+    fdqTerminal: TFDQuery;
+    fdqTerminalCODLOJA: TSmallintField;
+    fdqTerminalCODTERMINAL: TSmallintField;
+    fdqTerminalCODEXTERNO: TStringField;
+    fdqTerminalDESCRICAO: TStringField;
+    fdqTerminalESTADO: TStringField;
+    fdqTerminalENDERECO_VNC: TStringField;
+    fdqTerminalIP_ATUAL: TStringField;
+    fdqTerminalCMD_SERV_TER: TStringField;
+    fdqTerminalMSG_TER_SERV: TStringField;
+    fdqTerminalCMD_TER_SERV: TStringField;
+    fdqTerminalMSG_SERV_TER: TStringField;
+    fdqTerminalULT_CONTATO: TSQLTimeStampField;
+    fdqTerminalULT_ATUALIZA: TSQLTimeStampField;
+    fdqTerminalSKIN: TStringField;
+    fdqTerminalOFF_LINE: TStringField;
+    fdqTerminalCODECF: TSmallintField;
+    fdqTerminalPARAMS: TMemoField;
+    fdqTerminalMD5: TStringField;
+    fdqPesqProdutoDJPdvCODPRODUTO: TIntegerField;
+    fdqPesqProdutoDJPdvCODEXTERNO: TStringField;
+    fdqPesqProdutoDJPdvCODBARRAS: TStringField;
+    fdqPesqProdutoDJPdvDESCRICAO: TStringField;
+    fdqPesqProdutoDJPdvCOMPLEMENTO: TStringField;
+    fdqPesqProdutoDJPdvUN: TStringField;
+    fdqPesqProdutoDJPdvPRECO_VENDA: TBCDField;
+    fdqPesqProdutoDJPdvDESCONTO: TCurrencyField;
+    fdqPesqProdutoDJPdvSITU_TRIBUTA: TStringField;
+    fdqPesqProdutoDJPdvICMS: TCurrencyField;
+    fdqPesqProdutoDJPdvOBS_POPUP: TStringField;
+    fdqPesqProdutoDJPdvALTERADO: TSQLTimeStampField;
+    fdqPesqProdutoDJPdvCALCULA_QTD: TStringField;
+    fdqPesqProdutoDJPdvBLOQ_QTD_FRAC: TStringField;
+    fdqPesqProdutoDJPdvBLOQUEIA_QTD: TStringField;
+    fdqPesqProdutoDJPdvARREDONDA: TStringField;
+    fdqPesqProdutoDJPdvPRODUCAO_PROPRIA: TStringField;
+    fdqPesqProdutoDJPdvCODGRUPO: TStringField;
+    fdqPesqProdutoDJPdvCODDEPARTAMENTO: TStringField;
+    fdqPesqProdutoDJPdvCODMARCA: TStringField;
+    fdqPesqProdutoDJPdvFLAG: TSmallintField;
+    fdqPesqProdutoDJPdvTIPOVASILHAME: TSmallintField;
+    fdqPesqProdutoDJPdvCODANIMACAO: TSmallintField;
+    fdqPesqProdutoDJPdvNCM: TStringField;
+    fdqPesqProdutoDJPdvQTD_ESTOQUE: TBCDField;
+    fdqPesqProdutoDJPdvDATA_ESTOQUE: TSQLTimeStampField;
+    fdqPesqProdutoDJPdvHASH: TLargeintField;
+    fdqPesqProdutoDJPdvCODDESCADICPROD: TSmallintField;
+    fdqPesqProdutoDJPdvGTINCOM: TStringField;
+    fdqPesqProdutoDJPdvEXTIPI: TStringField;
+    fdqPesqProdutoDJPdvGTINTRIB: TStringField;
+    fdqPesqProdutoDJPdvID_ICMS: TSmallintField;
+    fdqPesqProdutoDJPdvID_IPI: TSmallintField;
+    fdqPesqProdutoDJPdvID_ISSQN: TSmallintField;
+    fdqPesqProdutoDJPdvID_II: TSmallintField;
+    fdqPesqProdutoDJPdvID_PIS: TSmallintField;
+    fdqPesqProdutoDJPdvID_PISST: TSmallintField;
+    fdqPesqProdutoDJPdvID_COFINS: TSmallintField;
+    fdqPesqProdutoDJPdvID_COFINSST: TSmallintField;
+    fdqPesqProdutoDJPdvKIT: TSmallintField;
+    fdqPesqProdutoDJPdvPRAZO_DEVOLUCAO: TSmallintField;
+    fdqPesqProdutoDJPdvCEST: TStringField;
+    fdqPesqProdutoDJPdvCONTROLA_ESTOQUE: TSmallintField;
+    fdqPesqProdutoDJPdvCODIGO_ANP: TIntegerField;
+    fdqFinalizaroaCupom: TFDQuery;
+    dspFinalizaroaCupom: TDataSetProvider;
+    cdsFinalizaroaCupom: TClientDataSet;
+    cdsFinalizaroaCupomCODLOJA: TSmallintField;
+    cdsFinalizaroaCupomCODTERMINAL: TSmallintField;
+    cdsFinalizaroaCupomCODTURNO: TSmallintField;
+    cdsFinalizaroaCupomCOO: TIntegerField;
+    cdsFinalizaroaCupomSEQUENCIA: TSmallintField;
+    cdsFinalizaroaCupomCODFORMAPAGTO: TStringField;
+    cdsFinalizaroaCupomVALOR_PAGO: TBCDField;
+    cdsFinalizaroaCupomHASH: TLargeintField;
+    cdsFinalizaroaCupomCONTADOR: TIntegerField;
+    cdsFinalizaroaCupomNUMGNF: TIntegerField;
+    cdsReducaoZCODLOJA: TSmallintField;
+    cdsReducaoZCODECF: TSmallintField;
+    cdsReducaoZCRO: TSmallintField;
+    cdsReducaoZCOO: TIntegerField;
+    cdsReducaoZCRZ: TSmallintField;
+    cdsReducaoZDATAHORA_EMISSAO: TSQLTimeStampField;
+    cdsReducaoZDATA_MOVIMENTO: TDateField;
+    cdsReducaoZVENDA_BRUTA: TBCDField;
+    cdsReducaoZGRANDE_TOTAL: TBCDField;
+    cdsReducaoZDADOS: TMemoField;
+    cdsReducaoZHASH: TLargeintField;
+    cdsReducaoZDADOS_HASH: TMemoField;
+    cdsReducaoZTIPOCAPTURA: TStringField;
+    fdqCST_PIS: TFDQuery;
+    dspCST_PIS: TDataSetProvider;
+    cdsCST_PIS: TClientDataSet;
+    cdsCST_PISCST_PIS_PASEP: TIntegerField;
+    cdsCST_PISDESCRICAO: TStringField;
+    cdsCST_PISENTRADA_SAIDA: TSmallintField;
+    cdsCST_PISGERA_CREDITO: TSmallintField;
+    cdsCST_PISALIQUOTA_PIS: TBCDField;
+    fdmTemp_PIS: TFDMemTable;
+    fdmTemp_PISCST: TIntegerField;
+    fdmTemp_COFINS: TFDMemTable;
+    fdmTemp_COFINSCST: TIntegerField;
+    fdqCST_COFINS: TFDQuery;
+    dspCST_COFINS: TDataSetProvider;
+    cdsCST_COFINS: TClientDataSet;
+    cdsCST_COFINSCST_COFINS: TIntegerField;
+    cdsCST_COFINSDESCRICAO: TStringField;
+    cdsCST_COFINSENTRADA_SAIDA: TSmallintField;
+    cdsCST_COFINSGERA_CREDITO: TSmallintField;
+    cdsCST_COFINSALIQUOTA_COFINS: TBCDField;
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dmMDJPdv: TdmMDJPdv;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+uses dataDBEXMaster, dataMProvider;
+
+{$R *.dfm}
+
+procedure TdmMDJPdv.DataModuleCreate(Sender: TObject);
+begin
+
+  if dmMProvider.cdsConfiguracoesMODELOPDV.Value = 4 then
+  begin
+
+    fdcDJPdv.Close;
+
+    fdcDJPdv.Params.Clear;
+    fdcDJPdv.Params.Values['SERVER'       ]   := dmMProvider.cdsCfgConexaoZeusRetailIP_SERVIDOR.Value;
+    fdcDJPdv.Params.Values['DATABASE'     ]   := dmMProvider.cdsCfgConexaoZeusRetailNOME_BANCO.Value;
+    fdcDJPdv.Params.Values['USER_NAME'    ]   := dmMProvider.cdsCfgConexaoZeusRetailUSUARIO.Value;
+    fdcDJPdv.Params.Values['PASSWORD'     ]   := dmMProvider.cdsCfgConexaoZeusRetailSENHA.Value;
+    fdcDJPdv.Params.Values['CHARACTERSET' ]   := 'ISO8859_1';
+
+    if  UpperCase(dmMProvider.cdsCfgConexaoZeusRetailTIPO_SERVIDOR.Value) <> 'LOCAL'then
+      dmMDJPdv.fdcDJPdv.Params.Values['PROTOCOL'  ]   := 'TCPIP'
+    else
+      dmMDJPdv.fdcDJPdv.Params.Values['PROTOCOL'  ]   := dmMProvider.cdsCfgConexaoZeusRetailTIPO_SERVIDOR.Value;
+
+    dmMDJPdv.fdcDJPdv.Params.Values['PAGESIZE'     ]   := '16384';
+    dmMDJPdv.fdcDJPdv.Params.Values['DRIVERID'     ]   := 'FB';
+
+  end;
+
+end;
+
+end.

@@ -1,0 +1,17 @@
+{TODO 1 -oLindomar -ccontrole :
+Atualização do saldo de produtos
+
+tipo peça = 0 e 4 atualiza saldo pela ordem de producao
+tipo peça = 1 atualiza saldo almoxarifado / consumo
+
+enquanto a os não é encerrada
+tipo peça = 2 atualiza (inclui) saldo reservado / peça revenda
+após a os ser enecerrada
+tipo peça = 2 atualiza (retira) saldo reservado / peça revenda
+
+tipo peça = 3  não atualiza pois é peça avulsa
+tipo peça = 4  não atualiza pois é produção e vai atualizar (baixar) pela nf
+
+}
+{DONE 1 -oLindomar -ccontrole : Permitir cliente avulso}
+{DONE 2 -oLindomar -ccontrole : Gerar número  da ordem de serviço ao iniciar inclusão}

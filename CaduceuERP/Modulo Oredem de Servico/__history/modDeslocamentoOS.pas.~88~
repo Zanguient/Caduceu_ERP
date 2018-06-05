@@ -1,0 +1,424 @@
+unit modDeslocamentoOS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.StdCtrls, Vcl.Imaging.pngimage, Vcl.ExtCtrls, System.Actions, Vcl.ActnList,
+  Vcl.Mask, Vcl.DBCtrls, Datasnap.DBClient, System.DateUtils;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmDeslocamentoOS = class(TForm)
+    grdTabela: TDBGrid;
+    imgExcluir: TImage;
+    lblF5: TLabel;
+    lblF2: TLabel;
+    imgNovo: TImage;
+    lblF6: TLabel;
+    imgEditar: TImage;
+    imgSair: TImage;
+    pnlTitulo: TPanel;
+    pnlTotais: TPanel;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    lblTotalKM: TLabel;
+    lblTotaldeHoras: TLabel;
+    imgGerarRelatorioConsulta: TImage;
+    ActionList1: TActionList;
+    actManutencao: TAction;
+    actExcluirDeslocamentoOS: TAction;
+    edtTotalKM: TEdit;
+    edtTotalHoras: TEdit;
+    procedure FormCreate(Sender: TObject);
+    procedure imgSairClick(Sender: TObject);
+    function Man_Tab_DeslocamentoOS(pOpcao:smallint):boolean;
+    procedure actManutencaoExecute(Sender: TObject);
+    procedure grdTabelaKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure actExcluirDeslocamentoOSExecute(Sender: TObject);
+    procedure lblF5Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure Relacionar_Deslocamento;
+    procedure imgGerarRelatorioConsultaClick(Sender: TObject);
+    procedure lblF2Click(Sender: TObject);
+    procedure CalcularTotais;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmDeslocamentoOS: TfrmDeslocamentoOS;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes, modIncluirEditarDeslocamentoOS, dataMRelatorios;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+procedure TfrmDeslocamentoOS.actExcluirDeslocamentoOSExecute(Sender: TObject);
+begin
+
+  Man_Tab_DeslocamentoOS(1);
+  Relacionar_Deslocamento;
+
+end;
+
+procedure TfrmDeslocamentoOS.actManutencaoExecute(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsDeslocamentoOS.IsEmpty then
+  begin
+
+    dmMProvider.cdsDeslocamentoOS.Edit;
+
+    frmIncluirEditarDeslocamentoOS := TfrmIncluirEditarDeslocamentoOS.Create(self);
+
+    if frmIncluirEditarDeslocamentoOS.ShowModal = mrOk then
+      Man_Tab_DeslocamentoOS(0);
+
+    FreeAndNil(frmIncluirEditarDeslocamentoOS);
+
+  end;
+
+end;
+
+procedure TfrmDeslocamentoOS.CalcularTotais;
+var
+  iTotalKM:integer;
+  tTotalHoras:integer;
+begin
+
+  try
+
+    dmMProvider.cdsDeslocamentoOS.First;
+    dmMProvider.cdsDeslocamentoOS.DisableControls;
+
+    while not dmMProvider.cdsDeslocamentoOS.Eof do
+    begin
+
+      iTotalKM    := iTotalKM + dmMProvider.cdsDeslocamentoOSKM_CALC.Value;
+      tTotalHoras := HoursBetween(dmMProvider.cdsDeslocamentoOSHORA_SAIDA_ORIGEM.Value, dmMProvider.cdsDeslocamentoOSHORA_REGRESSO_ORIGEM.Value);
+
+      dmMProvider.cdsDeslocamentoOS.Next;
+
+    end;
+
+    dmMProvider.cdsDeslocamentoOS.First;
+    dmMProvider.cdsDeslocamentoOS.EnableControls;;
+
+    edtTotalKM.Text := IntToStr(iTotalKM);
+    edtTotalKM.Text := FormatDateTime('HH:mm',tTotalHoras);
+
+  finally
+    CDSClone.Free;
+  end;
+
+
+end;
+
+procedure TfrmDeslocamentoOS.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(Handle);
+
+  for i := 0 to grdTabela.Columns.Count - 1 do
+    grdTabela.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  Relacionar_Deslocamento;
+
+end;
+
+procedure TfrmDeslocamentoOS.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  case key of
+    VK_F2:lblF2Click(self);
+    VK_F5:lblF5Click(self);
+    VK_F6:actManutencaoExecute(self);
+  end;
+
+end;
+
+procedure TfrmDeslocamentoOS.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  try
+
+    if (UpperCase(Key) = 'S') and (lblMsg.Tag = ord(ExcluirDeslocamentoOS))
+    then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := ord(nulo);
+      actExcluirDeslocamentoOSExecute(self);
+      LimparMSG_ERRO(lblMsg, nil);
+
+    end
+    else if (UpperCase(Key) = 'N') AND (lblMsg.Tag <> ord(nulo)) then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := ord(nulo);
+      LimparMSG_ERRO(lblMsg, nil);
+
+    end;
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmDeslocamentoOS.grdTabelaDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsDeslocamentoOS.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsDeslocamentoOS.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmDeslocamentoOS.grdTabelaKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  case Key of
+
+    VK_DELETE:
+      begin
+
+        LimparMSG_ERRO(lblMsg, nil);
+
+        if dmMProvider.cdsDeslocamentoOS.Active then
+        begin
+
+          if not dmMProvider.cdsDeslocamentoOS.IsEmpty then
+          begin
+
+            lblMsg.Tag := ord(ExcluirDeslocamentoOS);
+            lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+          end;
+
+        end;
+
+      end;
+
+  end;
+
+end;
+
+procedure TfrmDeslocamentoOS.imgGerarRelatorioConsultaClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsDeslocamentoOS.IsEmpty then
+  begin
+
+    if FileExists(ExtractFilePath(Application.ExeName)+'Rav\Relatorios_OS.rav') then
+    begin
+
+      dmRelatorios.rvsGenesisAC.SystemPreview.ZoomFactor  := 126.4;
+      dmRelatorios.rvpGenesisAC.ProjectFile := ExtractFilePath(Application.ExeName)+'Rav\Relatorios_OS.rav';
+      dmRelatorios.rvpGenesisAC.SelectReport('rptDeslocamentoOS',true);
+      dmRelatorios.rvpGenesisAC.Execute;
+      dmRelatorios.rvpGenesisAC.Close;
+
+  end
+  else
+    Application.MessageBox(PChar(dmDBEXMaster.sNomeUsuario + ', ' + MSG_ARQ_NEXISTE + #13
+                + ExtractFilePath(Application.ExeName)+'Rav\Relatorios_OS.rav'), 'Atenção!',mb_IconWarning + mb_Ok);
+
+  end;
+end;
+
+procedure TfrmDeslocamentoOS.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+procedure TfrmDeslocamentoOS.lblF2Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsDeslocamentoOS.Active then
+  begin
+
+    dmMProvider.cdsDeslocamentoOS.Append;
+
+    frmIncluirEditarDeslocamentoOS := TfrmIncluirEditarDeslocamentoOS.Create(self);
+
+    if frmIncluirEditarDeslocamentoOS.ShowModal = mrOk then
+      Man_Tab_DeslocamentoOS(0);
+
+    FreeAndNil(frmIncluirEditarDeslocamentoOS);
+
+  end;
+
+end;
+
+procedure TfrmDeslocamentoOS.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsDeslocamentoOS.Active then
+  begin
+
+    if not (dmMProvider.cdsDeslocamentoOS.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO(lblMsg, nil);
+
+      lblMsg.Tag      := ord(ExcluirDeslocamentoOS);
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+end;
+
+function TfrmDeslocamentoOS.Man_Tab_DeslocamentoOS(pOpcao: smallint): boolean;
+begin
+
+  try
+
+    if not dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.StartTransaction;
+
+    dmMSProcedure.fdspDeslocamentoOS.Params[0].Value  := pOpcao;
+    dmMSProcedure.fdspDeslocamentoOS.Params[1].Value  := dmMProvider.cdsDeslocamentoOSDESLOCAMENTO_OS.Value;
+    dmMSProcedure.fdspDeslocamentoOS.Params[2].Value  := dmMProvider.cdsDeslocamentoOSORDEM_SERVICO.Value;
+    dmMSProcedure.fdspDeslocamentoOS.Params[3].Value  := dmMProvider.cdsDeslocamentoOSDATA_CADASTRO.Value;
+
+    if dmMProvider.cdsDeslocamentoOSHORA_SAIDA_ORIGEM.Value > 0 then
+      dmMSProcedure.fdspDeslocamentoOS.Params[4].Value  := dmMProvider.cdsDeslocamentoOSHORA_SAIDA_ORIGEM.Value
+    else
+      dmMSProcedure.fdspDeslocamentoOS.Params[4].Value  := null;
+
+    dmMSProcedure.fdspDeslocamentoOS.Params[5].Value  := dmMProvider.cdsDeslocamentoOSKM_SAIDA_ORIGEM.Value;
+
+    if dmMProvider.cdsDeslocamentoOSHORA_CHEGADA_DESTINO.Value > 0 then
+      dmMSProcedure.fdspDeslocamentoOS.Params[6].Value  := dmMProvider.cdsDeslocamentoOSHORA_CHEGADA_DESTINO.Value
+    else
+      dmMSProcedure.fdspDeslocamentoOS.Params[6].Value  := null;
+
+    dmMSProcedure.fdspDeslocamentoOS.Params[7].Value  := dmMProvider.cdsDeslocamentoOSKM_CHEGADA_DESTINO.Value;
+
+    if dmMProvider.cdsDeslocamentoOSHORA_SAIDA_DESTINO.Value > 0 then
+      dmMSProcedure.fdspDeslocamentoOS.Params[8].Value := dmMProvider.cdsDeslocamentoOSHORA_SAIDA_DESTINO.Value
+    else
+      dmMSProcedure.fdspDeslocamentoOS.Params[8].Value := null;
+
+    dmMSProcedure.fdspDeslocamentoOS.Params[9].Value := dmMProvider.cdsDeslocamentoOSKM_SAIDA_DESTINO.Value;
+
+    dmMSProcedure.fdspDeslocamentoOS.Params[10].Value := dmMProvider.cdsDeslocamentoOSHORA_REGRESSO_ORIGEM.Value;
+    dmMSProcedure.fdspDeslocamentoOS.Params[11].Value := dmMProvider.cdsDeslocamentoOSKM_REGRESSO_ORIGEM.Value;
+    dmMSProcedure.fdspDeslocamentoOS.Params[12].Value := dmMProvider.cdsDeslocamentoOSVALOR_ALIMENTACAO.Value;
+    dmMSProcedure.fdspDeslocamentoOS.Params[13].Value := dmMProvider.cdsDeslocamentoOSVALOR_HOSPEDAGEM.Value;
+    dmMSProcedure.fdspDeslocamentoOS.Params[14].Value := dmMProvider.cdsDeslocamentoOSKM_CALC.Value;
+    dmMSProcedure.fdspDeslocamentoOS.Params[15].Value := dmMProvider.cdsDeslocamentoOSHORAS_CALC.Value;
+    dmMSProcedure.fdspDeslocamentoOS.ExecProc;
+
+    if dmMSProcedure.fdspDeslocamentoOS.Params[16].Value > 0 then
+    begin
+
+      if not (dmMProvider.cdsDeslocamentoOS.State in [dsEdit, dsInsert]) then
+        dmMProvider.cdsDeslocamentoOS.Edit;
+
+      dmMProvider.cdsDeslocamentoOSDESLOCAMENTO_OS.Value := dmMSProcedure.fdspDeslocamentoOS.Params[16].Value;
+
+      dmMProvider.cdsDeslocamentoOS.Post;
+
+    end;
+
+    if dmDBEXMaster.fdtMaster.Active then
+      dmDBEXMaster.fdtMaster.Commit;
+
+    CalcularTotais;
+
+    Result := true;
+
+  except
+    on E: exception do
+    begin
+
+      if dmDBEXMaster.fdtMaster.Active then
+        dmDBEXMaster.fdtMaster.Rollback;
+
+      Tratar_Erro_Conexao(E);
+      Result := False;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmDeslocamentoOS.Relacionar_Deslocamento;
+begin
+
+  dmMProvider.cdsDeslocamentoOS.Close;
+  dmMProvider.cdsDeslocamentoOS.ProviderName := 'dspDeslocamentoOS';
+
+  dmDBEXMaster.fdqDeslocamentoOS.SQL.Clear;
+  dmDBEXMaster.fdqDeslocamentoOS.SQL.Add('select * from DESLOCAMENTO_OS');
+  dmDBEXMaster.fdqDeslocamentoOS.SQL.Add('order by DESLOCAMENTO_OS');
+
+  dmMProvider.cdsDeslocamentoOS.Open;
+  dmMProvider.cdsDeslocamentoOS.ProviderName := '';
+
+end;
+
+end.

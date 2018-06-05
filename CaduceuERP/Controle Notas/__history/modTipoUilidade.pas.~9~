@@ -1,0 +1,51 @@
+unit modTipoUilidade;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls;
+
+type
+  TfrmTipoUtilidade = class(TForm)
+    grpCadastro: TGroupBox;
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    edtDescricao: TDBEdit;
+    lblDescricao: TLabel;
+    procedure imgSairClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmTipoUtilidade: TfrmTipoUtilidade;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes,
+  uFuncoes_BD;
+
+procedure TfrmTipoUtilidade.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+end;
+
+procedure TfrmTipoUtilidade.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

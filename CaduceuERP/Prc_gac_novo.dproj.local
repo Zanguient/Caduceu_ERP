@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/04/17 15:23:25.000.348,=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
+    <Transaction>2017/04/17 15:25:29.000.519,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2017/04/17 15:25:29.000.007,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2017/04/17 15:26:24.000.922,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2017/04/17 15:26:24.000.911,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2017/04/17 15:26:36.000.687,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2017/04/17 15:26:41.000.565,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2017/04/17 15:27:01.000.917,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2017/04/17 15:27:09.000.829,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataSintegraSped.pas</Transaction>
+    <Transaction>2017/04/17 15:27:26.000.545,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2017/04/17 15:27:39.000.258,=D:\Projetos\Funcoes Genericas\uFuncoes_BD.pas</Transaction>
+    <Transaction>2017/04/17 15:27:39.000.237,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+    <Transaction>2017/04/17 15:34:12.000.488,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit3.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Principal\modTelaPrincipal_Novo.dfm</Transaction>
+    <Transaction>2017/04/17 15:34:12.000.488,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit3.pas=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Principal\modTelaPrincipal_Novo.pas</Transaction>
+    <Transaction>2017/04/17 15:35:12.000.191,C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Project3.dproj=D:\Projetos\Delphi_XE6\GenesisAC\Modulo Principal\Prc_gac_novo.dproj</Transaction>
+    <Transaction>2017/04/17 15:40:46.000.610,D:\Projetos\Delphi_XE6\GenesisAC\Modulo Principal\Prc_gac_novo.dproj=D:\Projetos\Delphi_XE6\GenesisAC\Prc_gac_novo.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

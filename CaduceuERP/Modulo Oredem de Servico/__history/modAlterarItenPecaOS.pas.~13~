@@ -1,0 +1,57 @@
+unit modAlterarItenPecaOS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls;
+
+type
+  TfrmAlterarItemPeca = class(TForm)
+    imgIncluir: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    grpDescricaoPeca: TGroupBox;
+    edtDescricao: TDBEdit;
+    grpInformaacoesItem: TGroupBox;
+    grpQuantidade: TGroupBox;
+    grpValorUnitario: TGroupBox;
+    grpTecnicoResponsavel: TGroupBox;
+    DBEdit1: TDBEdit;
+    DBEdit2: TDBEdit;
+    DBLookupComboBox1: TDBLookupComboBox;
+    procedure imgSairClick(Sender: TObject);
+    procedure imgIncluirClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmAlterarItemPeca: TfrmAlterarItemPeca;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmAlterarItemPeca.imgIncluirClick(Sender: TObject);
+begin
+
+  ModalResult := mrOk;
+
+end;
+
+procedure TfrmAlterarItemPeca.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

@@ -1,0 +1,348 @@
+unit modFormasPagamentoOS;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.DBCtrls, Vcl.Mask,
+  Vcl.ExtCtrls, Vcl.Imaging.pngimage, Vcl.Grids, Vcl.DBGrids;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmFormasPagamentoOS = class(TForm)
+    grpFormasPagamento: TGroupBox;
+    cboFormaPagamento: TDBLookupComboBox;
+    grpDetalhesFormaPagamento: TGroupBox;
+    lblNumeroParcelas: TLabel;
+    edtNumeroParcelas: TDBEdit;
+    lblDescontoMax: TLabel;
+    edtDescontoMax: TDBEdit;
+    lblAcrescimoMin: TLabel;
+    edAcrescimoMin: TDBEdit;
+    lblMoraDiaria: TLabel;
+    edtMoraDiaria: TDBEdit;
+    rdgTipoForma: TDBRadioGroup;
+    grpPlanoContas: TGroupBox;
+    cboConta: TDBLookupComboBox;
+    cboSubConta: TDBLookupComboBox;
+    lblContaPC: TLabel;
+    lblSubContaPC: TLabel;
+    grpDetalhesdoRecebimento: TGroupBox;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grdParcelasOrdemSevico: TDBGrid;
+    grpPrazosFormaPagto: TGroupBox;
+    grdPrazoFormaPagto: TDBGrid;
+    procedure FormCreate(Sender: TObject);
+    procedure cboFormaPagamentoCloseUp(Sender: TObject);
+    procedure grdPrazoFormaPagtoDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdParcelasOrdemSevicoDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure imgSairClick(Sender: TObject);
+    procedure imgConfirmarClick(Sender: TObject);
+  private
+    { Private declarations }
+    procedure GerarParcelasOS(pGerarParcelas:boolean);
+    procedure Relacionar_Parcelas_OS(pOrdemServico:integer);
+    function Man_Tab_Parcelas_OS(pOpcao:smallint):boolean;
+    procedure CorrigeValorDocumento(pValor: currency; pDocumento: string; pVencimento: TDateTime);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmFormasPagamentoOS: TfrmFormasPagamentoOS;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, uConstantes_Padrao, uFuncoes,
+  dataMSProcedure;
+
+procedure TfrmFormasPagamentoOS.cboFormaPagamentoCloseUp(Sender: TObject);
+begin
+
+  dmMProvider.cdsDiasFormapagto.Close;
+  dmMProvider.cdsDiasFormapagto.ProviderName := 'dspDiasFormaPagto';
+
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Clear;
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Add('select * from diasformapagamento');
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Add('where formapagamento = ' + IntToStr(dmMProvider.cdsFormasPagamentoFORMAPAGAMENTO.Value));
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Add('order by DIASFORMAPAGAMENTO');
+
+  dmMProvider.cdsDiasFormapagto.Open;
+  dmMProvider.cdsDiasFormapagto.ProviderName := '';
+
+  GerarParcelasOS((dmMProvider.cdsFormasPagamentoTIPO.Value = 10));
+
+end;
+
+procedure TfrmFormasPagamentoOS.CorrigeValorDocumento(pValor: currency; pDocumento: string; pVencimento: TDateTime);
+begin
+
+  try
+
+    dmDBEXMaster.fdtMaster.StartTransaction;
+
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[0].Value       := 0;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[1].Value       := dmMProvider.cdsParcelasOSPARCELAS_ORDEM_SERVICO.Value;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[2].Value       := dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[3].Value       := pVencimento;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[4].Value       := pValor;
+    dmMSProcedure.fdspParcelas_OrdemServico.ExecProc;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+  end;
+
+end;
+
+procedure TfrmFormasPagamentoOS.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+  Color             := COR_PADRAO_DIALOGOS;
+
+  for i := 0 to grdPrazoFormaPagto.Columns.Count - 1 do
+    grdPrazoFormaPagto.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  for i := 0 to grdParcelasOrdemSevico.Columns.Count - 1 do
+    grdParcelasOrdemSevico.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+  dmMProvider.cdsFormasPagamento.Close;
+  dmMProvider.cdsFormasPagamento.ProviderName := 'dspFormasPagamento';
+
+  dmDBEXMaster.fdqFormasPagamento.SQL.Clear;
+  dmDBEXMaster.fdqFormasPagamento.SQL.Add('select *from formapagamento');
+  dmDBEXMaster.fdqFormasPagamento.SQL.Add('where tipooperacao = 1');
+  dmDBEXMaster.fdqFormasPagamento.SQL.Add('and ativo = 1');
+  dmDBEXMaster.fdqFormasPagamento.SQL.Add('order by nome');
+
+  dmMProvider.cdsFormasPagamento.Open;
+  dmMProvider.cdsFormasPagamento.ProviderName := '';
+
+  cboFormaPagamento.KeyValue := dmMProvider.cdsFormasPagamentoFORMAPAGAMENTO.Value;
+
+  dmMProvider.cdsDiasFormapagto.Close;
+  dmMProvider.cdsDiasFormapagto.ProviderName := 'dspDiasFormaPagto';
+
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Clear;
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Add('select * from diasformapagamento');
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Add('where formapagamento = ' + IntToStr(dmMProvider.cdsFormasPagamentoFORMAPAGAMENTO.Value));
+  dmDBEXMaster.fdqDiasFormaPagto.SQL.Add('order by DIASFORMAPAGAMENTO');
+
+  dmMProvider.cdsDiasFormapagto.Open;
+  dmMProvider.cdsDiasFormapagto.ProviderName := '';
+
+  GerarParcelasOS((dmMProvider.cdsFormasPagamentoTIPO.Value = 10));
+
+end;
+
+procedure TfrmFormasPagamentoOS.GerarParcelasOS(pGerarParcelas:boolean);
+var
+  i:integer;
+  cResto, cValorCalculado: currency;
+  dVencimento: TDateTime;
+
+begin
+
+  cResto            := 0;
+  cValorCalculado   := 0;
+
+  if pGerarParcelas then
+  begin
+
+    // elimina todas as parcelas que possam existir na tabela
+    // parcelas
+    if Man_Tab_Parcelas_OS(1) then
+    begin
+
+      Relacionar_Parcelas_OS(dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value);
+
+      dVencimento := dmMProvider.cdsOrdemServicoDATA_TERMINO.Value;
+
+      dmMProvider.cdsDiasFormapagto.First;
+
+      while not dmMProvider.cdsDiasFormapagto.eof do
+      begin
+
+        dmMProvider.cdsParcelasOS.Append;
+        dmMProvider.cdsParcelasOSDOCUMENTO.Value  := '';
+        dmMProvider.cdsParcelasOSVENCIMENTO.Value := dVencimento + dmMProvider.cdsDiasFormapagtoDIAS.Value;
+        dmMProvider.cdsParcelasOSVALOR.Value      := Trunc((dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value / dmMProvider.cdsDiasFormaPagto.RecordCount) * 100) / 100;
+
+        cValorCalculado                           := cValorCalculado + dmMProvider.cdsParcelasOSVALOR.Value;
+        dVencimento                               := dmMProvider.cdsParcelasOSVENCIMENTO.Value;
+
+        if Man_Tab_Parcelas_OS(0) then
+          Relacionar_Parcelas_OS(dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value);
+
+        dmMProvider.cdsDiasFormaPagto.Next;
+
+      end;
+
+      cResto := (cValorCalculado - dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value);
+
+      if cResto < 0 then
+        cResto := cResto * (-1);
+
+      if cValorCalculado > dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value then
+        CorrigeValorDocumento((dmMProvider.cdsParcelasOSVALOR.Value - cResto), dmMProvider.cdsParcelasOSDOCUMENTO.Value, dmMProvider.cdsParcelasOSVENCIMENTO.Value)
+
+      else if (cValorCalculado < dmMProvider.cdsOrdemServicoVALOR_TOTAL_OS.Value) and not(dmMProvider.cdsDiasFormaPagto.IsEmpty) then
+        CorrigeValorDocumento((dmMProvider.cdsParcelasOSVALOR.Value + cResto), dmMProvider.cdsParcelasOSDOCUMENTO.Value, dmMProvider.cdsParcelasOSVENCIMENTO.Value);
+
+      dmMProvider.cdsDiasFormapagto.First;
+
+    end
+    else
+      dmDBEXMaster.fdcMaster.Rollback;
+
+  end;
+
+end;
+
+procedure TfrmFormasPagamentoOS.grdParcelasOrdemSevicoDrawColumnCell(
+  Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsParcelasOS.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsParcelasOS.RecNo) then
+    begin
+
+      grdParcelasOrdemSevico.Canvas.Font.Color   := clBlack;
+      grdParcelasOrdemSevico.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdParcelasOrdemSevico.Canvas.Font.Color   := clBlack;
+      grdParcelasOrdemSevico.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdParcelasOrdemSevico.Canvas.FillRect(Rect);
+    grdParcelasOrdemSevico.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmFormasPagamentoOS.grdPrazoFormaPagtoDrawColumnCell(
+  Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsDiasFormapagto.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsDiasFormapagto.RecNo) then
+    begin
+
+      grdPrazoFormaPagto.Canvas.Font.Color   := clBlack;
+      grdPrazoFormaPagto.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdPrazoFormaPagto.Canvas.Font.Color   := clBlack;
+      grdPrazoFormaPagto.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdPrazoFormaPagto.Canvas.FillRect(Rect);
+    grdPrazoFormaPagto.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmFormasPagamentoOS.imgConfirmarClick(Sender: TObject);
+begin
+
+  Modalresult := mrOk;
+
+end;
+
+procedure TfrmFormasPagamentoOS.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+function TfrmFormasPagamentoOS.Man_Tab_Parcelas_OS(pOpcao: smallint): boolean;
+begin
+
+  try
+
+    dmDBEXMaster.fdtMaster.StartTransaction;
+
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[0].Value       := pOpcao;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[1].Value       := 0;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[2].Value       := dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[3].Value       := dmMProvider.cdsParcelasOSVENCIMENTO.Value;
+    dmMSProcedure.fdspParcelas_OrdemServico.Params[4].Value       := dmMProvider.cdsParcelasOSVALOR.Value;
+    dmMSProcedure.fdspParcelas_OrdemServico.ExecProc;
+
+    Result := true;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      Result := False;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFormasPagamentoOS.Relacionar_Parcelas_OS(pOrdemServico: integer);
+begin
+
+  dmMProvider.cdsParcelasOS.Close;
+  dmMProvider.cdsParcelasOS.ProviderName := 'dspParcelasOS';
+
+  dmDBEXMaster.fdqParcelasOrdemServico.SQL.Clear;
+  dmDBEXMaster.fdqParcelasOrdemServico.SQL.Add('select * from PARCELAS_ORDEM_SERVICO');
+  dmDBEXMaster.fdqParcelasOrdemServico.SQL.Add('where ordem_servico = ' + IntToStr(dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value));
+  dmDBEXMaster.fdqParcelasOrdemServico.SQL.Add('order by PARCELAS_ORDEM_SERVICO');
+
+  dmMProvider.cdsParcelasOS.Open;
+  dmMProvider.cdsParcelasOS.ProviderName := '';
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+end.

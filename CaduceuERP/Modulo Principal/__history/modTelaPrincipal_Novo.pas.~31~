@@ -1,0 +1,509 @@
+unit modTelaPrincipal_Novo;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
+  Vcl.Imaging.pngimage, System.Actions, Vcl.ActnList, Vcl.Touch.GestureMgr,
+  AdvSmoothDock, Vcl.ComCtrls, Vcl.CategoryButtons, Vcl.ButtonGroup,
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan;
+
+type
+  TfrmPrincipal = class(TForm)
+    pnlCopiaAtualizacao: TPanel;
+    pgbProgressoCopia: TProgressBar;
+    actMaster: TActionManager;
+    acSair: TAction;
+    acEstados: TAction;
+    acCidades: TAction;
+    acFiliais: TAction;
+    acFuncionarios: TAction;
+    acUsuarios: TAction;
+    acFornecedores: TAction;
+    acGrupos: TAction;
+    acSubGrupo: TAction;
+    acSecoes: TAction;
+    acSetorBalanca: TAction;
+    acInfNutricional: TAction;
+    acProducao: TAction;
+    acRentabilidade: TAction;
+    acAliquotas: TAction;
+    acProdutos: TAction;
+    acCfop: TAction;
+    acFPagamento: TAction;
+    acNbmNcm: TAction;
+    acBancos: TAction;
+    acContasMovimento: TAction;
+    acPlContas: TAction;
+    acAdmCartCred: TAction;
+    acLancamentos: TAction;
+    acCPA: TAction;
+    acCRE: TAction;
+    acChqRec: TAction;
+    acChqPagar: TAction;
+    acCtrlCart: TAction;
+    acFlCaixa: TAction;
+    acOrdemCompra: TAction;
+    acNFEntrada: TAction;
+    acNFSaida: TAction;
+    acSaldo: TAction;
+    acInventario: TAction;
+    acPrecos: TAction;
+    acPermissoes: TAction;
+    acEtiquetas: TAction;
+    acSuporteChat: TAction;
+    acSuporteRemoto: TAction;
+    acFechaVenda: TAction;
+    acMRECF: TAction;
+    acSintegraGeraArq: TAction;
+    acTabComissao: TAction;
+    acRelatorios: TAction;
+    acConfiguracoes: TAction;
+    acAutomacao: TAction;
+    acIntegracao: TAction;
+    acClientes: TAction;
+    acRegistro61: TAction;
+    acNFModelo02: TAction;
+    acServico: TAction;
+    actReg60MA: TAction;
+    actRefFornecedor: TAction;
+    actDanfe: TAction;
+    actLivroEntradas: TAction;
+    actLivroSaidas: TAction;
+    actApuracaoICMS: TAction;
+    actPromocoes: TAction;
+    actCST_CSOSN: TAction;
+    actSimilar: TAction;
+    actPaises: TAction;
+    actSituacoesOS: TAction;
+    actEquipamentos: TAction;
+    actAlmoxarifado: TAction;
+    actObservecoes: TAction;
+    actAjuda: TAction;
+    actOrdemServico: TAction;
+    actPerdas: TAction;
+    actUnidMedida: TAction;
+    actOrdemDeProducao: TAction;
+    imgMinimizar: TImage;
+    icoUpdate: TTrayIcon;
+    tmrUpdate: TTimer;
+    tmrDataHora: TTimer;
+    tmrInatividade: TTimer;
+    tmrFaturaDisponivel: TTimer;
+    stbPrincipal: TStatusBar;
+    CategoryPanelGroup1: TCategoryPanelGroup;
+    ctpAuxiliar: TCategoryPanel;
+    btgAuxiliar: TButtonGroup;
+    ctpContabil: TCategoryPanel;
+    btgApuracaoICMS: TButtonGroup;
+    ctbLivrosFiscais: TCategoryButtons;
+    ctpAdministracao: TCategoryPanel;
+    ButtonGroup1: TButtonGroup;
+    ButtonGroup3: TButtonGroup;
+    ctbSintegra: TCategoryButtons;
+    ctpUtilitarios: TCategoryPanel;
+    ButtonGroup5: TButtonGroup;
+    ctbSuporte: TCategoryButtons;
+    ctpEstoque: TCategoryPanel;
+    btgSaldo: TButtonGroup;
+    ButtonGroup4: TButtonGroup;
+    ctbNotasFiscais: TCategoryButtons;
+    ctpFinanceiro: TCategoryPanel;
+    btgFinanceiro1: TButtonGroup;
+    ctbCheques: TCategoryButtons;
+    btgFinanceiro2: TButtonGroup;
+    ctbCentroCustos: TCategoryButtons;
+    ctpCadastros: TCategoryPanel;
+    btgCadastros: TButtonGroup;
+    ButtonGroup2: TButtonGroup;
+    ctbFamilias: TCategoryButtons;
+    ctbProdutos: TCategoryButtons;
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure imgMinimizarClick(Sender: TObject);
+    procedure acSairExecute(Sender: TObject);
+    procedure stbPrincipalDrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel;
+      const Rect: TRect);
+    procedure ctbFamiliasClick(Sender: TObject);
+    procedure ctbProdutosClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    bEm_Atualizacao, bSolicitacao_fechar:boolean;
+    sSenha:string;
+  end;
+
+var
+  frmPrincipal: TfrmPrincipal;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMAtualizacao, dataMProvider, dataMSource,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmPrincipal.acSairExecute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+procedure TfrmPrincipal.ctbFamiliasClick(Sender: TObject);
+begin
+
+  if ctbFamilias.Categories[0].Collapsed then
+  begin
+
+    if ctbProdutos.Categories[0].Collapsed then
+    begin
+
+      ctbFamilias.Height  := 30;
+      ctpCadastros.Height := 580;
+
+    end
+    else
+    begin
+
+      ctbFamilias.Height := 30;
+      ctpCadastros.Height := 723;
+
+    end;
+
+  end
+  else
+  begin
+
+    if ctbProdutos.Categories[0].Collapsed then
+    begin
+
+      ctbFamilias.Height  := 155;
+      ctpCadastros.Height := 709;
+
+    end
+    else
+    begin
+
+      ctbFamilias.Height  := 155;
+      ctpCadastros.Height := 775;
+
+    end;
+
+
+  end;
+
+
+end;
+
+procedure TfrmPrincipal.ctbProdutosClick(Sender: TObject);
+begin
+
+  if ctbProdutos.Categories[0].Collapsed then
+  begin
+
+    if ctbFamilias.Categories[0].Collapsed then
+    begin
+
+      ctbProdutos.Height  := 30;
+      ctpCadastros.Height := 570;
+
+    end
+    else
+    begin
+
+      ctbProdutos.Height  := 30;
+      ctpCadastros.Height := 710;
+
+    end;
+
+  end
+  else
+  begin
+
+    if ctbFamilias.Categories[0].Collapsed then
+    begin
+
+      ctbProdutos.Height  := 132;
+      ctpCadastros.Height := 683;
+
+    end
+    else
+    begin
+
+      ctbProdutos.Height  := 132;
+      ctpCadastros.Height := 817;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+{
+    procedure verifica se tem módulos do sistema aberto
+    e fecha
+  }
+  FecharJanelasAbertas;
+
+end;
+
+procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+
+  {
+
+    Pergunta ao usário se deseja realmente encerrar o sistema
+
+  }
+  if bEm_Atualizacao then
+  begin
+
+    Application.MessageBox(pchar(dmDBEXMaster.sNomeUsuario
+                + ', existe um processo de atualização em andamento.' + #13 + #13
+                + 'Assim que for concluído, o sistema será encerrado.' + #13
+                + 'Não interrompa esse procedimento pois pode causar corrupção de alguns arquivos!'),
+                'Atenção!', MB_ICONWARNING + mb_Ok);
+    pnlCopiaAtualizacao.Visible := true;
+    bSolicitacao_fechar         := pnlCopiaAtualizacao.Visible;
+    CanClose := False;
+
+  end
+  else
+    CanClose := Application.MessageBox(pchar(dmDBEXMaster.sNomeUsuario
+                + ', confirma encerramento do sistema?' + #13 + #13
+                + 'Salve todas as alterações, caso contrário' + #13
+                + 'as mesmas serão canceladas pelo sistema!'),
+                'Atenção!', mb_IconQuestion + mb_DefButton2 +mb_YesNo) = idYes;
+
+end;
+
+procedure TfrmPrincipal.FormCreate(Sender: TObject);
+var
+  ms: TMemoryStream;
+begin
+
+//  bSolicitacao_fechar := false;
+//  bEm_Atualizacao     := false;
+
+  //encerra a tela de login
+  PostMessage(FindWindow(nil, 'Caduceu - ERP'), WM_CLOSE, 0, 0);
+
+  DesabilitarBotaoFecharForm(self.handle);
+
+  dmDBEXMaster.sNomeUsuario       := ParamStr(1);
+  dmDBEXMaster.sSenha             := paramstr(2);
+  dmDBEXMaster.iIdUsuario         := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial          := StrToInt(ParamStr(4));
+
+  AbrirTabelas;
+
+  while not dmMProvider.cdsMenuAtalhos.Eof do
+  begin
+
+    ms := TMemoryStream.Create;
+    dmMProvider.cdsMenuAtalhosIMAGEM_ATALHO.SaveToStream(ms);
+
+    with advMenuAtalhos.Items.Add do
+    begin
+
+      Caption := dmMProvider.cdsMenuAtalhosTITULO.AsString;
+      Data    := dmMProvider.cdsMenuAtalhosENDERECO.AsString;
+
+      Image.LoadFromStream(ms);
+      Image.Transparent := true;
+
+    end;
+
+    FreeAndNil(ms);
+
+    dmMProvider.cdsMenuAtalhos.Next;
+
+  end;
+
+  imgFundo.Width                          := Self.Width;
+  imgFundo.Height                         := Self.Height;
+
+  dmDBEXMaster.sIP_Servidor               := RetornarIP;
+
+  Caption                                 := Application.Title + ' / ' + dmDBEXMaster.sIP_Servidor;
+ {
+  //menu cadastros
+  ctpCadastros.Collapsed                  := True;
+  ctpCadastros.Height                     := 30;
+
+  ctbFamilias.Categories[0].Collapsed     := True;
+  ctbFamilias.Height                      := 30;
+
+  //menu financeiro
+  ctpFinanceiro.Collapsed                 := True;
+  ctpFinanceiro.Height                    := 30;
+
+  ctbCentroCustos.Categories[0].Collapsed := True;
+  ctbCentroCustos.Height                  := 30;
+
+  ctbCheques.Categories[0].Collapsed      := True;
+  ctbCheques.Height                       := 30;
+
+  //menu estoque
+  ctpEstoque.Collapsed                    := True;
+  ctpEstoque.Height                       := 30;
+
+  ctbNotasFiscais.Categories[0].Collapsed := True;
+  ctbNotasFiscais.Height                  := 30;
+
+  //menu preços
+  ctpUtilitarios.Collapsed                := True;
+  ctpUtilitarios.Height                   := 30;
+
+  ctbSuporte.Categories[0].Collapsed      := True;
+  ctbSuporte.Height                       := 30;
+
+  //menu admnistração
+  ctpAdministracao.Collapsed              := True;
+  ctpAdministracao.Height                 := 30;
+
+  ctbSintegra.Categories[0].Collapsed     := True;
+  ctbSintegra.Height                      := 30;
+
+  //menu contábil
+  ctpContabil.Collapsed                   := True;
+  ctpContabil.Height                      := 30;
+
+  //menu auxiliar
+  ctpAuxiliar.Collapsed                   := False;
+  }
+  sSenha                                  := dmDBEXMaster.sSenha;
+
+  CriarPastasAplicacao;
+
+end;
+
+procedure TfrmPrincipal.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  {
+
+    Encerra o sistema caso o usuário pressione ESC
+
+  }
+  if key = #27  then
+    Close;
+
+end;
+
+procedure TfrmPrincipal.FormShow(Sender: TObject);
+var
+  R : TRect;
+begin
+  {
+
+    Coloca a aplicação em tela cheia
+
+  }
+
+  SystemParametersInfo(SPI_GETWORKAREA, 0, @R,0);
+  SetBounds(R.Left, R.Top, R.Right-R.Left, R.Bottom-R.Top);
+
+  if ((dmDBEXMaster.dDataLicença - Date) <= 8) and ((dmDBEXMaster.dDataLicença - Date) > 0) then
+  begin
+
+    Application.MessageBox(pchar(dmDBEXMaster.sNomeUsuario
+      + ', falta(m): ' + FloatToStr(dmDBEXMaster.dDataLicença - Date) + ' dia(s) para a licença de uso expirar'),'Atenção!', mb_IconWarning +mb_Ok);
+
+    caption := caption + '         ' + 'FALTA(M) ' + FloatToStr(dmDBEXMaster.dDataLicença - Date) + ' DIA(S) PARA A LICENÇA DE USO EXPIRAR';
+
+  end
+  else if ((dmDBEXMaster.dDataLicença - Date) <0) then
+  begin
+
+    Application.MessageBox(pchar(dmDBEXMaster.sNomeUsuario
+      + ', licença expirada à: ' + FloatToStr((dmDBEXMaster.dDataLicença - Date)*-1)+ ' dias'),'Atenção!', mb_IconWarning +mb_Ok);
+    Application.Terminate;
+
+
+  end;
+
+end;
+
+procedure TfrmPrincipal.imgMinimizarClick(Sender: TObject);
+begin
+
+  Application.Minimize;
+
+end;
+
+procedure TfrmPrincipal.stbPrincipalDrawPanel(StatusBar: TStatusBar;
+  Panel: TStatusPanel; const Rect: TRect);
+begin
+
+
+  with stbPrincipal.Canvas do
+  begin
+    FillRect(Rect);
+
+    {
+
+      define estilo da fonte
+
+    }
+
+    Font.Name := 'Arial';
+    Font.Size := 9;
+
+    //Desenha as imagens de acordo com o indice de cada panel
+    if (dmDBEXMaster.dDataLicença - Date) <= 8 then
+    begin
+
+      if (Panel.Index = 6) or (Panel.Index = 7) then
+        dmDBEXMaster.imgStatusBar.Draw(stbPrincipal.Canvas,Rect.Left+5,Rect.Top+1,Panel.Index + 1)
+      else
+        dmDBEXMaster.imgStatusBar.Draw(stbPrincipal.Canvas,Rect.Left+5,Rect.Top+1,Panel.Index);
+
+    end
+    else
+    begin
+
+      if Panel.Index = 7 then
+        dmDBEXMaster.imgStatusBar.Draw(stbPrincipal.Canvas,Rect.Left+5,Rect.Top+1,Panel.Index + 1)
+      else
+        dmDBEXMaster.imgStatusBar.Draw(stbPrincipal.Canvas,Rect.Left+5,Rect.Top+1,Panel.Index);
+
+    end;
+
+    //Escreve o texto em cada panel
+    if Panel.Index = 0 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,FormatDateTime('c', Now));
+
+    if Panel.Index = 1 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,dmDBEXMaster.sNomeUsuario);
+
+    if Panel.Index = 2 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,RetornarVersao(Application.ExeName,1));
+
+    if Panel.Index = 3 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,dmMProvider.cdsFilialRAZAOSOCIAL.AsString);
+
+    if Panel.Index = 4 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,pubNomeComputador);
+
+    if Panel.Index = 5 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,RetornarIP);
+
+    if Panel.Index = 6 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,FormatDateTime('dd/mm/yyyy',dmDBEXMaster.dDataLicença));
+
+    if Panel.Index = 7 then
+      TextOut(Rect.Left + 25, Rect.Top + 1,'V.' + dmMProvider.cdsVersaoBancoVERSAO.Value);
+
+  end;
+
+end;
+
+end.

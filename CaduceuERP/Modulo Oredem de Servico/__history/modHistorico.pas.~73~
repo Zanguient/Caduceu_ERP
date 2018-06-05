@@ -1,0 +1,372 @@
+unit modHistorico;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls,
+  Vcl.Imaging.pngimage, Vcl.ExtCtrls, System.Actions, Vcl.ActnList, Vcl.StdActns;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmHistorico = class(TForm)
+    grdHistorico: TDBGrid;
+    grpHistorico: TGroupBox;
+    GroupBox1: TGroupBox;
+    edtHistorico: TEdit;
+    edtContato: TEdit;
+    imgIncluir: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    ActionList1: TActionList;
+    actExcluir: TAction;
+    actSalvar: TAction;
+    WindowClose1: TWindowClose;
+    procedure FormCreate(Sender: TObject);
+    procedure grdHistoricoDblClick(Sender: TObject);
+    procedure grdHistoricoDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdHistoricoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    procedure edtHistoricoKeyPress(Sender: TObject; var Key: Char);
+    procedure edtHistoricoEnter(Sender: TObject);
+    procedure edtHistoricoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure WindowClose1Execute(Sender: TObject);
+  private
+    { Private declarations }
+    function Man_Tab_Historico(pOpcao:smallint):boolean;
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure LimparMSG_ERRO;
+    procedure Relacionar_Historico_OS(pOrdem_Servico:integer);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmHistorico: TfrmHistorico;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+procedure TfrmHistorico.actExcluirExecute(Sender: TObject);
+begin
+
+  Man_Tab_Historico(1);
+
+end;
+
+procedure TfrmHistorico.actSalvarExecute(Sender: TObject);
+begin
+
+  if (Length(Trim(edtHistorico.Text)) > 0) and (Length(Trim(edtContato.Text)) > 0) then
+    Man_Tab_Historico(0);
+
+  edtHistorico.Clear;
+  edtContato.Clear;
+
+end;
+
+procedure TfrmHistorico.edtHistoricoEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(sender);
+
+end;
+
+procedure TfrmHistorico.edtHistoricoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmHistorico.edtHistoricoKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmHistorico.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color   := COR_PADRAO_DIALOGOS;
+  Caption := Caption + ' - OS Nº. '  + IntToStr(dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value);
+
+  for i := 0 to grdHistorico.Columns.Count - 1 do
+    grdHistorico.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+procedure TfrmHistorico.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  try
+
+    if (UpperCase(Key) = 'S') and (lblMsg.Tag = ord(ExcluirHistoricoOS))
+    then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := ord(nulo);
+      actExcluirExecute(self);
+
+      edtHistorico.Clear;
+      edtContato.Clear;
+      edtHistorico.SetFocus;
+
+    end
+    else if (UpperCase(Key) = 'N') AND (lblMsg.Tag <> ord(nulo)) then
+    begin
+
+      Key         := #0;
+      lblMsg.Tag  := ord(nulo);
+      LimparMSG_ERRO;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdcMaster.Rollback;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmHistorico.grdHistoricoDblClick(Sender: TObject);
+begin
+
+  if dmMProvider.cdsHistorico_OSTIPO.Value = 1 then
+  begin
+
+    edtHistorico.Text := dmMProvider.cdsHistorico_OSHISTORICO.Value;
+    edtContato.Text   := dmMProvider.cdsHistorico_OSCONTATO.Value;
+    frmHistorico.Tag  := 3;
+
+  end;
+
+end;
+
+procedure TfrmHistorico.grdHistoricoDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsHistorico_OS.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsHistorico_OS.RecNo) then
+    begin
+
+      grdHistorico.Canvas.Font.Color   := clBlack;
+      grdHistorico.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdHistorico.Canvas.Font.Color   := clBlack;
+      grdHistorico.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdHistorico.Canvas.FillRect(Rect);
+    grdHistorico.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmHistorico.grdHistoricoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  case Key of
+
+    VK_DELETE:
+      begin
+
+        LimparMSG_ERRO;
+
+        if not dmMProvider.cdsHistorico_OS.IsEmpty then
+        begin
+
+          lblMsg.Tag      := ord(ExcluirHistoricoOS);
+          lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+        end;
+
+      end;
+
+  end;
+
+
+end;
+
+procedure TfrmHistorico.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+function TfrmHistorico.Man_Tab_Historico(pOpcao: smallint): boolean;
+begin
+
+  try
+
+    dmDBEXMaster.fdcMaster.StartTransaction;
+
+    dmMSProcedure.fdspHistorico_OS.Params[0].Value        := pOpcao;
+
+    if (frmHistorico.tag <> 3) and (pOpcao = 0) then //para incluir
+      dmMSProcedure.fdspHistorico_OS.Params[1].Value      := -1
+    else
+      dmMSProcedure.fdspHistorico_OS.Params[1].Value      := dmMProvider.cdsHistorico_OSHISTORICO_ORDEM.Value;
+
+    dmMSProcedure.fdspHistorico_OS.Params[2].Value        := dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value;
+    dmMSProcedure.fdspHistorico_OS.Params[3].Value        := edtHistorico.Text;
+    dmMSProcedure.fdspHistorico_OS.Params[4].Value        := dmDBEXMaster.sNomeUsuario;
+    dmMSProcedure.fdspHistorico_OS.Params[5].Value        := Date;
+    dmMSProcedure.fdspHistorico_OS.Params[6].Value        := Time;
+    dmMSProcedure.fdspHistorico_OS.Params[7].Value        := 1;
+    dmMSProcedure.fdspHistorico_OS.Params[8].Value        := edtContato.Text;
+
+    dmMSProcedure.fdspHistorico_OS.ExecProc;
+
+    Relacionar_Historico_OS(dmMProvider.cdsOrdemServicoORDEM_DE_SERVICO.Value);
+
+    dmDBEXMaster.fdcMaster.Commit;
+
+    LimparMSG_ERRO;
+
+    frmHistorico.tag      := 0;
+    Result                := true;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+
+      dmDBEXMaster.fdcMaster.Rollback;
+
+      Result := False;
+
+    end;
+  end;
+
+
+end;
+
+procedure TfrmHistorico.Relacionar_Historico_OS(pOrdem_Servico: integer);
+begin
+
+  dmMProvider.cdsHistorico_OS.Close;
+  dmMProvider.cdsHistorico_OS.ProviderName := 'dspHistorico_OS';
+
+  dmDBEXMaster.fdqHistorico_OS.SQL.Clear;
+  dmDBEXMaster.fdqHistorico_OS.SQL.Add('select * from HISTORICO_ORDEM_SERVICO');
+  dmDBEXMaster.fdqHistorico_OS.SQL.Add('where ordem_servico = ' + IntToStr(pOrdem_servico));
+  dmDBEXMaster.fdqHistorico_OS.SQL.Add('order by historico_ordem');
+
+  dmMProvider.cdsHistorico_OS.Open;
+  dmMProvider.cdsHistorico_OS.ProviderName := '';
+
+end;
+
+procedure TfrmHistorico.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang:string;
+begin
+
+  if Pos('Unable',pE.Message) > 0then
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO
+  else if Pos('FOREIGN',pE.Message) > 0then
+  begin
+
+    sChave_Extrang := Trim(Copy(pE.Message,pos('ON TABLE',Uppercase(pE.Message))+ 10,Length(pE.Message)));
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_ERRO_CHAVE_ESTRANGEIRA
+                      + Copy(sChave_Extrang,1,pos('"',sChave_Extrang)-1);
+
+  end
+  else
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + pE.Message;
+
+  TocarSomAlerta(ord(SystemHand));
+
+
+end;
+
+procedure TfrmHistorico.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

@@ -1,0 +1,528 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{F7A4BC42-2165-4CC9-A31C-731A6F9C35F1}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Cidades.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Estados.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Filiais.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Usuarios.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Config.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CFOP_CFPS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Funcionario.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Adm.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CtrlCT.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AtualizaTabelasSped.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NFEntrada.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Relatorios.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SituacoesOS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Equipamentos.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="OrdemServico.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Servicos.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Perdas.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NbmNcm.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="FichaTecnica.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Fornecedor.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Integracao_Fiscal.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SetorBalanca.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Almoxarifado.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="GenesisPV.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="UndMedida.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="GenesisCX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="OrdemProducao.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NFSaida.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Danfe.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ApuracaoICMS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="LivroFiscalEntradas.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="LivroFiscalSaidas.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Produtos.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CaduceuERP.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Automacao.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ImpShof.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CtrlNotas.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="PrcCaduc.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CodComumForn.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Permissao.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Participantes.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="LogSys.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Cidades">
+        <MSBuild Projects="Cidades.dproj"/>
+    </Target>
+    <Target Name="Cidades:Clean">
+        <MSBuild Projects="Cidades.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Cidades:Make">
+        <MSBuild Projects="Cidades.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Estados">
+        <MSBuild Projects="Estados.dproj"/>
+    </Target>
+    <Target Name="Estados:Clean">
+        <MSBuild Projects="Estados.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Estados:Make">
+        <MSBuild Projects="Estados.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Filiais">
+        <MSBuild Projects="Filiais.dproj"/>
+    </Target>
+    <Target Name="Filiais:Clean">
+        <MSBuild Projects="Filiais.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Filiais:Make">
+        <MSBuild Projects="Filiais.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Usuarios">
+        <MSBuild Projects="Usuarios.dproj"/>
+    </Target>
+    <Target Name="Usuarios:Clean">
+        <MSBuild Projects="Usuarios.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Usuarios:Make">
+        <MSBuild Projects="Usuarios.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Config">
+        <MSBuild Projects="Config.dproj"/>
+    </Target>
+    <Target Name="Config:Clean">
+        <MSBuild Projects="Config.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Config:Make">
+        <MSBuild Projects="Config.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CFOP_CFPS">
+        <MSBuild Projects="CFOP_CFPS.dproj"/>
+    </Target>
+    <Target Name="CFOP_CFPS:Clean">
+        <MSBuild Projects="CFOP_CFPS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CFOP_CFPS:Make">
+        <MSBuild Projects="CFOP_CFPS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Funcionario">
+        <MSBuild Projects="Funcionario.dproj"/>
+    </Target>
+    <Target Name="Funcionario:Clean">
+        <MSBuild Projects="Funcionario.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Funcionario:Make">
+        <MSBuild Projects="Funcionario.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Adm">
+        <MSBuild Projects="Adm.dproj"/>
+    </Target>
+    <Target Name="Adm:Clean">
+        <MSBuild Projects="Adm.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Adm:Make">
+        <MSBuild Projects="Adm.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CtrlCT">
+        <MSBuild Projects="CtrlCT.dproj"/>
+    </Target>
+    <Target Name="CtrlCT:Clean">
+        <MSBuild Projects="CtrlCT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CtrlCT:Make">
+        <MSBuild Projects="CtrlCT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AtualizaTabelasSped">
+        <MSBuild Projects="AtualizaTabelasSped.dproj"/>
+    </Target>
+    <Target Name="AtualizaTabelasSped:Clean">
+        <MSBuild Projects="AtualizaTabelasSped.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AtualizaTabelasSped:Make">
+        <MSBuild Projects="AtualizaTabelasSped.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NFEntrada">
+        <MSBuild Projects="NFEntrada.dproj"/>
+    </Target>
+    <Target Name="NFEntrada:Clean">
+        <MSBuild Projects="NFEntrada.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NFEntrada:Make">
+        <MSBuild Projects="NFEntrada.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Relatorios">
+        <MSBuild Projects="Relatorios.dproj"/>
+    </Target>
+    <Target Name="Relatorios:Clean">
+        <MSBuild Projects="Relatorios.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Relatorios:Make">
+        <MSBuild Projects="Relatorios.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SituacoesOS">
+        <MSBuild Projects="SituacoesOS.dproj"/>
+    </Target>
+    <Target Name="SituacoesOS:Clean">
+        <MSBuild Projects="SituacoesOS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SituacoesOS:Make">
+        <MSBuild Projects="SituacoesOS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Equipamentos">
+        <MSBuild Projects="Equipamentos.dproj"/>
+    </Target>
+    <Target Name="Equipamentos:Clean">
+        <MSBuild Projects="Equipamentos.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Equipamentos:Make">
+        <MSBuild Projects="Equipamentos.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OrdemServico">
+        <MSBuild Projects="OrdemServico.dproj"/>
+    </Target>
+    <Target Name="OrdemServico:Clean">
+        <MSBuild Projects="OrdemServico.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OrdemServico:Make">
+        <MSBuild Projects="OrdemServico.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Servicos">
+        <MSBuild Projects="Servicos.dproj"/>
+    </Target>
+    <Target Name="Servicos:Clean">
+        <MSBuild Projects="Servicos.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Servicos:Make">
+        <MSBuild Projects="Servicos.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Perdas">
+        <MSBuild Projects="Perdas.dproj"/>
+    </Target>
+    <Target Name="Perdas:Clean">
+        <MSBuild Projects="Perdas.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Perdas:Make">
+        <MSBuild Projects="Perdas.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NbmNcm">
+        <MSBuild Projects="NbmNcm.dproj"/>
+    </Target>
+    <Target Name="NbmNcm:Clean">
+        <MSBuild Projects="NbmNcm.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NbmNcm:Make">
+        <MSBuild Projects="NbmNcm.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FichaTecnica">
+        <MSBuild Projects="FichaTecnica.dproj"/>
+    </Target>
+    <Target Name="FichaTecnica:Clean">
+        <MSBuild Projects="FichaTecnica.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FichaTecnica:Make">
+        <MSBuild Projects="FichaTecnica.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Fornecedor">
+        <MSBuild Projects="Fornecedor.dproj"/>
+    </Target>
+    <Target Name="Fornecedor:Clean">
+        <MSBuild Projects="Fornecedor.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Fornecedor:Make">
+        <MSBuild Projects="Fornecedor.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Integracao_Fiscal">
+        <MSBuild Projects="Integracao_Fiscal.dproj"/>
+    </Target>
+    <Target Name="Integracao_Fiscal:Clean">
+        <MSBuild Projects="Integracao_Fiscal.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Integracao_Fiscal:Make">
+        <MSBuild Projects="Integracao_Fiscal.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SetorBalanca">
+        <MSBuild Projects="SetorBalanca.dproj"/>
+    </Target>
+    <Target Name="SetorBalanca:Clean">
+        <MSBuild Projects="SetorBalanca.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SetorBalanca:Make">
+        <MSBuild Projects="SetorBalanca.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Almoxarifado">
+        <MSBuild Projects="Almoxarifado.dproj"/>
+    </Target>
+    <Target Name="Almoxarifado:Clean">
+        <MSBuild Projects="Almoxarifado.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Almoxarifado:Make">
+        <MSBuild Projects="Almoxarifado.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GenesisPV">
+        <MSBuild Projects="GenesisPV.dproj"/>
+    </Target>
+    <Target Name="GenesisPV:Clean">
+        <MSBuild Projects="GenesisPV.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GenesisPV:Make">
+        <MSBuild Projects="GenesisPV.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="UndMedida">
+        <MSBuild Projects="UndMedida.dproj"/>
+    </Target>
+    <Target Name="UndMedida:Clean">
+        <MSBuild Projects="UndMedida.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="UndMedida:Make">
+        <MSBuild Projects="UndMedida.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GenesisCX">
+        <MSBuild Projects="GenesisCX.dproj"/>
+    </Target>
+    <Target Name="GenesisCX:Clean">
+        <MSBuild Projects="GenesisCX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GenesisCX:Make">
+        <MSBuild Projects="GenesisCX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OrdemProducao">
+        <MSBuild Projects="OrdemProducao.dproj"/>
+    </Target>
+    <Target Name="OrdemProducao:Clean">
+        <MSBuild Projects="OrdemProducao.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OrdemProducao:Make">
+        <MSBuild Projects="OrdemProducao.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NFSaida">
+        <MSBuild Projects="NFSaida.dproj"/>
+    </Target>
+    <Target Name="NFSaida:Clean">
+        <MSBuild Projects="NFSaida.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NFSaida:Make">
+        <MSBuild Projects="NFSaida.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Danfe">
+        <MSBuild Projects="Danfe.dproj"/>
+    </Target>
+    <Target Name="Danfe:Clean">
+        <MSBuild Projects="Danfe.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Danfe:Make">
+        <MSBuild Projects="Danfe.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ApuracaoICMS">
+        <MSBuild Projects="ApuracaoICMS.dproj"/>
+    </Target>
+    <Target Name="ApuracaoICMS:Clean">
+        <MSBuild Projects="ApuracaoICMS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ApuracaoICMS:Make">
+        <MSBuild Projects="ApuracaoICMS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="LivroFiscalEntradas">
+        <MSBuild Projects="LivroFiscalEntradas.dproj"/>
+    </Target>
+    <Target Name="LivroFiscalEntradas:Clean">
+        <MSBuild Projects="LivroFiscalEntradas.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LivroFiscalEntradas:Make">
+        <MSBuild Projects="LivroFiscalEntradas.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="LivroFiscalSaidas">
+        <MSBuild Projects="LivroFiscalSaidas.dproj"/>
+    </Target>
+    <Target Name="LivroFiscalSaidas:Clean">
+        <MSBuild Projects="LivroFiscalSaidas.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LivroFiscalSaidas:Make">
+        <MSBuild Projects="LivroFiscalSaidas.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Produtos">
+        <MSBuild Projects="Produtos.dproj"/>
+    </Target>
+    <Target Name="Produtos:Clean">
+        <MSBuild Projects="Produtos.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Produtos:Make">
+        <MSBuild Projects="Produtos.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CaduceuERP">
+        <MSBuild Projects="CaduceuERP.dproj"/>
+    </Target>
+    <Target Name="CaduceuERP:Clean">
+        <MSBuild Projects="CaduceuERP.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CaduceuERP:Make">
+        <MSBuild Projects="CaduceuERP.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Automacao">
+        <MSBuild Projects="Automacao.dproj"/>
+    </Target>
+    <Target Name="Automacao:Clean">
+        <MSBuild Projects="Automacao.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Automacao:Make">
+        <MSBuild Projects="Automacao.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ImpShof">
+        <MSBuild Projects="ImpShof.dproj"/>
+    </Target>
+    <Target Name="ImpShof:Clean">
+        <MSBuild Projects="ImpShof.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImpShof:Make">
+        <MSBuild Projects="ImpShof.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CtrlNotas">
+        <MSBuild Projects="CtrlNotas.dproj"/>
+    </Target>
+    <Target Name="CtrlNotas:Clean">
+        <MSBuild Projects="CtrlNotas.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CtrlNotas:Make">
+        <MSBuild Projects="CtrlNotas.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PrcCaduc">
+        <MSBuild Projects="PrcCaduc.dproj"/>
+    </Target>
+    <Target Name="PrcCaduc:Clean">
+        <MSBuild Projects="PrcCaduc.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PrcCaduc:Make">
+        <MSBuild Projects="PrcCaduc.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CodComumForn">
+        <MSBuild Projects="CodComumForn.dproj"/>
+    </Target>
+    <Target Name="CodComumForn:Clean">
+        <MSBuild Projects="CodComumForn.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodComumForn:Make">
+        <MSBuild Projects="CodComumForn.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Permissao">
+        <MSBuild Projects="Permissao.dproj"/>
+    </Target>
+    <Target Name="Permissao:Clean">
+        <MSBuild Projects="Permissao.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Permissao:Make">
+        <MSBuild Projects="Permissao.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Participantes">
+        <MSBuild Projects="Participantes.dproj"/>
+    </Target>
+    <Target Name="Participantes:Clean">
+        <MSBuild Projects="Participantes.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Participantes:Make">
+        <MSBuild Projects="Participantes.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="LogSys">
+        <MSBuild Projects="LogSys.dproj"/>
+    </Target>
+    <Target Name="LogSys:Clean">
+        <MSBuild Projects="LogSys.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LogSys:Make">
+        <MSBuild Projects="LogSys.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Cidades;Estados;Filiais;Usuarios;Config;CFOP_CFPS;Funcionario;Adm;CtrlCT;AtualizaTabelasSped;NFEntrada;Relatorios;SituacoesOS;Equipamentos;OrdemServico;Servicos;Perdas;NbmNcm;FichaTecnica;Fornecedor;Integracao_Fiscal;SetorBalanca;Almoxarifado;GenesisPV;UndMedida;GenesisCX;OrdemProducao;NFSaida;Danfe;ApuracaoICMS;LivroFiscalEntradas;LivroFiscalSaidas;Produtos;CaduceuERP;Automacao;ImpShof;CtrlNotas;PrcCaduc;CodComumForn;Permissao;Participantes;LogSys"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Cidades:Clean;Estados:Clean;Filiais:Clean;Usuarios:Clean;Config:Clean;CFOP_CFPS:Clean;Funcionario:Clean;Adm:Clean;CtrlCT:Clean;AtualizaTabelasSped:Clean;NFEntrada:Clean;Relatorios:Clean;SituacoesOS:Clean;Equipamentos:Clean;OrdemServico:Clean;Servicos:Clean;Perdas:Clean;NbmNcm:Clean;FichaTecnica:Clean;Fornecedor:Clean;Integracao_Fiscal:Clean;SetorBalanca:Clean;Almoxarifado:Clean;GenesisPV:Clean;UndMedida:Clean;GenesisCX:Clean;OrdemProducao:Clean;NFSaida:Clean;Danfe:Clean;ApuracaoICMS:Clean;LivroFiscalEntradas:Clean;LivroFiscalSaidas:Clean;Produtos:Clean;CaduceuERP:Clean;Automacao:Clean;ImpShof:Clean;CtrlNotas:Clean;PrcCaduc:Clean;CodComumForn:Clean;Permissao:Clean;Participantes:Clean;LogSys:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Cidades:Make;Estados:Make;Filiais:Make;Usuarios:Make;Config:Make;CFOP_CFPS:Make;Funcionario:Make;Adm:Make;CtrlCT:Make;AtualizaTabelasSped:Make;NFEntrada:Make;Relatorios:Make;SituacoesOS:Make;Equipamentos:Make;OrdemServico:Make;Servicos:Make;Perdas:Make;NbmNcm:Make;FichaTecnica:Make;Fornecedor:Make;Integracao_Fiscal:Make;SetorBalanca:Make;Almoxarifado:Make;GenesisPV:Make;UndMedida:Make;GenesisCX:Make;OrdemProducao:Make;NFSaida:Make;Danfe:Make;ApuracaoICMS:Make;LivroFiscalEntradas:Make;LivroFiscalSaidas:Make;Produtos:Make;CaduceuERP:Make;Automacao:Make;ImpShof:Make;CtrlNotas:Make;PrcCaduc:Make;CodComumForn:Make;Permissao:Make;Participantes:Make;LogSys:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

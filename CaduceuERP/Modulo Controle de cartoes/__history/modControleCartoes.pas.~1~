@@ -1,0 +1,720 @@
+unit modControleCartoes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.DBCtrls,
+  Vcl.Mask, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Vcl.Imaging.pngimage,
+  Vcl.StdActns, System.Actions, Vcl.ActnList,db, midaslib;
+
+type
+  TfrmModControleCartoes = class(TForm)
+    imgSair: TImage;
+    imgEditar: TImage;
+    imgExcluir: TImage;
+    imgSalvar: TImage;
+    imgDesfazer: TImage;
+    imgNovo: TImage;
+    lblF6: TLabel;
+    lblF5: TLabel;
+    lblF4: TLabel;
+    lblF3: TLabel;
+    lblF2: TLabel;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    pgcControleCartoes: TPageControl;
+    tbsTabela: TTabSheet;
+    grdTabela: TDBGrid;
+    tbsCadastro: TTabSheet;
+    grpCadastro: TGroupBox;
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    ActionList1: TActionList;
+    actEditar: TAction;
+    actDesfazer: TAction;
+    WindowClose1: TWindowClose;
+    actMinimizar: TAction;
+    actIncluir: TAction;
+    actSalvar: TAction;
+    actExcluir: TAction;
+    imgBaixa: TImage;
+    lblF7: TLabel;
+    grpTotais: TGroupBox;
+    grpCreditos: TGroupBox;
+    grpDebitos: TGroupBox;
+    lblCreditoAberto: TLabel;
+    lblCreditoBaixado: TLabel;
+    lblDebitoAberto: TLabel;
+    lblDebitoBaixado: TLabel;
+    edtCreditoAberto: TDBEdit;
+    dtCreditoBaixado: TDBEdit;
+    edtDebitoAberto: TDBEdit;
+    edtDebitobaixado: TDBEdit;
+    lblControle: TLabel;
+    edtControle: TDBEdit;
+    lblAdministradora: TLabel;
+    cboAdministradora: TDBLookupComboBox;
+    lblEmissao: TLabel;
+    lblDeposito: TLabel;
+    lblRecebimento: TLabel;
+    edtDataEmissao: TDBEdit;
+    edtDataDeposito: TDBEdit;
+    edtdataRecebimento: TDBEdit;
+    grpValores: TGroupBox;
+    lblValorOperacao: TLabel;
+    lblValorDesconto: TLabel;
+    lblValorReceber: TLabel;
+    edtValorOperacao: TDBEdit;
+    edtValorDesconto: TDBEdit;
+    edtvalorReceber: TDBEdit;
+    rdgTipoOperacao: TDBRadioGroup;
+    grpStatus: TGroupBox;
+    edtDescrStatus: TDBEdit;
+    grpDatabaixa: TGroupBox;
+    edtDataBaixa: TDBEdit;
+    dtpInicial: TDateTimePicker;
+    dtpFinal: TDateTimePicker;
+    ldoFiltroInicial: TLabel;
+    lblFiltroFinal: TLabel;
+    actBaixaCartao: TAction;
+    procedure FormCreate(Sender: TObject);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    function AbrirTabelaCtrlCartoes(pOpcao:smallint; pDataIni, pDataFin:TDateTime):boolean;
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtDataEmissaoEnter(Sender: TObject);
+    procedure edtDataEmissaoExit(Sender: TObject);
+    procedure edtDataDepositoExit(Sender: TObject);
+    procedure edtValorOperacaoKeyPress(Sender: TObject; var Key: Char);
+    procedure edtValorOperacaoExit(Sender: TObject);
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    procedure actEditarExecute(Sender: TObject);
+    procedure edtDescrStatusChange(Sender: TObject);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure lblF5Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure actSalvarExecute(Sender: TObject);
+    function ValidarCampos:boolean;
+    procedure actIncluirExecute(Sender: TObject);
+    procedure impPesquisarClick(Sender: TObject);
+    procedure edtControleKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtControleKeyPress(Sender: TObject; var Key: Char);
+    procedure actBaixaCartaoExecute(Sender: TObject);
+  private
+    { Private declarations }
+    procedure LimparMSG_ERRO;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmModControleCartoes: TfrmModControleCartoes;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes, modBaixaCartao;
+
+function TfrmModControleCartoes.AbrirTabelaCtrlCartoes(pOpcao:smallint; pDataIni, pDataFin:TDateTime):boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsCtrlCartoes.Close;
+  dmMProvider.cdsCtrlCartoes.ProviderName := 'dspCtrlCartoes';;
+  dmDBEXMaster.fdqCtrlCartoes.SQL.Clear;
+  dmDBEXMaster.fdqCtrlCartoes.SQL.Add('SELECT * FROM CONTROLECARTAOTICKET');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_CtrlCartoes(pOpcao,pDataIni, pDataFin);
+
+  dmDBEXMaster.fdqCtrlCartoes.SQL.Add(sWhere);
+
+  try
+
+    dmMProvider.cdsCtrlCartoes.Open;
+    dmMProvider.cdsCtrlCartoes.ProviderName := '';
+
+    if (dmMProvider.cdsCtrlCartoes.IsEmpty) and (pOpcao <> 3) then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PERIODO_NAO_ENCONTRADO;
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsCtrlCartoes.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.actBaixaCartaoExecute(Sender: TObject);
+begin
+
+  frmBaixaCartao := TfrmBaixaCartao.Create(self);
+  frmBaixaCartao.ShowModal;
+
+  FreeAndNil(frmBaixaCartao);
+
+end;
+
+procedure TfrmModControleCartoes.actDesfazerExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsCtrlCartoes.Cancel;
+
+  HabilitaDesabilitaControles(False);
+
+end;
+
+procedure TfrmModControleCartoes.actEditarExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if not dmMProvider.cdsCtrlCartoes.IsEmpty then
+  begin
+
+    if dmMProvider.cdsCtrlCartoesSTATUS.Value = 0 then
+    begin
+
+      HabilitaDesabilitaControles(True);
+      pgcControleCartoes.ActivePageIndex := 1;
+      cboAdministradora.SetFocus;
+
+    end
+    else
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_STATUS_NAO_PERMITE;
+      Application.ProcessMessages;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.actExcluirExecute(Sender: TObject);
+begin
+
+  try
+
+    if dmMProvider.cdsCtrlCartoes.Active then
+    begin
+
+      if  dmMProvider.cdsCtrlCartoesSTATUS.Value = 0 then
+      begin
+
+        if not (dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert]) then
+        begin
+
+          dmDBEXMaster.fdtMaster.StartTransaction;
+
+          LimparMSG_ERRO;
+
+          dmMSProcedure.fdspCtrlCartoes.Params[0].Value  := 1;
+          dmMSProcedure.fdspCtrlCartoes.Params[1].Value  := dmMProvider.cdsCtrlCartoesCONTROLECARTAOTICKET.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[2].Value  := dmMProvider.cdsCtrlCartoesADMINISTRADORA.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[3].Value  := dmMProvider.cdsCtrlCartoesEMISSAO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[4].Value  := dmMProvider.cdsCtrlCartoesDEPOSITO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[5].Value  := dmMProvider.cdsCtrlCartoesRECEBIMENTO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[6].Value  := dmMProvider.cdsCtrlCartoesBAIXA.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[7].Value  := dmMProvider.cdsCtrlCartoesSTATUS.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[8].Value  := dmMProvider.cdsCtrlCartoesTIPO_OPERACAO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[9].Value  := dmMProvider.cdsCtrlCartoesVALORARECEBER.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[10].Value := dmMProvider.cdsCtrlCartoesVALORDACOMPRA.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[11].Value := dmMProvider.cdsCtrlCartoesVALORDODESCONTO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[12].Value := pubNomeComputador;
+          dmMSProcedure.fdspCtrlCartoes.Params[13].Value := dmDBEXMaster.iIdUsuario;
+          dmMSProcedure.fdspCtrlCartoes.Params[14].Value := RetornarIP;
+
+          dmMSProcedure.fdspCtrlCartoes.ExecProc;
+
+          dmDBEXMaster.fdtMaster.Commit;
+
+          dmMProvider.cdsCtrlCartoes.Delete;
+
+          dmDBEXMaster.AbritTotaizControleCartao(dmMProvider.cdsCtrlCartoesEMISSAO.Value,dmMProvider.cdsCtrlCartoesEMISSAO.Value);
+
+        end;
+
+      end
+      else
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_STATUS_NAO_PERMITE;
+        Application.ProcessMessages;
+
+      end;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+
+
+
+end;
+
+procedure TfrmModControleCartoes.actIncluirExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    if not (dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert]) then
+    begin
+
+      pgcControleCartoes.Pages[1].TabVisible  := True;
+
+      HabilitaDesabilitaControles(True);
+
+      pgcControleCartoes.ActivePageIndex      := 1;
+
+      AbrirTabelaCtrlCartoes(3,0,0);
+      dmMProvider.cdsCtrlCartoes.Append;
+
+      cboAdministradora.SetFocus;
+
+    end;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.actSalvarExecute(Sender: TObject);
+begin
+  try
+
+    ActiveControl := nil;
+
+    if dmMProvider.cdsCtrlCartoes.Active then
+    begin
+
+      if dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert] then
+      begin
+
+        if ValidarCampos then
+        begin
+
+          dmDBEXMaster.fdtMaster.StartTransaction;
+
+          LimparMSG_ERRO;
+
+          dmMSProcedure.fdspCtrlCartoes.Params[0].Value  := 0;
+          dmMSProcedure.fdspCtrlCartoes.Params[1].Value  := dmMProvider.cdsCtrlCartoesCONTROLECARTAOTICKET.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[2].Value  := dmMProvider.cdsCtrlCartoesADMINISTRADORA.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[3].Value  := dmMProvider.cdsCtrlCartoesEMISSAO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[4].Value  := dmMProvider.cdsCtrlCartoesDEPOSITO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[5].Value  := dmMProvider.cdsCtrlCartoesRECEBIMENTO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[6].Value  := dmMProvider.cdsCtrlCartoesBAIXA.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[7].Value  := dmMProvider.cdsCtrlCartoesSTATUS.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[8].Value  := dmMProvider.cdsCtrlCartoesTIPO_OPERACAO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[9].Value  := dmMProvider.cdsCtrlCartoesVALORARECEBER.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[10].Value := dmMProvider.cdsCtrlCartoesVALORDACOMPRA.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[11].Value := dmMProvider.cdsCtrlCartoesVALORDODESCONTO.Value;
+          dmMSProcedure.fdspCtrlCartoes.Params[12].Value := pubNomeComputador;
+          dmMSProcedure.fdspCtrlCartoes.Params[13].Value := dmDBEXMaster.iIdUsuario;
+          dmMSProcedure.fdspCtrlCartoes.Params[14].Value := RetornarIP;
+
+          dmMSProcedure.fdspCtrlCartoes.ExecProc;
+
+          dmDBEXMaster.fdtMaster.Commit;
+
+          if dmMSProcedure.fdspCtrlCartoes.Params[15].Value > 0 then
+            dmMProvider.cdsCtrlCartoesCONTROLECARTAOTICKET.Value := dmMSProcedure.fdspCtrlCartoes.Params[15].Value;
+
+          dmDBEXMaster.fdtMaster.Commit;
+
+          dmMProvider.cdsCtrlCartoes.Post;
+
+          dmDBEXMaster.AbritTotaizControleCartao(dmMProvider.cdsCtrlCartoesEMISSAO.Value, dmMProvider.cdsCtrlCartoesEMISSAO.Value);
+
+          HabilitaDesabilitaControles(false);
+
+        end
+        else
+        begin
+
+          lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PREENCHIMENTO_OBRIGATORIO;
+          TocarSomAlerta(ord(SystemHand));
+
+        end;
+
+      end;
+
+    end;
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.edtControleKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.edtControleKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmModControleCartoes.edtDataDepositoExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsCtrlCartoesRECEBIMENTO.Value := dmMProvider.cdsCtrlCartoesEMISSAO.Value + dmMProvider.cdsAdministradorasPRAZO.Value;
+
+end;
+
+procedure TfrmModControleCartoes.edtDataEmissaoEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmModControleCartoes.edtDataEmissaoExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsCtrlCartoesDEPOSITO.Value := dmMProvider.cdsCtrlCartoesEMISSAO.Value;
+
+end;
+
+procedure TfrmModControleCartoes.edtDescrStatusChange(Sender: TObject);
+begin
+
+  case dmMProvider.cdsCtrlCartoesSTATUS.Value of
+    0:edtDescrStatus.Font.Color := clGreen;
+    1:edtDescrStatus.Font.Color := clRed;
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.edtValorOperacaoExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert] then
+  begin
+
+    dmMProvider.cdsCtrlCartoesVALORDODESCONTO.Value := dmMProvider.cdsCtrlCartoesVALORDACOMPRA.Value * (dmMProvider.cdsAdministradorasDESCONTO.Value/ 100);
+    dmMProvider.cdsCtrlCartoesVALORARECEBER.Value   := dmMProvider.cdsCtrlCartoesVALORDACOMPRA.Value - dmMProvider.cdsCtrlCartoesVALORDODESCONTO.Value;
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.edtValorOperacaoKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = FormatoUS.DecimalSeparator then
+    Key := FormatoBR.DecimalSeparator;
+
+  if key = #13 then
+  begin
+    key := #0;
+    PostMessage(handle, WM_KEYDOWN, VK_TAB, 1);
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                               := COR_PADRAO_TELAS;
+  Caption                             := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario           := ParamStr(1);
+  dmDBEXMaster.sSenha                 := paramstr(2);
+  dmDBEXMaster.iIdUsuario             := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial              := StrToInt(ParamStr(4));
+
+  pgcControleCartoes.Pages[1].TabVisible       := False;
+  pgcControleCartoes.ActivePageIndex           := 0;
+
+  dtpInicial.Date := date;
+  dtpFinal.Date   := dtpInicial.Date;
+
+end;
+
+procedure TfrmModControleCartoes.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmModControleCartoes.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    actExcluirExecute(self);
+
+  end
+  else   if (UpperCase(key) = 'N') and (lblMsg.Tag = -1) then
+  begin
+
+    key         := #0;
+    lblMsg.Tag  := 0;
+    LimparMSG_ERRO;
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsCtrlCartoes.IsEmpty then
+  begin
+
+    pgcControleCartoes.Pages[1].TabVisible  := True;
+    pgcControleCartoes.ActivePageIndex      := 1;
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.grdTabelaDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsCtrlCartoes.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsCtrlCartoes.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+
+end;
+
+procedure TfrmModControleCartoes.grdTabelaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(Self);
+
+end;
+
+procedure TfrmModControleCartoes.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+procedure TfrmModControleCartoes.impPesquisarClick(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if AbrirTabelaCtrlCartoes(rdpOpcoesPesquisa.ItemIndex, dtpInicial.Date, dtpFinal.Date) then
+  begin
+
+    pgcControleCartoes.Pages[1].TabVisible  := False;
+    pgcControleCartoes.ActivePageIndex      := 0;
+
+    grdTabela.SetFocus;
+
+  end;
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmModControleCartoes.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsCtrlCartoes.Active then
+  begin
+
+    if not (dmMProvider.cdsCtrlCartoes.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmModControleCartoes.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+procedure TfrmModControleCartoes.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  dtpInicial.SetFocus;
+
+end;
+
+procedure TfrmModControleCartoes.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang:string;
+begin
+
+  if Pos('Unable',pE.Message) > 0then
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO
+  else if Pos('FOREIGN',pE.Message) > 0then
+  begin
+
+    sChave_Extrang := Trim(Copy(pE.Message,pos('ON TABLE',Uppercase(pE.Message))+ 10,Length(pE.Message)));
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_ERRO_CHAVE_ESTRANGEIRA
+                      + Copy(sChave_Extrang,1,pos('"',sChave_Extrang)-1);
+
+  end
+  else
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + pE.Message;
+
+  TocarSomAlerta(ord(SystemHand));
+
+end;
+
+function TfrmModControleCartoes.ValidarCampos: boolean;
+begin
+
+  Result := true;
+
+  if dmMProvider.cdsCtrlCartoesEMISSAO.Value <= 0 then
+  begin
+
+    edtDataEmissao.SetFocus;
+    Result := false;
+
+  end
+  else if dmMProvider.cdsCtrlCartoesVALORDACOMPRA.Value <= 0 then
+  begin
+
+    edtValorOperacao.SetFocus;
+    Result := false;
+
+  end
+  else if rdgTipoOperacao.ItemIndex < 0 then
+    Result := false;
+
+end;
+
+procedure TfrmModControleCartoes.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

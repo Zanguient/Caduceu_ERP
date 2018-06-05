@@ -1,0 +1,72 @@
+unit modPermissoes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Data.DB, Vcl.Grids,
+  Vcl.DBGrids, Vcl.ComCtrls, Vcl.CheckLst;
+
+type
+  TDBGrid = class(Vcl.DBGrids.TDBGrid)
+  protected
+    procedure DrawCellBackground(const ARect: TRect; AColor: TColor;
+      AState: TGridDrawState; ACol, ARow: Integer); override;
+  end;
+  TfrmPermissoes = class(TForm)
+    grpUsuarios: TGroupBox;
+    grdusuarios: TDBGrid;
+    grpPermi9ssoes: TGroupBox;
+    CheckListBox1: TCheckListBox;
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPermissoes: TfrmPermissoes;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes, uFuncoes_BD;
+
+procedure TfrmPermissoes.FormCreate(Sender: TObject);
+var
+  i:integer;
+begin
+
+  Caption := Application.Title + ' - ' + PREFIXO_VERSAO + RetornarVersao(Application.ExeName, 1);
+
+  DesabilitarBotaoFecharForm(handle);
+
+  dmDBEXMaster.sNomeUsuario := ParamStr(1);
+  dmDBEXMaster.sSenha       := ParamStr(2);
+  dmDBEXMaster.iIdUsuario   := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial    := StrToInt(ParamStr(4));
+
+  for i := 0 to grdusuarios.Columns.Count - 1 do
+    grdusuarios.Columns[i].Title.Color := COR_TITULO_GRADE;
+
+end;
+
+{ TDBGrid }
+
+procedure TDBGrid.DrawCellBackground(const ARect: TRect; AColor: TColor;
+  AState: TGridDrawState; ACol, ARow: Integer);
+begin
+  inherited;
+
+  if ACol < 0 then
+    inherited DrawCellBackground(ARect, AColor, AState, ACol, ARow)
+  else
+    inherited DrawCellBackground(ARect, Columns[ACol].Title.Color, AState,
+      ACol, ARow)
+
+end;
+
+end.

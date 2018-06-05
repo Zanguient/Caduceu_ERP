@@ -1,0 +1,25 @@
+unit dataMSProcedureContabil;
+
+interface
+
+uses
+  System.SysUtils, System.Classes;
+
+type
+  TdmMSPContabil = class(TDataModule)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dmMSPContabil: TdmMSPContabil;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

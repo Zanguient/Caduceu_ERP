@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/12/21 17:24:22.000.335,=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2016/12/21 17:24:50.000.555,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataDBEXMaster.pas</Transaction>
+    <Transaction>2016/12/21 17:24:55.000.069,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas</Transaction>
+    <Transaction>2016/12/21 17:24:55.000.108,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSource.pas</Transaction>
+    <Transaction>2016/12/21 17:24:55.000.086,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMRelatorios.pas</Transaction>
+    <Transaction>2016/12/21 17:24:55.000.078,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMProvider.pas</Transaction>
+    <Transaction>2016/12/21 17:24:59.000.049,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMSProcedure.pas</Transaction>
+    <Transaction>2016/12/21 17:25:14.000.871,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\datamZeus.pas</Transaction>
+    <Transaction>2016/12/21 17:25:21.000.837,=D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataSintegraSped.pas</Transaction>
+    <Transaction>2016/12/21 17:25:51.000.614,D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataMAtualizacao.pas=</Transaction>
+    <Transaction>2016/12/21 17:26:28.000.659,D:\Projetos\Delphi_XE6\GenesisAC\ImportaSHOFICINA\modImpShof.pas=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2016/12/21 17:26:28.000.659,D:\Projetos\Delphi_XE6\GenesisAC\ImportaSHOFICINA\modImpShof.dfm=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2016/12/21 17:26:42.000.091,D:\Projetos\Delphi_XE6\GenesisAC\ImpShof.dproj=C:\Users\Lindomar\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2016/12/21 17:27:07.000.786,=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+    <Transaction>2016/12/21 17:27:34.000.799,D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataShoficina.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.dfm</Transaction>
+    <Transaction>2016/12/21 17:27:34.000.799,D:\Projetos\Delphi_XE6\GenesisAC\Data_Modulos\dataShoficina.pas=D:\Projetos\Delphi_XE6\GenesisAC\Unit1.pas</Transaction>
+    <Transaction>2016/12/21 18:01:54.000.751,=D:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/12/21 18:02:14.000.592,D:\Projetos\Delphi_XE6\GenesisAC\ImportaSHOFICINA\frmImportarShof.pas=D:\Projetos\Delphi_XE6\GenesisAC\Unit3.pas</Transaction>
+    <Transaction>2016/12/21 18:02:14.000.592,D:\Projetos\Delphi_XE6\GenesisAC\ImportaSHOFICINA\frmImportarShof.dfm=D:\Projetos\Delphi_XE6\GenesisAC\Unit3.dfm</Transaction>
+    <Transaction>2016/12/22 08:52:56.000.789,D:\Projetos\Delphi_XE6\GenesisAC\ImportaSHOFICINA\modImpShof.pas=</Transaction>
+    <Transaction>2016/12/22 09:05:07.000.659,=D:\Projetos\Constantes padrao\uConstantes_Padrao.pas</Transaction>
+    <Transaction>2016/12/22 09:05:21.000.791,=D:\Projetos\Funcoes Genericas\uFuncoes.pas</Transaction>
+  </Transactions>
+</BorlandProject>

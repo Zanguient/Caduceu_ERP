@@ -1,0 +1,833 @@
+unit modSintegra;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.StdCtrls, DateUtils, ACBrSintegra;
+
+
+procedure GerarSintegraTotalidade(sArquivoSintegra: string);
+procedure GerarRegistro10;
+procedure GerarRegistro11;
+procedure GerarRegistro50;
+procedure GerarRegistro54;
+function PesquisarProduto(pProduto:string):boolean;
+procedure GerarRegistro60M;
+procedure GerarRegistro60A;
+procedure GerarRegistro60D;
+procedure GerarRegistro60I;
+procedure GerarRegistro60R;
+procedure GerarRegistro70;
+procedure GerarRegistro74;
+
+var
+  iHoraFinal: TDateTime;
+  iTotalRegistros, iRegistroAtual:integer;
+
+implementation
+
+uses modIntegracao, dataDBEXMaster, dataMProvider, uConstantes_Padrao, uFuncoes,
+  dataSintegraSped;
+
+procedure GerarSintegraTotalidade(sArquivoSintegra: string);
+var
+  iTotaRegistros,  iTotalReg50, iTotalReg54, iTotalReg60M, iTotalReg60A, iTotalReg60D,
+  ItotalReg60I, iTotalReg60R, iTotalreg70, iTotalReg74, iTotalReg75, I : integer;
+
+begin
+
+  frmIntegracao.pnlProgresso.Visible        := True;
+  frmIntegracao.advMarquueProcesso.Animate  := frmIntegracao.pnlProgresso.Visible;
+
+  // verifica se está marcado para gerar o registro 10
+  if frmIntegracao.chkRegistroSintegra.Checked[0] then
+  begin
+
+    frmIntegracao.ACBrSintegra1.FileName          := sArquivoSintegra;
+    frmIntegracao.ACBrSintegra1.VersaoValidador   := vv524;
+
+    frmIntegracao.lblMsg.Caption                  := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 10 - Mestre do Estabelecimento';
+    Application.ProcessMessages;
+
+    GerarRegistro10;
+
+    frmIntegracao.lblMsg.Caption                  := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 11 -  Dados complementares do informante';
+    Application.ProcessMessages;
+
+    GerarRegistro11;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[2] then
+      GerarRegistro50;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[5] then
+      GerarRegistro54;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[8] then
+      GerarRegistro60M;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[9] then
+      GerarRegistro60A;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[10] then
+      GerarRegistro60D;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[11] then
+      GerarRegistro60I;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[12] then
+      GerarRegistro60R;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[14] then
+      GerarRegistro70;
+
+    if frmIntegracao.chkRegistroSintegra.Checked[16] then
+      GerarRegistro74;
+
+    iTotaRegistros  := frmIntegracao.ACBrSintegra1.Registros50.Count
+                        + frmIntegracao.ACBrSintegra1.Registros54.Count
+                        + frmIntegracao.ACBrSintegra1.Registros60M.Count
+                        + frmIntegracao.ACBrSintegra1.Registros60A.Count
+                        + frmIntegracao.ACBrSintegra1.Registros60D.Count
+                        + frmIntegracao.ACBrSintegra1.Registros60I.Count
+                        + frmIntegracao.ACBrSintegra1.Registros60R.Count
+                        + frmIntegracao.ACBrSintegra1.Registros70.Count
+                        + frmIntegracao.ACBrSintegra1.Registros74.Count
+                        + frmIntegracao.ACBrSintegra1.Registros75.Count + 2;
+
+    iTotalReg50     := frmIntegracao.ACBrSintegra1.Registros50.Count;
+    iTotalReg54     := frmIntegracao.ACBrSintegra1.Registros54.Count;
+    iTotalReg60M    := frmIntegracao.ACBrSintegra1.Registros60M.Count;
+    iTotalReg60A    := frmIntegracao.ACBrSintegra1.Registros60A.Count;
+    iTotalReg60D    := frmIntegracao.ACBrSintegra1.Registros60D.Count;
+    iTotalReg60I    := frmIntegracao.ACBrSintegra1.Registros60I.Count;
+    iTotalReg60R    := frmIntegracao.ACBrSintegra1.Registros60R.Count;
+    iTotalReg70     := frmIntegracao.ACBrSintegra1.Registros70.Count;
+    iTotalReg74     := frmIntegracao.ACBrSintegra1.Registros74.Count;
+    iTotalReg75     := frmIntegracao.ACBrSintegra1.Registros75.Count;
+
+    frmIntegracao.ACBrSintegra1.GeraArquivo;
+
+    frmIntegracao.lblMsg.Caption              := '';
+    frmIntegracao.pnlProgresso.Visible        := False;
+    frmIntegracao.advMarquueProcesso.Animate  := frmIntegracao.pnlProgresso.Visible;
+    Application.ProcessMessages;
+
+    iHoraFinal                                := Time;
+
+    frmIntegracao.memConteudoSintegra.Clear;
+    frmIntegracao.memConteudoSintegra.Lines.Add(dmDBEXMaster.sNomeUsuario + ', o arquivo:');
+    frmIntegracao.memConteudoSintegra.Lines.Add(sArquivoSintegra + ', foi criado com sucesso!');
+    frmIntegracao.memConteudoSintegra.Lines.Add('----------------------------| Estatísticas |----------------------------');
+    frmIntegracao.memConteudoSintegra.Lines.Add('Tempo gasto---------------------> ' + TimeToStr(iHoraFinal - frmIntegracao.iHoraInicial));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 10  ----> ' + Format('%-10.10s', [IntToStr(1)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 11  ----> ' + Format('%-10.10s', [IntToStr(1)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 50  ----> ' + Format('%-10.10s', [IntToStr(iTotalReg50)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 54  ----> ' + Format('%-10.10s', [IntToStr(iTotalReg54)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 60M ----> ' + Format('%-10.10s', [IntToStr(iTotalReg60M)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 60A ----> ' + Format('%-10.10s', [IntToStr(iTotalReg60A)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 60D ----> ' + Format('%-10.10s', [IntToStr(iTotalReg60D)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 60I ----> ' + Format('%-10.10s', [IntToStr(iTotalReg60I)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 60R ----> ' + Format('%-10.10s', [IntToStr(iTotalReg60R)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 70  ----> ' + Format('%-10.10s', [IntToStr(iTotalReg70)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 74  ----> ' + Format('%-10.10s', [IntToStr(iTotalReg74)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros tipo 75  ----> ' + Format('%-10.10s', [IntToStr(iTotalReg75)]));
+    frmIntegracao.memConteudoSintegra.Lines.Add('------------------------------------------------------------------------');
+
+    frmIntegracao.memConteudoSintegra.Lines.Add('Total de registros--------------> ' + Format('%-10.10s', [IntToStr(iTotaRegistros)]));
+
+    for i := 0 to frmIntegracao.memConteudoSintegra.Lines.Count - 1 do
+      SendMessage(frmIntegracao.memConteudoSintegra.handle, EM_LINESCROLL, SB_LINEUP, -1);
+
+  end;
+
+end;
+
+procedure GerarRegistro10;
+begin
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    Registro10.CNPJ                 := Trim(LimparCpnjInscricao(dmMProvider.cdsFilialCNPJ.Value));
+    Registro10.Inscricao            := Trim(LimparCpnjInscricao(dmMProvider.cdsFilialINSCRICAO.Value));
+    Registro10.RazaoSocial          := dmMProvider.cdsFilialRAZAOSOCIAL.Value;
+    Registro10.Cidade               := dmMProvider.cdsFilialNOME_CIDADE.Value;
+    Registro10.Estado               := Trim(dmMProvider.cdsFilialESTADO.Value);
+    Registro10.Telefone             := dmMProvider.cdsFilialTELEFONE1.Value;
+    Registro10.DataInicial          := frmIntegracao.dtpInicioSintegra.Date;
+    Registro10.DataFinal            := frmIntegracao.dtpFimSintegra.Date;
+    Registro10.CodigoConvenio       := '3';
+    Registro10.NaturezaInformacoes  := IntToStr(frmIntegracao.rdgOperacaoSintegra.ItemIndex + 1);
+
+    case frmIntegracao.rdgFinalidadeSintegra.ItemIndex of
+      0:Registro10.FinalidadeArquivo  := '1'; // Normal;
+      1:Registro10.FinalidadeArquivo  := '2'; // Retificacao Total;
+      2:Registro10.FinalidadeArquivo  := '3'; // Retificacao Aditiva;
+      3:Registro10.FinalidadeArquivo  := '5'; // Desfazimento;
+    end;
+
+  end;
+
+end;
+
+procedure GerarRegistro11;
+begin
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    Registro11.Endereco     := dmMProvider.cdsFilialENDERECO.Value;
+
+    if dmMProvider.cdsFilialNUMERO.Value <= 0 then
+      Registro11.Numero     := 'S/N'
+    else
+      Registro11.Numero     := IntToStr(dmMProvider.cdsFilialNUMERO.Value);
+
+    Registro11.Bairro       := dmMProvider.cdsFilialBAIRRO.Value;
+    Registro11.Cep          := dmMProvider.cdsFilialCEP.Value;
+    Registro11.Responsavel  := dmMProvider.cdsFilialCONTATO.Value;
+    Registro11.Telefone     := dmMProvider.cdsFilialTELEFONE1.Value;
+
+  end;
+
+end;
+
+procedure GerarRegistro50;
+var
+  wRegistro50: TRegistro50;
+begin
+
+  dmSintegraSPED.cdsRegistro50.Close;
+  dmSintegraSPED.cdsRegistro50.ProviderName := 'dspRegistro50';
+
+  dmSintegraSPED.fdqRegistro50.Params[0].Value := '';
+  dmSintegraSPED.fdqRegistro50.Params[1].Value := frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro50.Params[2].Value := frmIntegracao.dtpFimSintegra.Date;
+  dmSintegraSPED.fdqRegistro50.Params[3].Value := '';
+
+  dmSintegraSPED.cdsRegistro50.Open;
+  dmSintegraSPED.cdsRegistro50.ProviderName := '';
+
+  iTotalRegistros                             := dmSintegraSPED.cdsRegistro50.RecordCount;
+  iRegistroAtual                              := 0;
+
+  while not dmSintegraSPED.cdsRegistro50.Eof do
+  begin
+
+    with frmIntegracao.ACBrSintegra1 do
+    begin
+
+      inc(iRegistroAtual);
+
+      wRegistro50                  := TRegistro50.Create;
+
+      frmIntegracao.lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  MSG_AGUARDE + 'gerando registro 50' + '/NF-'
+                                      + FormatFloat('000000', dmSintegraSPED.cdsRegistro50OP_NOTAFISCAL.Value)
+                                      + ' * ' + IntToStr(iRegistroAtual) + '/'+ IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro50.CPFCNPJ           := LimparCpnjInscricao(dmSintegraSPED.cdsRegistro50OP_CNPJ.Value);
+      wRegistro50.Inscricao         := LimparCpnjInscricao(dmSintegraSPED.cdsRegistro50OP_INSCRICAO.Value);
+      wRegistro50.DataDocumento     := dmSintegraSPED.cdsRegistro50OP_EMISSAO.Value;
+      wRegistro50.UF                := dmSintegraSPED.cdsRegistro50OP_ESTADO.Value;
+      wRegistro50.Modelo            := dmSintegraSPED.cdsRegistro50OP_MODELO.Value;
+
+      if (Length(Trim(dmSintegraSPED.cdsRegistro50OP_SERIE.Value)) > 0)  then
+      begin
+
+        if StrToInt(Trim(dmSintegraSPED.cdsRegistro50OP_SERIE.Value)) > 0  then
+          wRegistro50.Serie             := dmSintegraSPED.cdsRegistro50OP_SERIE.Value
+        else
+          wRegistro50.Serie             := '';
+
+
+      end
+      else
+        wRegistro50.Serie             := '';
+
+      wRegistro50.Numero            := IntToStr(dmSintegraSPED.cdsRegistro50OP_NOTAFISCAL.Value);
+      wRegistro50.Cfop              := dmSintegraSPED.cdsRegistro50OP_CFOP.Value;
+      wRegistro50.EmissorDocumento  := dmSintegraSPED.cdsRegistro50OP_EMITENTE.Value;
+      wRegistro50.ValorContabil     := dmSintegraSPED.cdsRegistro50OP_VALOR_TOTAL.Value;
+      wRegistro50.BasedeCalculo     := dmSintegraSPED.cdsRegistro50OP_BASE_CALCULO_ICMS.Value;
+      wRegistro50.Icms              := dmSintegraSPED.cdsRegistro50OP_VALOR_ICMS.Value;
+      wRegistro50.Isentas           := dmSintegraSPED.cdsRegistro50OP_ISENTAS_NTRIBUTADA.Value;
+      wRegistro50.Outras            := dmSintegraSPED.cdsRegistro50OP_OUTRAS.Value;
+      wRegistro50.Aliquota          := dmSintegraSPED.cdsRegistro50OP_ALIQUOTAS.Value;
+      wRegistro50.Situacao          := dmSintegraSPED.cdsRegistro50OP_SITUACAO.Value;
+
+      frmIntegracao.ACBrSintegra1.Registros50.Add(wRegistro50);
+
+    end;
+
+    dmSintegraSPED.cdsRegistro50.Next;
+
+  end;
+
+end;
+
+procedure GerarRegistro54;
+var
+  wregistro54: TRegistro54;
+  wregistro75: TRegistro75;
+  iContaItem: integer;
+begin
+
+  iContaItem := 1;
+
+  dmSintegraSPED.cdsRegistro54.Close;
+  dmSintegraSPED.cdsRegistro54.ProviderName   := 'dspRegistro54';
+
+  dmSintegraSPED.fdqRegistro54.Close;
+  dmSintegraSPED.fdqRegistro54.Params[0].Value:= frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro54.Params[1].Value:= frmIntegracao.dtpFimSintegra.Date;
+  dmSintegraSPED.fdqRegistro54.Params[2].Value:= '';
+
+  dmSintegraSPED.cdsRegistro54.Open;
+  dmSintegraSPED.cdsRegistro54.ProviderName   := '';
+
+  iTotalRegistros                             := dmSintegraSPED.cdsRegistro54.RecordCount;
+  iRegistroAtual                              := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not dmSintegraSPED.cdsRegistro54.Eof do
+    begin
+
+      if dmSintegraSPED.cdsRegistro54OP_PRODUTO.Value > 0 then
+      begin
+
+        inc(iRegistroAtual);
+
+        frmIntegracao.lblMsg.Caption := dmDBEXMaster.sNomeUsuario +  MSG_AGUARDE + 'gerando registro 54 - Itens das notas fiscais'
+                                        + ' * ' + IntToStr(iRegistroAtual) + '/'+ IntToStr(iTotalRegistros);
+        Application.ProcessMessages;
+
+        wRegistro54                             := TRegistro54.Create;
+        wRegistro75                             := TRegistro75.Create;
+
+        if Length(Trim(dmSintegraSPED.cdsRegistro54OP_CFOP.Value)) > 0 then
+        begin
+
+          wRegistro54.CPFCNPJ               := LimparCpnjInscricao(dmSintegraSPED.cdsRegistro54OP_CNPJ.Value);
+          wRegistro54.Modelo                := dmSintegraSPED.cdsRegistro54OP_MODELO.Value;
+
+          if (Length(Trim(dmSintegraSPED.cdsRegistro54OP_SERIE.Value)) > 0)  then
+          begin
+
+            if StrToInt(Trim(dmSintegraSPED.cdsRegistro54OP_SERIE.Value)) > 0  then
+              wRegistro54.Serie             := dmSintegraSPED.cdsRegistro54OP_SERIE.Value
+            else
+              wRegistro54.Serie             := '';
+
+
+          end
+          else
+            wRegistro54.Serie               := '';
+
+
+          wRegistro54.Numero                  := IntToStr(dmSintegraSPED.cdsRegistro54OP_NOTAFISCAL.Value);
+          wRegistro54.Cfop                    := dmSintegraSPED.cdsRegistro54OP_CFOP.Value;
+          wRegistro54.CST                     := FormatFloat('000',dmSintegraSPED.cdsRegistro54OP_CST.Value);
+
+          if dmSintegraSPED.cdsRegistro54OP_NUMERO_ITEM.Value <= 990 then
+            wRegistro54.NumeroItem            := dmSintegraSPED.cdsRegistro54OP_NUMERO_ITEM.Value
+          else
+            wRegistro54.NumeroItem            := 0;
+
+          if dmSintegraSPED.cdsRegistro54OP_PRODUTO.Value > 0 then
+            wRegistro54.Codigo                := IntToStr(dmSintegraSPED.cdsRegistro54OP_PRODUTO.Value)
+          else
+            wRegistro54.Codigo                := '';
+
+          wRegistro54.Descricao               := '';
+          wRegistro54.Quantidade              := dmSintegraSPED.cdsRegistro54OP_QUANTIDADE.Value;
+          wRegistro54.Valor                   := dmSintegraSPED.cdsRegistro54OP_VALOR_UNITARIO.Value;
+          wRegistro54.ValorDescontoDespesa    := dmSintegraSPED.cdsRegistro54OP_DESCONTO_DESPESAS.Value;
+          wRegistro54.BasedeCalculo           := dmSintegraSPED.cdsRegistro54OP_BASE_ICMS.Value;
+          wRegistro54.BaseST                  := dmSintegraSPED.cdsRegistro54OP_BASE_ICMSR.Value;
+          wRegistro54.ValorIpi                := dmSintegraSPED.cdsRegistro54OP_VALOR_IPI.Value;
+          wRegistro54.Aliquota                := dmSintegraSPED.cdsRegistro54OP_ALIQUOTA_ICMS.Value;
+
+          Registros54.Add(wregistro54);
+
+          if PesquisarProduto(IntToStr(dmSintegraSPED.cdsRegistro54OP_PRODUTO.Value)) then
+          begin
+
+            wRegistro75.Codigo                  := wRegistro54.Codigo;
+            wRegistro75.AliquotaICMS            := wRegistro54.Aliquota;
+            wRegistro75.DataInicial             := Registro10.DataInicial;
+            wRegistro75.DataFinal               := Registro10.DataFinal;
+            wRegistro75.Descricao               := dmDBEXMaster.fdqMasterPesquisa.FieldByName('DESCRICAO').Value;
+            wRegistro75.Unidade                 := dmDBEXMaster.fdqMasterPesquisa.FieldByName('UNIDADE').Value;
+
+            Registros75.Add(wregistro75);
+
+          end;
+
+          dmDBEXMaster.fdqMasterPesquisa.Close;
+
+        end;
+
+      end
+      else
+      begin
+
+        wRegistro54                         := TRegistro54.Create;
+
+        wRegistro54.CPFCNPJ                 := LimparCpnjInscricao(dmSintegraSPED.cdsRegistro54OP_CNPJ.Value);
+        wRegistro54.Modelo                  := dmSintegraSPED.cdsRegistro54OP_MODELO.Value;
+        wRegistro54.Serie                   := dmSintegraSPED.cdsRegistro54OP_SERIE.Value;
+        wRegistro54.Numero                  := InttoStr(dmSintegraSPED.cdsRegistro54OP_NOTAFISCAL.Value);
+        wRegistro54.Cfop                    := dmSintegraSPED.cdsRegistro54OP_CFOP.Value;
+
+        if dmSintegraSPED.cdsRegistro54OP_NUMERO_ITEM.Value <= 990 then
+          wRegistro54.CST                   := FormatFloat('000',dmSintegraSPED.cdsRegistro54OP_CST.Value)
+        else
+          wRegistro54.CST                   := '';
+
+        wRegistro54.NumeroItem              := dmSintegraSPED.cdsRegistro54OP_NUMERO_ITEM.Value;
+
+        if dmSintegraSPED.cdsRegistro54OP_PRODUTO.Value > 0 then
+          wRegistro54.Codigo                := FormatFloat('00000000000000',dmSintegraSPED.cdsRegistro54OP_PRODUTO.Value)
+        else
+          wRegistro54.Codigo                := Format('%-14.14s', [' ']);
+
+        wRegistro54.Descricao               := '';
+        wRegistro54.Quantidade              := dmSintegraSPED.cdsRegistro54OP_QUANTIDADE.Value;
+        wRegistro54.Valor                   := dmSintegraSPED.cdsRegistro54OP_VALOR_UNITARIO.Value;
+        wRegistro54.ValorDescontoDespesa    := dmSintegraSPED.cdsRegistro54OP_DESCONTO_DESPESAS.Value;
+        wRegistro54.BasedeCalculo           := dmSintegraSPED.cdsRegistro54OP_BASE_ICMS.Value;
+        wRegistro54.BaseST                  := dmSintegraSPED.cdsRegistro54OP_BASE_ICMSR.Value;
+        wRegistro54.ValorIpi                := dmSintegraSPED.cdsRegistro54OP_VALOR_IPI.Value;
+        wRegistro54.Aliquota                := dmSintegraSPED.cdsRegistro54OP_ALIQUOTA_ICMS.Value;
+
+        Registros54.Add(wregistro54);
+
+      end;
+
+      dmSintegraSPED.cdsRegistro54.Next;
+
+    end;
+
+  end;
+
+end;
+
+function PesquisarProduto(pProduto:string):boolean;
+begin
+
+  dmDBEXMaster.fdqMasterPesquisa.Close;
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Clear;
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('SELECT PRODUTO.PRODUTO, PRODUTO.ncm, PRODUTO.DESCRICAO, PRODUTO.unidade,');
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('PRODUTOFILIAL.ipi, aliquotas.aliquota, PRODUTOFILIAL.reducaobasedecalculo,');
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('PRODUTOFILIAL.custobruto, PRODUTO.CST FROM PRODUTO PRODUTO');
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('JOIN PRODUTOFILIAL PRODUTOFILIAL');
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('ON(PRODUTOFILIAL.produto = PRODUTO.PRODUTO)');
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('JOIN ALIQUOTAS ALIQUOTAS');
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('ON(ALIQUOTAS.TRIBUTACAO = PRODUTO.TRIBUTACAO)');
+  dmDBEXMaster.fdqMasterPesquisa.SQL.Add('WHERE PRODUTO.PRODUTO = ' + pProduto);
+  dmDBEXMaster.fdqMasterPesquisa.Open;
+
+  Result := not dmDBEXMaster.fdqMasterPesquisa.IsEmpty;
+
+end;
+
+procedure GerarRegistro60M;
+var
+  wregistro60M: TRegistro60M;
+begin
+
+  dmSintegraSPED.cdsRegistro60M.Close;
+  dmSintegraSPED.cdsRegistro60M.ProviderName  := 'dspRegistro60M';
+
+  dmSintegraSPED.fdqRegistro60M.Close;
+  dmSintegraSPED.fdqRegistro60M.Params[0].Value :=  frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro60M.Params[1].Value :=  frmIntegracao.dtpFimSintegra.Date;
+
+  dmSintegraSPED.cdsRegistro60M.Open;
+  dmSintegraSPED.cdsRegistro60M.ProviderName  := '';
+
+  iTotalRegistros                             := dmSintegraSPED.cdsRegistro60M.RecordCount;
+  iRegistroAtual                              := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not dmSintegraSPED.cdsRegistro60M.Eof do
+    begin
+
+      inc(iRegistroAtual);
+
+      frmIntegracao.lblMsg.Caption                := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 60M - Identificação do ECF-'
+                                                     + dmSintegraSPED.cdsRegistro60MOP_SERIE.Value
+                                                     + ' * ' + IntToStr(iRegistroAtual) + '/' + IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro60M              := TRegistro60M.Create;
+
+      wRegistro60M.Emissao      := dmSintegraSPED.cdsRegistro60MOP_EMISSAO.Value;
+      wRegistro60M.NumSerie     := dmSintegraSPED.cdsRegistro60MOP_SERIE.Value;
+      wRegistro60M.NumOrdem     := dmSintegraSPED.cdsRegistro60MOP_NUMEROECF.Value;
+      wRegistro60M.ModeloDoc    := '2D';
+      wRegistro60M.CooInicial   := dmSintegraSPED.cdsRegistro60MOP_COOINICIAL.Value;
+      wRegistro60M.CooFinal     := dmSintegraSPED.cdsRegistro60MOP_COOFINAL.Value;
+      wRegistro60M.CRZ          := dmSintegraSPED.cdsRegistro60MOP_CONTADORREDUCAOZ.Value;
+      wRegistro60M.CRO          := dmSintegraSPED.cdsRegistro60MOP_CRO.Value;
+      wRegistro60M.VendaBruta   := dmSintegraSPED.cdsRegistro60MOP_VENDABRUTA.Value;
+      wRegistro60M.ValorGT      := dmSintegraSPED.cdsRegistro60MOP_GTFINAL.Value;
+
+      Registros60M.Add(wregistro60M);
+
+      dmSintegraSPED.cdsRegistro60M.Next;
+
+    end;
+
+  end;
+
+end;
+
+procedure GerarRegistro60A;
+var
+  wregistro60A: TRegistro60A;
+begin
+
+  dmSintegraSPED.cdsRegistro60A.Close;
+  dmSintegraSPED.cdsRegistro60A.ProviderName  := 'dspRegistro60A';
+
+  dmSintegraSPED.fdqRegistro60A.Params[1].Value := frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro60A.Params[2].Value := frmIntegracao.dtpFimSintegra.Date;
+
+  dmSintegraSPED.cdsRegistro60A.Open;
+  dmSintegraSPED.cdsRegistro60A.ProviderName  := '';
+
+  iTotalRegistros                             := dmSintegraSPED.cdsRegistro60A.RecordCount;
+  iRegistroAtual                              := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not dmSintegraSPED.cdsRegistro60A.Eof do
+    begin
+
+      inc(iRegistroAtual);
+
+      frmIntegracao.lblMsg.Caption                := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 60A - Analítico ident. de cada Sit. Tributária'
+                                                     + ' * ' + IntToStr(iRegistroAtual) + '/' + IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro60A              := TRegistro60A.Create;
+
+      wRegistro60A.Emissao      := dmSintegraSPED.cdsRegistro60AOP_EMISSAO.Value;
+      wRegistro60A.NumSerie     := dmSintegraSPED.cdsRegistro60AOP_SERIE.Value;
+      wRegistro60A.StAliquota   := dmSintegraSPED.cdsRegistro60AOP_ALIQUOTA.Value;
+      wRegistro60A.Valor        := dmSintegraSPED.cdsRegistro60AOP_VALORACUMULADO.Value;
+
+      Registros60A.Add(wregistro60A);
+
+      dmSintegraSPED.cdsRegistro60A.Next;
+
+    end;
+
+  end;
+
+end;
+procedure GerarRegistro60D;
+var
+  wregistro60D: TRegistro60D;
+  wregistro75: TRegistro75;
+begin
+
+  dmSintegraSPED.cdsRegistro60D.Close;
+  dmSintegraSPED.cdsRegistro60D.ProviderName  := 'dspRegistro60D';
+
+  dmSintegraSPED.fdqRegistro60D.Params[0].Value := frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro60D.Params[1].Value := frmIntegracao.dtpFimSintegra.Date;
+
+  dmSintegraSPED.cdsRegistro60D.Open;
+  dmSintegraSPED.cdsRegistro60D.ProviderName  := '';
+
+  iTotalRegistros                             := dmSintegraSPED.cdsRegistro60D.RecordCount;
+  iRegistroAtual                              := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not dmSintegraSPED.cdsRegistro60D.Eof do
+    begin
+
+      inc(iRegistroAtual);
+
+      frmIntegracao.lblMsg.Caption                := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 60D - Resumo diário de produtos'
+                                                     + ' * ' + IntToStr(iRegistroAtual) + '/' + IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro60D                  := TRegistro60D.Create;
+
+      wRegistro60D.Emissao          := dmSintegraSPED.cdsRegistro60DOP_EMISSAO.Value;
+      wRegistro60D.NumSerie         := dmSintegraSPED.cdsRegistro60DOP_SERIE.Value;
+      wRegistro60D.Codigo           := InttoStr(StrToInt(dmSintegraSPED.cdsRegistro60DOP_PRODUTO.Value));
+      wRegistro60D.Quantidade       := dmSintegraSPED.cdsRegistro60DOP_QUANTIDADE.Value;
+      wRegistro60D.Valor            := dmSintegraSPED.cdsRegistro60DOP_VALOR_UNITARIO.Value;
+      wRegistro60D.BaseDeCalculo    := dmSintegraSPED.cdsRegistro60DOP_BASE_ICMS.Value;
+      wRegistro60D.StAliquota       := dmSintegraSPED.cdsRegistro60DOP_ALIQUOTA_ICMS.Value;
+      wRegistro60D.ValorIcms        := dmSintegraSPED.cdsRegistro60DOP_VALOR_ICMS.Value;
+
+      Registros60D.Add(wRegistro60D);
+
+      wRegistro75                   := TRegistro75.Create;
+
+      if PesquisarProduto(wRegistro60D.Codigo) then
+      begin
+
+        wRegistro75.Codigo        := wRegistro60D.Codigo;
+        wRegistro75.AliquotaICMS  := dmDBEXMaster.fdqMasterPesquisa.FieldByName('ALIQUOTA').Value;
+        wRegistro75.DataInicial   := Registro10.DataInicial;
+        wRegistro75.DataFinal     := Registro10.DataFinal;
+        wRegistro75.Descricao     := dmDBEXMaster.fdqMasterPesquisa.FieldByName('DESCRICAO').Value;
+        wRegistro75.Unidade       := dmDBEXMaster.fdqMasterPesquisa.FieldByName('UNIDADE').Value;
+
+        Registros75.Add(wregistro75);
+
+      end;
+
+      dmSintegraSPED.cdsRegistro60D.Next;
+
+    end;
+
+  end;
+
+end;
+
+procedure GerarRegistro60I;
+var
+  wRegistro60I: TRegistro60I;
+begin
+
+  dmSintegraSPED.cdsRegistro60I.Close;
+  dmSintegraSPED.cdsRegistro60I.ProviderName  := 'dspRegistro60I';
+
+  dmSintegraSPED.fdqRegistro60I.Params[0].Value := frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro60I.Params[1].Value := frmIntegracao.dtpFimSintegra.Date;
+
+  dmSintegraSPED.cdsRegistro60I.Open;
+  dmSintegraSPED.cdsRegistro60I.ProviderName  := '';
+
+  iTotalRegistros                             := dmSintegraSPED.cdsRegistro60I.RecordCount;
+  iRegistroAtual                              := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not dmSintegraSPED.cdsRegistro60I.Eof do
+    begin
+
+      inc(iRegistroAtual);
+
+      frmIntegracao.lblMsg.Caption                := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 60I - Itens do documento por ECF'
+                                                     + ' * ' + IntToStr(iRegistroAtual) + '/' + IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro60I                  := TRegistro60I.Create;
+
+      wRegistro60I.Emissao          := dmSintegraSPED.cdsRegistro60IOP_EMISSAO.Value;
+      wRegistro60I.NumSerie         := dmSintegraSPED.cdsRegistro60IOP_SERIE.Value;
+      wRegistro60I.ModeloDoc        := '2D';
+      wRegistro60I.Cupom            := IntToStr(dmSintegraSPED.cdsRegistro60IOP_NUMERO_CUPOM.Value);
+      wRegistro60I.Item             := dmSintegraSPED.cdsRegistro60IOP_NUMERO_ITEM.Value;
+      wRegistro60I.Codigo           := dmSintegraSPED.cdsRegistro60IOP_PRODUTO.Value;
+      wRegistro60I.Quantidade       := dmSintegraSPED.cdsRegistro60IOP_QUANTIDADE.Value;
+      wRegistro60I.Valor            := dmSintegraSPED.cdsRegistro60IOP_VALOR_UNITARIO.Value;
+      wRegistro60I.BaseDeCalculo    := dmSintegraSPED.cdsRegistro60IOP_BASE_ICMS.Value;
+      wRegistro60I.StAliquota       := dmSintegraSPED.cdsRegistro60IOP_ALIQUOTA.Value;
+      wRegistro60I.ValorIcms        := dmSintegraSPED.cdsRegistro60IOP_VALOR_ICMS.Value;
+
+      Registros60I.Add(wRegistro60I);
+
+      dmSintegraSPED.cdsRegistro60I.Next;
+
+    end;
+
+  end;
+
+end;
+
+procedure GerarRegistro60R;
+var
+  wregistro60R: TRegistro60R;
+begin
+
+  dmSintegraSPED.cdsRegistro60R.Close;
+  dmSintegraSPED.cdsRegistro60R.ProviderName  := 'dspRegistro60R';
+
+  dmSintegraSPED.fdqRegistro60R.Params[0].Value := frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro60R.Params[1].Value := frmIntegracao.dtpFimSintegra.Date;
+
+  dmSintegraSPED.cdsRegistro60R.Open;
+  dmSintegraSPED.cdsRegistro60R.ProviderName  := '';
+
+  iTotalRegistros                             := dmSintegraSPED.cdsRegistro60R.RecordCount;
+  iRegistroAtual                              := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not dmSintegraSPED.cdsRegistro60R.Eof do
+    begin
+
+      inc(iRegistroAtual);
+
+      frmIntegracao.lblMsg.Caption                := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 60R - Registro mensal dos produtos em ECF'
+                                                     + ' * ' + IntToStr(iRegistroAtual) + '/' + IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro60R                  := TRegistro60R.Create;
+
+      wRegistro60R.MesAno           := FormatDateTime('mmyyyy',frmIntegracao.dtpInicioSintegra.Date);
+      wRegistro60R.Codigo           := IntToStr(dmSintegraSPED.cdsRegistro60ROP_PRODUTO.Value);
+      wRegistro60R.Qtd              := dmSintegraSPED.cdsRegistro60ROP_QUANTIDADE.Value;
+      wRegistro60R.Valor            := dmSintegraSPED.cdsRegistro60ROP_VALOR_UNITARIO.Value;
+      wRegistro60R.BaseDeCalculo    := dmSintegraSPED.cdsRegistro60ROP_BASE_ICMS.Value;
+      wRegistro60R.Aliquota         := dmSintegraSPED.cdsRegistro60ROP_ALIQUOTA_ICMS.Value;
+
+      Registros60R.Add(wRegistro60R);
+
+      dmSintegraSPED.cdsRegistro60R.Next;
+
+    end;
+
+  end;
+
+end;
+
+procedure GerarRegistro70;
+var
+  wRegistro70: TRegistro70;
+begin
+
+  dmSintegraSPED.cdsRegistro70.Close;
+  dmSintegraSPED.cdsRegistro70.ProviderName := 'dspRegistro70';
+
+  dmSintegraSPED.fdqRegistro70.Params[0].Value := frmIntegracao.dtpInicioSintegra.Date;
+  dmSintegraSPED.fdqRegistro70.Params[1].Value := frmIntegracao.dtpFimSintegra.Date;
+
+  dmSintegraSPED.cdsRegistro70.Open;
+  dmSintegraSPED.cdsRegistro70.ProviderName := '';
+
+  iTotalRegistros                           := dmSintegraSPED.cdsRegistro70.RecordCount;
+  iRegistroAtual                            := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not dmSintegraSPED.cdsRegistro70.Eof do
+    begin
+
+      inc(iRegistroAtual);
+
+      frmIntegracao.lblMsg.Caption                := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 70 - Nota fiscalde serviço de transporte'
+                                                     + ' * ' + IntToStr(iRegistroAtual) + '/' + IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro70                   := TRegistro70.Create;
+
+      wRegistro70.CPFCNPJ           := Trim(LimparCpnjInscricao(dmSintegraSPED.cdsRegistro70OP_CNPJ.Value));
+      wRegistro70.Inscricao         := Trim(LimparCpnjInscricao(dmSintegraSPED.cdsRegistro70OP_INSCRICAO.Value));
+      wRegistro70.DataDocumento     := dmSintegraSPED.cdsRegistro70OP_EMISSAO_ENTRADA.Value;
+      wRegistro70.UF                := Trim(dmSintegraSPED.cdsRegistro70OP_ESTADO.Value);
+      wRegistro70.Modelo            := IntToStr(dmSintegraSPED.cdsRegistro70OP_MODELO.Value);
+      wRegistro70.Serie             := dmSintegraSPED.cdsRegistro70OP_SERIE.Value;
+      wRegistro70.SubSerie          := dmSintegraSPED.cdsRegistro70OP_SUBSERIE.Value;
+      wRegistro70.Numero            := InttoStr(dmSintegraSPED.cdsRegistro70OP_NUMERO.Value);
+      wRegistro70.Cfop              := dmSintegraSPED.cdsRegistro70OP_CFOP.Value;
+      wRegistro70.ValorContabil     := dmSintegraSPED.cdsRegistro70OP_VALOR_TOTAL.Value;
+      wRegistro70.BasedeCalculo     := dmSintegraSPED.cdsRegistro70OP_BASE_ICMS.Value;
+      wRegistro70.Icms              := dmSintegraSPED.cdsRegistro70OP_VALOR_ICMS.Value;
+      wRegistro70.Isentas           := dmSintegraSPED.cdsRegistro70OP_ISENTAS_NAO_TRIBUTADA.Value;
+      wRegistro70.Outras            := dmSintegraSPED.cdsRegistro70OP_OUTRAS.Value;
+      wRegistro70.CifFobOutros      := IntToStr(dmSintegraSPED.cdsRegistro70OP_CIF_FOB.Value);
+      wRegistro70.Situacao          := dmSintegraSPED.cdsRegistro70OP_SITUACAO.Value;
+
+      Registros70.Add(wRegistro70);
+
+      dmSintegraSPED.cdsRegistro70.Next;
+
+    end;
+
+  end;
+
+end;
+
+procedure GerarRegistro74;
+var
+  wregistro74: TRegistro74;
+  wregistro75: TRegistro75;
+  iAno, iDia, iMes: Word;
+begin
+
+  DecodeDate(frmIntegracao.dtpFimSintegra.DateTime, iAno, iMes, iDia);
+
+  dmSintegraSPED.cdsRegistro74.Close;
+  dmSintegraSPED.cdsRegistro74.ProviderName     := 'dspRegistro74';
+
+  dmSintegraSPED.fdqRegistro74.Params[0].Value  := iAno;
+
+  dmSintegraSPED.cdsRegistro74.Open;
+  dmSintegraSPED.cdsRegistro74.ProviderName     := '';
+
+  iTotalRegistros                               := dmSintegraSPED.cdsRegistro74.RecordCount;
+  iRegistroAtual                                := 0;
+
+  with frmIntegracao.ACBrSintegra1 do
+  begin
+
+    while not(dmSintegraSPED.cdsRegistro74.Eof) do
+    begin
+
+      inc(iRegistroAtual);
+
+      frmIntegracao.lblMsg.Caption                := dmDBEXMaster.sNomeUsuario + MSG_AGUARDE + 'gerando registro 74 - Registro de invetário'
+                                                     + ' * ' + IntToStr(iRegistroAtual) + '/' + IntToStr(iTotalRegistros);
+      Application.ProcessMessages;
+
+      wRegistro74                     := TRegistro74.Create;
+      wRegistro75                     := TRegistro75.Create;
+
+      wRegistro74.Data                := frmIntegracao.dtpInicioSintegra.Date;
+      wRegistro74.Codigo              := IntToStr(dmSintegraSPED.cdsRegistro74OP_PRODUTO.Value);
+      wRegistro74.Quantidade          := dmSintegraSPED.cdsRegistro74OP_QUANTIDADE.Value;
+      wRegistro74.CodigoPosse         := '1';
+      wRegistro74.UFPossuidor         := Registro10.Estado;
+      wRegistro74.ValorProduto        := dmSintegraSPED.cdsRegistro74OP_VALOR_BRUTO.Value;
+
+
+      Registros74.Add(wRegistro74);
+
+      if PesquisarProduto(wRegistro74.Codigo) then
+      begin
+
+        wRegistro75.Codigo                  := wRegistro74.Codigo;
+        wRegistro75.AliquotaICMS            := dmDBEXMaster.fdqMasterPesquisa.FieldByName('ALIQUOTA').Value;
+        wRegistro75.DataInicial             := Registro10.DataInicial;
+        wRegistro75.DataFinal               := Registro10.DataFinal;
+        wRegistro75.Descricao               := dmDBEXMaster.fdqMasterPesquisa.FieldByName('DESCRICAO').Value;
+        wRegistro75.Unidade                 := dmDBEXMaster.fdqMasterPesquisa.FieldByName('UNIDADE').Value;
+
+        Registros75.Add(wregistro75);
+
+      end;
+
+      dmDBEXMaster.fdqMasterPesquisa.Close;
+
+      dmSintegraSPED.cdsRegistro74.Next;
+
+    end;
+
+
+  end;
+
+end;
+
+end.

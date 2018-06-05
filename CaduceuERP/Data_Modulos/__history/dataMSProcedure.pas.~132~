@@ -1,0 +1,159 @@
+unit dataMSProcedure;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.UI.Intf,
+  FireDAC.VCLUI.Wait, FireDAC.Comp.UI, FireDAC.Phys, FireDAC.Phys.IBBase,
+  FireDAC.Phys.FB, FireDAC.Phys.Oracle, FireDAC.Phys.ODBCBase,
+  FireDAC.Phys.MSSQL, FireDAC.Phys.FBDef, FireDAC.Phys.MSSQLDef;
+
+type
+  TdmMSProcedure = class(TDataModule)
+    fdspEstados: TFDStoredProc;
+    FDPhysFBDriverLink1: TFDPhysFBDriverLink;
+    FDGUIxWaitCursor1: TFDGUIxWaitCursor;
+    fdspCidades: TFDStoredProc;
+    fdspFilial: TFDStoredProc;
+    fdspUsuarios: TFDStoredProc;
+    fdspAtlGAC: TFDStoredProc;
+    fdspCtrlDown: TFDStoredProc;
+    fdspCFOP_CFPS: TFDStoredProc;
+    fdspFuncionarios: TFDStoredProc;
+    fdspConfiguracoes: TFDStoredProc;
+    fdspConfigECF: TFDStoredProc;
+    fdspAdministradoras: TFDStoredProc;
+    fdspCtrlCartoes: TFDStoredProc;
+    fdspAtualizaSaldoCC: TFDStoredProc;
+    fdspBaixaCartaoTicekt: TFDStoredProc;
+    fdspTab_Tab_5_3_SPEDF: TFDStoredProc;
+    fdspMaster: TFDStoredProc;
+    fdspCFOP_Entrada: TFDStoredProc;
+    fdspNFEntrada: TFDStoredProc;
+    fdspParcelasNFE: TFDStoredProc;
+    fdspItemNFEntrada: TFDStoredProc;
+    fdspConhecimento_Frete: TFDStoredProc;
+    fdspCpa: TFDStoredProc;
+    fdspProdutoFilial: TFDStoredProc;
+    fdspLancarRentabilidade: TFDStoredProc;
+    fdspMovimento: TFDStoredProc;
+    fdspAtualizar_ForPro_NFE: TFDStoredProc;
+    fdspMan_Tab_LivroEntrada: TFDStoredProc;
+    fdspSituacoes_OS: TFDStoredProc;
+    fdspVerificarRelCodSituacaoOS: TFDStoredProc;
+    fdspEquipamentos: TFDStoredProc;
+    fdspAgenda: TFDStoredProc;
+    fdspServicos: TFDStoredProc;
+    fdspOrdemServico: TFDStoredProc;
+    fdspItensOSServicos: TFDStoredProc;
+    fdspHistorico_OS: TFDStoredProc;
+    fdspItensOSPecas: TFDStoredProc;
+    fdspPerda: TFDStoredProc;
+    fdspItensPerdas: TFDStoredProc;
+    fdspNCM_NBS: TFDStoredProc;
+    fdspParcelas_OrdemServico: TFDStoredProc;
+    fdspProducao: TFDStoredProc;
+    fdspItemProducao: TFDStoredProc;
+    fdspFornededor: TFDStoredProc;
+    fdspMenuAtalhos: TFDStoredProc;
+    fdspAlmoxarifado: TFDStoredProc;
+    fdspItemAlmoxarifado: TFDStoredProc;
+    fdspCfgConexaoZeusRetail: TFDStoredProc;
+    fdspPedidoZeus: TFDStoredProc;
+    fdspItemPedZeus: TFDStoredProc;
+    fdspEndEntregaPedZeus: TFDStoredProc;
+    fdspFinalizadoraPedZeus: TFDStoredProc;
+    FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
+    fdspUndMedida: TFDStoredProc;
+    fdspParcelasPedidoZeus: TFDStoredProc;
+    fdspCre: TFDStoredProc;
+    fdspAtlzSaldoCliente: TFDStoredProc;
+    fdspAtualizarSaldoProduto: TFDStoredProc;
+    fdspAbre_Caixa: TFDStoredProc;
+    fdspItem_caixa_loja: TFDStoredProc;
+    fdspFechaCaixa: TFDStoredProc;
+    fdspConfigBuscaCEP: TFDStoredProc;
+    fdspOrdemdeProducao: TFDStoredProc;
+    fdspItemOrdemProducao: TFDStoredProc;
+    fdspRceita_Produtos: TFDStoredProc;
+    fdspClienteEntrega: TFDStoredProc;
+    fdspGravarRegistro50_Sintegra: TFDStoredProc;
+    fdspGravarRegistro54_Sintegra: TFDStoredProc;
+    fdspGravarRegistroC100SPED: TFDStoredProc;
+    fdspGravarRegistroC140SPED: TFDStoredProc;
+    fdspGravarRegistroC141SPED: TFDStoredProc;
+    fdspGravarRegistroC170SPED: TFDStoredProc;
+    fdspRC170SPEDF: TFDStoredProc;
+    fdspGravarRegistroC190SPED: TFDStoredProc;
+    fdspRC190SPEDF: TFDStoredProc;
+    fdspLivroSaida: TFDStoredProc;
+    fdspLivroEntrada: TFDStoredProc;
+    fdspConsiste_Parc_NFS: TFDStoredProc;
+    fdspItemNFSaida: TFDStoredProc;
+    fdspCfop_NFSaida: TFDStoredProc;
+    fdspParcelasNFS: TFDStoredProc;
+    fdspConsisteCFOP_ITNFS: TFDStoredProc;
+    fdspConsisteCFOP_NFS: TFDStoredProc;
+    fdspNFSaida: TFDStoredProc;
+    fdspParametros_NFE: TFDStoredProc;
+    fdspDocumento_Ref_NFS: TFDStoredProc;
+    fdspCCe: TFDStoredProc;
+    fdspSomaItensNFS: TFDStoredProc;
+    fdspTransportadorNFS: TFDStoredProc;
+    fdspFCP_Estados: TFDStoredProc;
+    fdspGravarFCP_Estados: TFDStoredProc;
+    fdspGravarRegistroC101SPED: TFDStoredProc;
+    fdspMan_Tab_RC101: TFDStoredProc;
+    fdspMan_Tab_RC100_SPED: TFDStoredProc;
+    fdspMan_Tab_R50_Sint: TFDStoredProc;
+    fdspMan_Tab_R70_Sint: TFDStoredProc;
+    fdspProdutos: TFDStoredProc;
+    fdspBarras: TFDStoredProc;
+    fdspPrecoQuantidade: TFDStoredProc;
+    fdspMVA: TFDStoredProc;
+    fdspReceitaProdutos: TFDStoredProc;
+    fdspTeclado_Balanca: TFDStoredProc;
+    fdspLog: TFDStoredProc;
+    fdspDataHoraServidor: TFDStoredProc;
+    fdspCtrl_Update: TFDStoredProc;
+    fdspFretePedidoVenda: TFDStoredProc;
+    fdspDeslocamentoOS: TFDStoredProc;
+    fdspConfig_financeiro: TFDStoredProc;
+    fdspMan_Tab_Arq_Imp_Prod: TFDStoredProc;
+    fdspMan_Tab_Reg60M: TFDStoredProc;
+    fdspMan_Tab_Reg60A: TFDStoredProc;
+    fdspMan_Tab_Reg60D: TFDStoredProc;
+    fdspMan_Tab_Reg60I: TFDStoredProc;
+    fdspMan_Tab_Reg60R: TFDStoredProc;
+    fdspChequesREC: TFDStoredProc;
+    fdspMan_Tab_RC405: TFDStoredProc;
+    fdspMan_Tab_RC410: TFDStoredProc;
+    fdspMan_Tab_RC420: TFDStoredProc;
+    fdspMan_Tab_RC460: TFDStoredProc;
+    fdspMan_Tab_RC470: TFDStoredProc;
+    fdspMan_Tab_RC490: TFDStoredProc;
+    fdspClientes: TFDStoredProc;
+    fdspCtrlNotas: TFDStoredProc;
+    fdspTipoUtilCtrlNotas: TFDStoredProc;
+    fdspSetorCtrlNotas: TFDStoredProc;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dmMSProcedure: TdmMSProcedure;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+uses dataDBEXMaster;
+
+{$R *.dfm}
+
+end.

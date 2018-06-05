@@ -1,0 +1,845 @@
+object dmShoficina: TdmShoficina
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 440
+  Width = 772
+  object fdcShoficina: TFDConnection
+    Params.Strings = (
+      'Database=D:\Aplicativos\GenesisAC\BBD\Serra\Dados.MDB'
+      'Password=!(&&!!)&'
+      'DriverID=MSAcc')
+    Connected = True
+    LoginPrompt = False
+    Left = 640
+    Top = 16
+  end
+  object FDGUIxWaitCursor1: TFDGUIxWaitCursor
+    Provider = 'Forms'
+    ScreenCursor = gcrHourGlass
+    Left = 640
+    Top = 64
+  end
+  object FDPhysMSAccessDriverLink1: TFDPhysMSAccessDriverLink
+    Left = 640
+    Top = 112
+  end
+  object fdqClientesSH: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from clientes where cpf_cnpj <> '#39#39
+      '')
+    Left = 40
+    Top = 16
+    object fdqClientesSHCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object fdqClientesSHNOME: TWideStringField
+      FieldName = 'NOME'
+      Origin = 'NOME'
+      Size = 60
+    end
+    object fdqClientesSHGRUPO: TWideStringField
+      FieldName = 'GRUPO'
+      Origin = 'GRUPO'
+      Size = 50
+    end
+    object fdqClientesSHCONTATO: TWideStringField
+      FieldName = 'CONTATO'
+      Origin = 'CONTATO'
+      Size = 254
+    end
+    object fdqClientesSHCPF_CNPJ: TWideStringField
+      FieldName = 'CPF_CNPJ'
+      Origin = 'CPF_CNPJ'
+    end
+    object fdqClientesSHIE_RG: TWideStringField
+      FieldName = 'IE_RG'
+      Origin = 'IE_RG'
+    end
+    object fdqClientesSHENDERECO: TWideStringField
+      FieldName = 'ENDERECO'
+      Origin = 'ENDERECO'
+      Size = 60
+    end
+    object fdqClientesSHCEP: TWideStringField
+      FieldName = 'CEP'
+      Origin = 'CEP'
+      Size = 10
+    end
+    object fdqClientesSHBAIRRO: TWideStringField
+      FieldName = 'BAIRRO'
+      Origin = 'BAIRRO'
+      Size = 60
+    end
+    object fdqClientesSHCIDADE: TWideStringField
+      FieldName = 'CIDADE'
+      Origin = 'CIDADE'
+      Size = 60
+    end
+    object fdqClientesSHUF: TWideStringField
+      FieldName = 'UF'
+      Origin = 'UF'
+      Size = 2
+    end
+    object fdqClientesSHTELEFONE: TWideStringField
+      FieldName = 'TELEFONE'
+      Origin = 'TELEFONE'
+    end
+    object fdqClientesSHEMAIL: TWideStringField
+      FieldName = 'EMAIL'
+      Origin = 'EMAIL'
+      Size = 254
+    end
+    object fdqClientesSHOBSERVACAO: TWideMemoField
+      FieldName = 'OBSERVACAO'
+      Origin = 'OBSERVACAO'
+      BlobType = ftWideMemo
+    end
+    object fdqClientesSHCELULAR: TWideStringField
+      FieldName = 'CELULAR'
+      Origin = 'CELULAR'
+    end
+    object fdqClientesSHSITE: TWideStringField
+      FieldName = 'SITE'
+      Origin = 'SITE'
+      Size = 50
+    end
+    object fdqClientesSHFAX: TWideStringField
+      FieldName = 'FAX'
+      Origin = 'FAX'
+    end
+    object fdqClientesSHANIVERSARIO: TSQLTimeStampField
+      FieldName = 'ANIVERSARIO'
+      Origin = 'ANIVERSARIO'
+    end
+    object fdqClientesSHSITUACAO: TSmallintField
+      FieldName = 'SITUACAO'
+      Origin = 'SITUACAO'
+    end
+    object fdqClientesSHCRM_VENDAS: TIntegerField
+      FieldName = 'CRM_VENDAS'
+      Origin = 'CRM_VENDAS'
+    end
+    object fdqClientesSHCRM_SERVICOS: TIntegerField
+      FieldName = 'CRM_SERVICOS'
+      Origin = 'CRM_SERVICOS'
+    end
+    object fdqClientesSHCRM_X1: TSingleField
+      FieldName = 'CRM_X1'
+      Origin = 'CRM_X1'
+    end
+    object fdqClientesSHCRM_X2: TSingleField
+      FieldName = 'CRM_X2'
+      Origin = 'CRM_X2'
+    end
+    object fdqClientesSHSENHAWEB: TWideStringField
+      FieldName = 'SENHAWEB'
+      Origin = 'SENHAWEB'
+      Size = 25
+    end
+    object fdqClientesSHGARANTIDOR: TBooleanField
+      FieldName = 'GARANTIDOR'
+      Origin = 'GARANTIDOR'
+      Required = True
+    end
+    object fdqClientesSHULTIMA_VENDA: TSQLTimeStampField
+      FieldName = 'ULTIMA_VENDA'
+      Origin = 'ULTIMA_VENDA'
+    end
+    object fdqClientesSHCADASTRADO: TSQLTimeStampField
+      FieldName = 'CADASTRADO'
+      Origin = 'CADASTRADO'
+    end
+    object fdqClientesSHBLOQUEADO: TBooleanField
+      FieldName = 'BLOQUEADO'
+      Origin = 'BLOQUEADO'
+      Required = True
+    end
+    object fdqClientesSHNFANTASIA: TWideStringField
+      FieldName = 'NFANTASIA'
+      Origin = 'NFANTASIA'
+      Size = 60
+    end
+    object fdqClientesSHCOD_PAIS: TIntegerField
+      FieldName = 'COD_PAIS'
+      Origin = 'COD_PAIS'
+    end
+    object fdqClientesSHNUMERO: TWideStringField
+      FieldName = 'NUMERO'
+      Origin = 'NUMERO'
+      Size = 10
+    end
+    object fdqClientesSHCOMPLEM: TWideStringField
+      FieldName = 'COMPLEM'
+      Origin = 'COMPLEM'
+      Size = 60
+    end
+    object fdqClientesSHTIPO_CLIENTE: TByteField
+      FieldName = 'TIPO_CLIENTE'
+      Origin = 'TIPO_CLIENTE'
+    end
+    object fdqClientesSHLIMITE: TCurrencyField
+      FieldName = 'LIMITE'
+      Origin = 'LIMITE'
+    end
+    object fdqClientesSHID_RADIO: TWideStringField
+      FieldName = 'ID_RADIO'
+      Origin = 'ID_RADIO'
+    end
+    object fdqClientesSHCOB_ENDERECO: TWideStringField
+      FieldName = 'COB_ENDERECO'
+      Origin = 'COB_ENDERECO'
+      Size = 254
+    end
+    object fdqClientesSHCOB_PAI: TWideStringField
+      FieldName = 'COB_PAI'
+      Origin = 'COB_PAI'
+      Size = 254
+    end
+    object fdqClientesSHCOB_MAE: TWideStringField
+      FieldName = 'COB_MAE'
+      Origin = 'COB_MAE'
+      Size = 254
+    end
+    object fdqClientesSHCOB_OBS: TWideMemoField
+      FieldName = 'COB_OBS'
+      Origin = 'COB_OBS'
+      BlobType = ftWideMemo
+    end
+    object fdqClientesSHEMAIL_NFE: TWideStringField
+      FieldName = 'EMAIL_NFE'
+      Origin = 'EMAIL_NFE'
+      Size = 254
+    end
+    object fdqClientesSHVENDEDOR: TIntegerField
+      FieldName = 'VENDEDOR'
+      Origin = 'VENDEDOR'
+    end
+    object fdqClientesSHCAMPO_LIVRE_1: TWideStringField
+      FieldName = 'CAMPO_LIVRE_1'
+      Origin = 'CAMPO_LIVRE_1'
+      Size = 254
+    end
+    object fdqClientesSHCAMPO_LIVRE_2: TWideStringField
+      FieldName = 'CAMPO_LIVRE_2'
+      Origin = 'CAMPO_LIVRE_2'
+      Size = 254
+    end
+    object fdqClientesSHCAMPO_LIVRE_3: TWideStringField
+      FieldName = 'CAMPO_LIVRE_3'
+      Origin = 'CAMPO_LIVRE_3'
+      Size = 254
+    end
+    object fdqClientesSHSEXO: TByteField
+      FieldName = 'SEXO'
+      Origin = 'SEXO'
+    end
+    object fdqClientesSHINS_MUN: TWideStringField
+      FieldName = 'INS_MUN'
+      Origin = 'INS_MUN'
+      Size = 25
+    end
+    object fdqClientesSHSUFRAMA: TWideStringField
+      FieldName = 'SUFRAMA'
+      Origin = 'SUFRAMA'
+      Size = 9
+    end
+    object fdqClientesSHRADIO_NX: TWideStringField
+      FieldName = 'RADIO_NX'
+      Origin = 'RADIO_NX'
+      Size = 30
+    end
+    object fdqClientesSHidEstrangeiro: TWideStringField
+      FieldName = 'idEstrangeiro'
+      Origin = 'idEstrangeiro'
+    end
+    object fdqClientesSHcbindIEDest: TByteField
+      FieldName = 'cbindIEDest'
+      Origin = 'cbindIEDest'
+    end
+    object fdqClientesSHCOB_OBS_ALERT: TBooleanField
+      FieldName = 'COB_OBS_ALERT'
+      Origin = 'COB_OBS_ALERT'
+      Required = True
+    end
+  end
+  object fdqUsuarios: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from usuarios'
+      'order by nome')
+    Left = 40
+    Top = 60
+  end
+  object dspUsuarios: TDataSetProvider
+    DataSet = fdqUsuarios
+    Left = 120
+    Top = 60
+  end
+  object cdsUsuarios: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspUsuarios'
+    Left = 211
+    Top = 60
+    object cdsUsuariosCODIGO: TAutoIncField
+      FieldName = 'CODIGO'
+      ReadOnly = True
+    end
+    object cdsUsuariosNOME: TWideStringField
+      FieldName = 'NOME'
+    end
+    object cdsUsuariosSENHA: TWideStringField
+      FieldName = 'SENHA'
+      Size = 10
+    end
+  end
+  object dtsUsuarios: TDataSource
+    DataSet = cdsUsuarios
+    Left = 292
+    Top = 60
+  end
+  object fdqEquipamentos: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from equipamentos'
+      'order by codigo')
+    Left = 123
+    Top = 16
+    object fdqEquipamentosCODIGO: TFDAutoIncField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object fdqEquipamentosCOD_CLIENTE: TIntegerField
+      FieldName = 'COD_CLIENTE'
+      Origin = 'COD_CLIENTE'
+    end
+    object fdqEquipamentosDESCRICAO: TWideStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Size = 80
+    end
+    object fdqEquipamentosMARCA: TWideStringField
+      FieldName = 'MARCA'
+      Origin = 'MARCA'
+      Size = 80
+    end
+    object fdqEquipamentosMODELO: TWideStringField
+      FieldName = 'MODELO'
+      Origin = 'MODELO'
+      Size = 80
+    end
+    object fdqEquipamentosSERIE: TWideStringField
+      FieldName = 'SERIE'
+      Origin = 'SERIE'
+      Size = 80
+    end
+    object fdqEquipamentosPAT: TWideStringField
+      FieldName = 'PAT'
+      Origin = 'PAT'
+      Size = 80
+    end
+    object fdqEquipamentosOBSERVACOES: TWideStringField
+      FieldName = 'OBSERVACOES'
+      Origin = 'OBSERVACOES'
+      Size = 254
+    end
+    object fdqEquipamentosDATA_COMPRA: TSQLTimeStampField
+      FieldName = 'DATA_COMPRA'
+      Origin = 'DATA_COMPRA'
+    end
+    object fdqEquipamentosREVENDA: TWideStringField
+      FieldName = 'REVENDA'
+      Origin = 'REVENDA'
+      Size = 50
+    end
+    object fdqEquipamentosNUM_NF: TWideStringField
+      FieldName = 'NUM_NF'
+      Origin = 'NUM_NF'
+      Size = 50
+    end
+    object fdqEquipamentosNUM_CERTGAR: TWideStringField
+      FieldName = 'NUM_CERTGAR'
+      Origin = 'NUM_CERTGAR'
+      Size = 50
+    end
+    object fdqEquipamentosCAMPO_BOOL: TBooleanField
+      FieldName = 'CAMPO_BOOL'
+      Origin = 'CAMPO_BOOL'
+      Required = True
+    end
+    object fdqEquipamentosCAMPO_DOUBLE: TFloatField
+      FieldName = 'CAMPO_DOUBLE'
+      Origin = 'CAMPO_DOUBLE'
+    end
+  end
+  object fdqSituacoesSH: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from situacoes'
+      'order by codigo')
+    Left = 211
+    Top = 16
+    object fdqSituacoesSHCODIGO: TFDAutoIncField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object fdqSituacoesSHNOME: TWideStringField
+      FieldName = 'NOME'
+      Origin = 'NOME'
+      Size = 35
+    end
+    object fdqSituacoesSHETAPA1: TBooleanField
+      FieldName = 'ETAPA1'
+      Origin = 'ETAPA1'
+      Required = True
+    end
+    object fdqSituacoesSHETAPA2: TBooleanField
+      FieldName = 'ETAPA2'
+      Origin = 'ETAPA2'
+      Required = True
+    end
+    object fdqSituacoesSHETAPA3: TBooleanField
+      FieldName = 'ETAPA3'
+      Origin = 'ETAPA3'
+      Required = True
+    end
+    object fdqSituacoesSHETAPA3_PG: TBooleanField
+      FieldName = 'ETAPA3_PG'
+      Origin = 'ETAPA3_PG'
+      Required = True
+    end
+    object fdqSituacoesSHPRONTO: TBooleanField
+      FieldName = 'PRONTO'
+      Origin = 'PRONTO'
+      Required = True
+    end
+    object fdqSituacoesSHSUBGRUPO: TIntegerField
+      FieldName = 'SUBGRUPO'
+      Origin = 'SUBGRUPO'
+    end
+    object fdqSituacoesSHCOR_FONTE: TCurrencyField
+      FieldName = 'COR_FONTE'
+      Origin = 'COR_FONTE'
+    end
+    object fdqSituacoesSHCOR_FUNDO: TCurrencyField
+      FieldName = 'COR_FUNDO'
+      Origin = 'COR_FUNDO'
+    end
+    object fdqSituacoesSHPLANO_CONTA: TIntegerField
+      FieldName = 'PLANO_CONTA'
+      Origin = 'PLANO_CONTA'
+    end
+  end
+  object fdqFuncionarios: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from funcionarios'
+      'order by nome')
+    Left = 40
+    Top = 108
+  end
+  object dspFuncionarios: TDataSetProvider
+    DataSet = fdqFuncionarios
+    Left = 120
+    Top = 108
+  end
+  object cdsFuncionarios: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspFuncionarios'
+    Left = 211
+    Top = 108
+    object cdsFuncionariosCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+    end
+    object cdsFuncionariosNOME: TWideStringField
+      FieldName = 'NOME'
+      Size = 60
+    end
+  end
+  object dtsFuncionarios: TDataSource
+    DataSet = cdsFuncionarios
+    Left = 292
+    Top = 108
+  end
+  object fdqOS: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from ordems'
+      'order by codigo')
+    Left = 292
+    Top = 16
+    object fdqOSCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object fdqOSCOD_CLIENTE: TIntegerField
+      FieldName = 'COD_CLIENTE'
+      Origin = 'COD_CLIENTE'
+    end
+    object fdqOSENTRADA: TSQLTimeStampField
+      FieldName = 'ENTRADA'
+      Origin = 'ENTRADA'
+    end
+    object fdqOSPRONTO: TSQLTimeStampField
+      FieldName = 'PRONTO'
+      Origin = 'PRONTO'
+    end
+    object fdqOSSAIDA: TSQLTimeStampField
+      FieldName = 'SAIDA'
+      Origin = 'SAIDA'
+    end
+    object fdqOSGARANTIA: TSQLTimeStampField
+      FieldName = 'GARANTIA'
+      Origin = 'GARANTIA'
+    end
+    object fdqOSSITUACAO: TIntegerField
+      FieldName = 'SITUACAO'
+      Origin = 'SITUACAO'
+    end
+    object fdqOSV_MAO: TCurrencyField
+      FieldName = 'V_MAO'
+      Origin = 'V_MAO'
+    end
+    object fdqOSV_PECAS: TCurrencyField
+      FieldName = 'V_PECAS'
+      Origin = 'V_PECAS'
+    end
+    object fdqOSV_DESLOCA: TCurrencyField
+      FieldName = 'V_DESLOCA'
+      Origin = 'V_DESLOCA'
+    end
+    object fdqOSV_TERCEIRO: TCurrencyField
+      FieldName = 'V_TERCEIRO'
+      Origin = 'V_TERCEIRO'
+    end
+    object fdqOSV_OUTROS: TCurrencyField
+      FieldName = 'V_OUTROS'
+      Origin = 'V_OUTROS'
+    end
+    object fdqOSCOD_EQUIP: TIntegerField
+      FieldName = 'COD_EQUIP'
+      Origin = 'COD_EQUIP'
+    end
+    object fdqOSAPARELHO: TWideStringField
+      FieldName = 'APARELHO'
+      Origin = 'APARELHO'
+      Size = 80
+    end
+    object fdqOSMARCA: TWideStringField
+      FieldName = 'MARCA'
+      Origin = 'MARCA'
+      Size = 80
+    end
+    object fdqOSMODELO: TWideStringField
+      FieldName = 'MODELO'
+      Origin = 'MODELO'
+      Size = 80
+    end
+    object fdqOSSERIE: TWideStringField
+      FieldName = 'SERIE'
+      Origin = 'SERIE'
+      Size = 80
+    end
+    object fdqOSPATRIMONIO: TWideStringField
+      FieldName = 'PATRIMONIO'
+      Origin = 'PATRIMONIO'
+      Size = 80
+    end
+    object fdqOSACESSORIO: TWideStringField
+      FieldName = 'ACESSORIO'
+      Origin = 'ACESSORIO'
+      Size = 254
+    end
+    object fdqOSDEFEITO: TWideMemoField
+      FieldName = 'DEFEITO'
+      Origin = 'DEFEITO'
+      BlobType = ftWideMemo
+    end
+    object fdqOSOBS_SERVICO: TWideMemoField
+      FieldName = 'OBS_SERVICO'
+      Origin = 'OBS_SERVICO'
+      BlobType = ftWideMemo
+    end
+    object fdqOSLAUDO: TWideMemoField
+      FieldName = 'LAUDO'
+      Origin = 'LAUDO'
+      BlobType = ftWideMemo
+    end
+    object fdqOSOBS_APARELHO: TWideStringField
+      FieldName = 'OBS_APARELHO'
+      Origin = 'OBS_APARELHO'
+      Size = 254
+    end
+    object fdqOSKILOMET: TIntegerField
+      FieldName = 'KILOMET'
+      Origin = 'KILOMET'
+    end
+    object fdqOSNUM_NF_PED: TWideStringField
+      FieldName = 'NUM_NF_PED'
+      Origin = 'NUM_NF_PED'
+      Size = 10
+    end
+    object fdqOSEM_USO: TBooleanField
+      FieldName = 'EM_USO'
+      Origin = 'EM_USO'
+      Required = True
+    end
+    object fdqOSNF_NUMERO: TIntegerField
+      FieldName = 'NF_NUMERO'
+      Origin = 'NF_NUMERO'
+    end
+    object fdqOSOS_REABERTA: TBooleanField
+      FieldName = 'OS_REABERTA'
+      Origin = 'OS_REABERTA'
+      Required = True
+    end
+    object fdqOSOS_OUTROS: TFloatField
+      FieldName = 'OS_OUTROS'
+      Origin = 'OS_OUTROS'
+    end
+    object fdqOSOS_OUTROS_EMIT: TIntegerField
+      FieldName = 'OS_OUTROS_EMIT'
+      Origin = 'OS_OUTROS_EMIT'
+    end
+    object fdqOSOS_SINAL: TCurrencyField
+      FieldName = 'OS_SINAL'
+      Origin = 'OS_SINAL'
+    end
+    object fdqOSPRIOR: TByteField
+      FieldName = 'PRIOR'
+      Origin = '[PRIOR]'
+    end
+    object fdqOSOS_NF_REMESSA: TIntegerField
+      FieldName = 'OS_NF_REMESSA'
+      Origin = 'OS_NF_REMESSA'
+    end
+    object fdqOSOS_NF_VALOR: TCurrencyField
+      FieldName = 'OS_NF_VALOR'
+      Origin = 'OS_NF_VALOR'
+    end
+    object fdqOSOS_NF_EMIT: TIntegerField
+      FieldName = 'OS_NF_EMIT'
+      Origin = 'OS_NF_EMIT'
+    end
+    object fdqOSOS_GARANTIDOR: TIntegerField
+      FieldName = 'OS_GARANTIDOR'
+      Origin = 'OS_GARANTIDOR'
+    end
+    object fdqOSOS_GARANTIDOR_SN: TWideStringField
+      FieldName = 'OS_GARANTIDOR_SN'
+      Origin = 'OS_GARANTIDOR_SN'
+    end
+    object fdqOSV_FRETE: TCurrencyField
+      FieldName = 'V_FRETE'
+      Origin = 'V_FRETE'
+    end
+    object fdqOSV_SEGURO: TCurrencyField
+      FieldName = 'V_SEGURO'
+      Origin = 'V_SEGURO'
+    end
+    object fdqOSWEB_CHAVE: TWideStringField
+      FieldName = 'WEB_CHAVE'
+      Origin = 'WEB_CHAVE'
+      Size = 10
+    end
+    object fdqOSWEB_SENHA: TWideStringField
+      FieldName = 'WEB_SENHA'
+      Origin = 'WEB_SENHA'
+      Size = 6
+    end
+    object fdqOSUSER_MICRO: TWideStringField
+      FieldName = 'USER_MICRO'
+      Origin = 'USER_MICRO'
+      Size = 30
+    end
+    object fdqOSORCA_FORMAS: TWideMemoField
+      FieldName = 'ORCA_FORMAS'
+      Origin = 'ORCA_FORMAS'
+      BlobType = ftWideMemo
+    end
+    object fdqOSALERTA_ABANDONO: TSQLTimeStampField
+      FieldName = 'ALERTA_ABANDONO'
+      Origin = 'ALERTA_ABANDONO'
+    end
+    object fdqOSTECNICO_FIXO: TIntegerField
+      FieldName = 'TECNICO_FIXO'
+      Origin = 'TECNICO_FIXO'
+    end
+    object fdqOSOS_FABRICANTE: TWideStringField
+      FieldName = 'OS_FABRICANTE'
+      Origin = 'OS_FABRICANTE'
+    end
+    object fdqOSNFC_NUMERO: TIntegerField
+      FieldName = 'NFC_NUMERO'
+      Origin = 'NFC_NUMERO'
+    end
+    object fdqOSPREVISTO: TSQLTimeStampField
+      FieldName = 'PREVISTO'
+      Origin = 'PREVISTO'
+    end
+    object fdqOSATENDENTE: TIntegerField
+      FieldName = 'ATENDENTE'
+      Origin = 'ATENDENTE'
+    end
+  end
+  object fdmFuncionarios: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 80
+    Top = 168
+    object fdmFuncionariosID_GENESIS: TIntegerField
+      FieldName = 'ID_GENESIS'
+    end
+    object fdmFuncionariosID_SHOFICINA: TIntegerField
+      FieldName = 'ID_SHOFICINA'
+    end
+  end
+  object fdmUsuarios: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 306
+    Top = 168
+    object fdmUsuariosID_GENESIS: TIntegerField
+      FieldName = 'ID_GENESIS'
+    end
+    object fdmUsuariosID_SHOFICINA: TIntegerField
+      FieldName = 'ID_SHOFICINA'
+    end
+  end
+  object dtsUsu: TDataSource
+    DataSet = fdmUsuarios
+    Left = 308
+    Top = 212
+  end
+  object dstFun: TDataSource
+    DataSet = fdmFuncionarios
+    Left = 84
+    Top = 212
+  end
+  object FDStanStorageXMLLink1: TFDStanStorageXMLLink
+    Left = 637
+    Top = 184
+  end
+  object fdqHist_OS: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from ordems_contato'
+      '')
+    Left = 524
+    Top = 24
+    object fdqHist_OSCODIGO: TFDAutoIncField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object fdqHist_OSCOD_ORDEM: TIntegerField
+      FieldName = 'COD_ORDEM'
+      Origin = 'COD_ORDEM'
+    end
+    object fdqHist_OSDESCRICAO: TWideStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Size = 254
+    end
+    object fdqHist_OSQUEM: TWideStringField
+      FieldName = 'QUEM'
+      Origin = 'QUEM'
+    end
+    object fdqHist_OSUSUARIO: TWideStringField
+      FieldName = 'USUARIO'
+      Origin = 'USUARIO'
+    end
+    object fdqHist_OSDATA_CADASTRO: TSQLTimeStampField
+      FieldName = 'DATA_CADASTRO'
+      Origin = 'DATA_CADASTRO'
+    end
+  end
+  object fdqPecas_SH: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from os_pecas')
+    Left = 372
+    Top = 16
+    object FDAutoIncField1: TFDAutoIncField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object IntegerField1: TIntegerField
+      FieldName = 'COD_ORDEM'
+      Origin = 'COD_ORDEM'
+    end
+    object WideStringField1: TWideStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Size = 254
+    end
+    object WideStringField2: TWideStringField
+      FieldName = 'QUEM'
+      Origin = 'QUEM'
+    end
+    object WideStringField3: TWideStringField
+      FieldName = 'USUARIO'
+      Origin = 'USUARIO'
+    end
+    object SQLTimeStampField1: TSQLTimeStampField
+      FieldName = 'DATA_CADASTRO'
+      Origin = 'DATA_CADASTRO'
+    end
+  end
+  object fdqServicos_SH: TFDQuery
+    Connection = fdcShoficina
+    SQL.Strings = (
+      'select * from os_servicos')
+    Left = 452
+    Top = 16
+    object FDAutoIncField2: TFDAutoIncField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object IntegerField2: TIntegerField
+      FieldName = 'COD_ORDEM'
+      Origin = 'COD_ORDEM'
+    end
+    object WideStringField4: TWideStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Size = 254
+    end
+    object WideStringField5: TWideStringField
+      FieldName = 'QUEM'
+      Origin = 'QUEM'
+    end
+    object WideStringField6: TWideStringField
+      FieldName = 'USUARIO'
+      Origin = 'USUARIO'
+    end
+    object SQLTimeStampField2: TSQLTimeStampField
+      FieldName = 'DATA_CADASTRO'
+      Origin = 'DATA_CADASTRO'
+    end
+  end
+end

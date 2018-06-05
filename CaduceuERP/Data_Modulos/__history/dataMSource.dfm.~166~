@@ -1,0 +1,692 @@
+object dmMSource: TdmMSource
+  OldCreateOrder = False
+  Height = 1116
+  Width = 807
+  object dtsEstados: TDataSource
+    DataSet = dmMProvider.cdsEstados
+    Left = 37
+    Top = 17
+  end
+  object dtsCidades: TDataSource
+    DataSet = dmMProvider.cdsCidades
+    Left = 37
+    Top = 65
+  end
+  object dtsFilial: TDataSource
+    DataSet = dmMProvider.cdsFilial
+    Left = 37
+    Top = 109
+  end
+  object dtsUsuarios: TDataSource
+    DataSet = dmMProvider.cdsUsuarios
+    Left = 37
+    Top = 157
+  end
+  object dtsConfiguracoes: TDataSource
+    DataSet = dmMProvider.cdsConfiguracoes
+    Left = 37
+    Top = 203
+  end
+  object dtsAltGAC: TDataSource
+    DataSet = dmMProvider.cdsAltGAC
+    Left = 640
+    Top = 17
+  end
+  object dtsCFOP_CFPS: TDataSource
+    DataSet = dmMProvider.cdsCFOP_CFPS
+    Left = 37
+    Top = 249
+  end
+  object dtsFuncionarios: TDataSource
+    DataSet = dmMProvider.cdsFuncionarios
+    Left = 37
+    Top = 297
+  end
+  object dtsModelo_Doc: TDataSource
+    DataSet = dmMProvider.cdsModelo_Doc
+    Left = 37
+    Top = 344
+  end
+  object dtsConfigECF: TDataSource
+    DataSet = dmMProvider.cdsConfigECF
+    Left = 37
+    Top = 390
+  end
+  object dtsModEtqGond: TDataSource
+    DataSet = dmMProvider.cdsModEtqGond
+    Left = 37
+    Top = 435
+  end
+  object dtsAdministradoras: TDataSource
+    DataSet = dmMProvider.cdsAdministradoras
+    Left = 37
+    Top = 481
+  end
+  object dtsContaCorente: TDataSource
+    DataSet = dmMProvider.cdsContaCorrente
+    Left = 37
+    Top = 527
+  end
+  object dtsCtrlCartoes: TDataSource
+    DataSet = dmMProvider.cdsCtrlCartoes
+    Left = 37
+    Top = 575
+  end
+  object dtsTotaisCtrlCartaoes: TDataSource
+    DataSet = dmDBEXMaster.fdqTotaisCtrlCartoes
+    Left = 640
+    Top = 109
+  end
+  object dtsSelBaixaCartao: TDataSource
+    DataSet = dmMProvider.cdsSelBaixaCartao
+    Left = 37
+    Top = 622
+  end
+  object dtsTabelasSped: TDataSource
+    DataSet = dmDBEXMaster.fdqTabelas_SPED
+    Left = 133
+    Top = 17
+  end
+  object dtsNFEntrada: TDataSource
+    DataSet = dmMProvider.cdsNFEntrada
+    Left = 133
+    Top = 249
+  end
+  object dtsFornecedor: TDataSource
+    DataSet = dmMProvider.cdsFornecedor
+    Left = 133
+    Top = 65
+  end
+  object dtsParcelasNFE: TDataSource
+    DataSet = dmMProvider.cdsParcelasNFE
+    Left = 133
+    Top = 109
+  end
+  object dtsCFOP_NFEntrada: TDataSource
+    Left = 133
+    Top = 157
+  end
+  object dtsSituacao_Doc: TDataSource
+    DataSet = dmMProvider.cdsSituacao_Doc
+    Left = 133
+    Top = 203
+  end
+  object dtsItem_NFEntrada: TDataSource
+    DataSet = dmMProvider.cdsItem_NFEntrada
+    Left = 133
+    Top = 297
+  end
+  object dtsConhecimentoFrete: TDataSource
+    DataSet = dmMProvider.cdsConhecimentoFrete
+    Left = 133
+    Top = 344
+  end
+  object dtsTipoCTE: TDataSource
+    DataSet = dmMProvider.cdsTipo_CTE
+    Left = 133
+    Top = 390
+  end
+  object dtsPlanoContas: TDataSource
+    DataSet = dmMProvider.cdsPlanoContas
+    Left = 133
+    Top = 527
+  end
+  object dtsItemPlContas: TDataSource
+    DataSet = dmMProvider.cdsItemPlContas
+    Left = 133
+    Top = 575
+  end
+  object dtsLancamentos: TDataSource
+    DataSet = dmMProvider.cdsLancamentos
+    Left = 133
+    Top = 622
+  end
+  object dtsDesdobRentabil: TDataSource
+    DataSet = dmMProvider.cdsDesdobRentabil
+    Left = 37
+    Top = 668
+  end
+  object dtsProdutoFilial: TDataSource
+    DataSet = dmMProvider.cdsProdutoFilial
+    Left = 133
+    Top = 481
+  end
+  object dtsSubGrupo: TDataSource
+    DataSet = dmMProvider.cdsSubGrupo
+    Left = 37
+    Top = 759
+  end
+  object dtsGrupo: TDataSource
+    DataSet = dmMProvider.cdsGrupo
+    Left = 37
+    Top = 713
+  end
+  object dtsSecao: TDataSource
+    DataSet = dmMProvider.cdsSecao
+    Left = 37
+    Top = 802
+  end
+  object dtsTipoItem: TDataSource
+    DataSet = dmMProvider.cdsTipoItem
+    Left = 133
+    Top = 668
+  end
+  object dtsTributacao: TDataSource
+    DataSet = dmMProvider.cdsTributacao
+    Left = 133
+    Top = 713
+  end
+  object dtsRegistro50: TDataSource
+    DataSet = dmMProvider.cdsRegistro50
+    Left = 133
+    Top = 759
+  end
+  object dtsRegistro54: TDataSource
+    DataSet = dmMProvider.cdsRegistro54
+    Left = 133
+    Top = 802
+  end
+  object dtsCLD_NFE: TDataSource
+    DataSet = dmMProvider.cdsCLD_NFE
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 17
+  end
+  object dtsRegInventarioP7: TDataSource
+    DataSet = dmMProvider.cdsRegInventarioP7
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 640
+    Top = 65
+  end
+  object dtsSituacoes_OS: TDataSource
+    DataSet = dmMProvider.cdsSituacoes_OS
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 65
+  end
+  object dtsEquipamentos: TDataSource
+    DataSet = dmMProvider.cdsEquipamentos
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 109
+  end
+  object dtsClientes: TDataSource
+    DataSet = dmMProvider.cdsClientes
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 157
+  end
+  object dtsOrdemServico: TDataSource
+    DataSet = dmMProvider.cdsOrdemServico
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 201
+  end
+  object dtsGarantidor: TDataSource
+    DataSet = dmMProvider.cdsFGarantidor_OS
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 249
+  end
+  object dtsFSituacaoPesq_OS: TDataSource
+    DataSet = dmMProvider.cdsFSituacaoPesq_OS
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 297
+  end
+  object dtsItens_OS_Servico: TDataSource
+    DataSet = dmMProvider.cdsItens_OS_servico
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 344
+  end
+  object dtsItens_OS_Peca: TDataSource
+    DataSet = dmMProvider.cdsItens_OS_Pecas
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 390
+  end
+  object dtsAgenda: TDataSource
+    DataSet = dmMProvider.cdsAgenda
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 435
+  end
+  object dtsServicos: TDataSource
+    DataSet = dmMProvider.cdsServicos
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 481
+  end
+  object dtsHistorico_OS: TDataSource
+    DataSet = dmMProvider.cdsHistorico_OS
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 527
+  end
+  object dtsSituacoesOS_ENC: TDataSource
+    DataSet = dmMProvider.cdsSituacoesOS_ENC
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 575
+  end
+  object dtsFormasPagamento: TDataSource
+    DataSet = dmMProvider.cdsFormasPagamento
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 622
+  end
+  object dtsPerdas: TDataSource
+    DataSet = dmMProvider.cdsPerdas
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 668
+  end
+  object dtsItensPerdas: TDataSource
+    DataSet = dmMProvider.cdsItensPerdas
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 713
+  end
+  object dtsParcelasOS: TDataSource
+    DataSet = dmMProvider.cdsParcelasOS
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 759
+  end
+  object dtsDiasFormaPagto: TDataSource
+    DataSet = dmMProvider.cdsDiasFormapagto
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 802
+  end
+  object dtsProducao: TDataSource
+    DataSet = dmMProvider.cdsProducao
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 371
+    Top = 17
+  end
+  object dtsItemProducao: TDataSource
+    DataSet = dmMProvider.cdsItemProducao
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 371
+    Top = 65
+  end
+  object dtsPesqProdutos: TDataSource
+    DataSet = dmMProvider.cdsPesqProdutos
+    Left = 372
+    Top = 109
+  end
+  object dtsOrdemCompra: TDataSource
+    Left = 372
+    Top = 157
+  end
+  object dtsPaises: TDataSource
+    DataSet = dmMProvider.cdsPaises
+    Left = 372
+    Top = 201
+  end
+  object dtsMenuAtalhos: TDataSource
+    DataSet = dmMProvider.cdsMenuAtalhos
+    Left = 372
+    Top = 249
+  end
+  object dtsAlmoxarifado: TDataSource
+    DataSet = dmMProvider.cdsAlmoxarifado
+    Left = 372
+    Top = 297
+  end
+  object dtsItemAlmoxarifado: TDataSource
+    DataSet = dmMProvider.cdsItemAlmoxarifado
+    Left = 372
+    Top = 344
+  end
+  object dtsCfgConexaoZeusRetail: TDataSource
+    DataSet = dmMProvider.cdsCfgConexaoZeusRetail
+    Left = 372
+    Top = 390
+  end
+  object dtsEnderecoEntPedZeus: TDataSource
+    DataSet = dmMProvider.cdsEndEntregaPedZeus
+    Left = 372
+    Top = 527
+  end
+  object dtsItemPedidoZeus: TDataSource
+    DataSet = dmMProvider.cdsItemPedZeus
+    Left = 372
+    Top = 481
+  end
+  object dtsFinalizadoraPedZeus: TDataSource
+    DataSet = dmMProvider.cdsFinalizadoraPedZeus
+    Left = 372
+    Top = 575
+  end
+  object dtsPedidoZeus: TDataSource
+    DataSet = dmMProvider.cdsPedidoZeus
+    Left = 371
+    Top = 435
+  end
+  object dtsUnidadeMedida: TDataSource
+    DataSet = dmMProvider.cdsUndMedida
+    Left = 372
+    Top = 622
+  end
+  object dtsParcelasPedZeus: TDataSource
+    DataSet = dmMProvider.cdsParcelasPedZeus
+    Left = 372
+    Top = 668
+  end
+  object dtsCaixaLoja: TDataSource
+    DataSet = dmMProvider.cdsCaixaLoja
+    Left = 372
+    Top = 713
+  end
+  object dtsItemCaixaLoja: TDataSource
+    DataSet = dmMProvider.cdsItemCaixaLoja
+    Left = 372
+    Top = 759
+  end
+  object dtsValorPrazoPedido: TDataSource
+    DataSet = dmDBEXMaster.fdqValorPrazoPedido
+    Left = 372
+    Top = 802
+  end
+  object dtsParcelamentoCX: TDataSource
+    DataSet = dmMProvider.cdsParcelamentoCX
+    Left = 494
+    Top = 17
+  end
+  object dtsParcelasCRE_TEMP_CX: TDataSource
+    DataSet = dmMProvider.cdsParcelasCRE_TEMP_CX
+    Left = 494
+    Top = 65
+  end
+  object dtsNCM_NBS: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsNcmNbs
+    Left = 494
+    Top = 109
+  end
+  object dtsConfigBuscaCEP: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsConfigBuscaCEP
+    Left = 494
+    Top = 157
+  end
+  object dtsOrdemProducao: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsOrdemProducao
+    Left = 494
+    Top = 202
+  end
+  object dtsItemOrdemProducao: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsItemOrdemProducao
+    Left = 494
+    Top = 249
+  end
+  object dtsCliente_Entrega: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsCliente_Entrega
+    Left = 494
+    Top = 297
+  end
+  object dtsNFSaida: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsNFSaida
+    Left = 494
+    Top = 344
+  end
+  object dtsItemNFSaida: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsItemNFSaida
+    Left = 494
+    Top = 390
+  end
+  object dtsCFOP_NFSaida: TDataSource
+    DataSet = dmMProvider.cdsCFOP_NFSaida
+    Left = 494
+    Top = 435
+  end
+  object dtsParcelasNFS: TDataSource
+    DataSet = dmMProvider.cdsParcelasNFS
+    Left = 494
+    Top = 481
+  end
+  object dtsTransportadoraNFS: TDataSource
+    DataSet = dmMProvider.cdsTransportadoraNFS
+    Left = 494
+    Top = 527
+  end
+  object dtsExportacaoNFS: TDataSource
+    DataSet = dmMProvider.cdsExpoirtacaoNFS
+    Left = 494
+    Top = 575
+  end
+  object dtsDocumentoRef_NFS: TDataSource
+    DataSet = dmMProvider.cdsDocumentoRef_NFS
+    Left = 494
+    Top = 622
+  end
+  object dtsEndRetiradaNFS: TDataSource
+    DataSet = dmMProvider.cdsEndRetiradaNFS
+    Left = 494
+    Top = 668
+  end
+  object dtsEndEntregaNFS: TDataSource
+    DataSet = dmMProvider.cdsEndEntregaNFS
+    Left = 494
+    Top = 713
+  end
+  object dtsOrigemMercadoria: TDataSource
+    DataSet = dmMProvider.cdsOrigemMercadoria
+    Left = 494
+    Top = 759
+  end
+  object dtsCST_PIS: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsCST_PIS
+    Left = 133
+    Top = 847
+  end
+  object dtsCST_COFINS: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsCST_COFINS
+    Left = 37
+    Top = 847
+  end
+  object dtsPesqClientes: TDataSource
+    DataSet = dmMProvider.cdsPesqClientes
+    Left = 494
+    Top = 802
+  end
+  object dtsParametros_NFE: TDataSource
+    DataSet = dmMProvider.cdsParametros_NFE
+    OnStateChange = dtsCLD_NFEStateChange
+    Left = 253
+    Top = 847
+  end
+  object dtsDetalhesCupomRefNFS_TEMP: TDataSource
+    DataSet = dmMProvider.cdsDetalhesCupomRefNFS_TEMP
+    Left = 640
+    Top = 157
+  end
+  object dtsInventario: TDataSource
+    DataSet = dmMProvider.cdsInventario
+    Left = 372
+    Top = 847
+  end
+  object dtsCCe: TDataSource
+    DataSet = dmMProvider.cdsCCe
+    Left = 494
+    Top = 847
+  end
+  object dtsCupomFiscalRefNFS: TDataSource
+    DataSet = dmMProvider.cdsCupomFiscalRefNFS
+    Left = 640
+    Top = 204
+  end
+  object dtsFCP_Estados: TDataSource
+    DataSet = dmMProvider.cdsFCP_Estados
+    Left = 37
+    Top = 894
+  end
+  object dtsNFSaidaRefer: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsNFSaidaRefer
+    Left = 133
+    Top = 894
+  end
+  object dtsLivroFiscalEntrada: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsLivroFiscalEntrada
+    Left = 253
+    Top = 894
+  end
+  object dtsLivroFiscalSaida: TDataSource
+    AutoEdit = False
+    DataSet = dmMProvider.cdsLivroFiscalSaida
+    Left = 372
+    Top = 894
+  end
+  object dtsPrecoQuantidade: TDataSource
+    DataSet = dmMProvider.cdsPrecoQuantidade
+    Left = 640
+    Top = 249
+  end
+  object dtsUltimaNFEntradaProduto: TDataSource
+    DataSet = dmMProvider.cdsUltimaNFEntradaProduto
+    Left = 640
+    Top = 297
+  end
+  object dtsIOS_Produto: TDataSource
+    DataSet = dmMProvider.cdsIOS_Produto
+    Left = 640
+    Top = 435
+  end
+  object dtsOS_Produto: TDataSource
+    DataSet = dmMProvider.cdsOS_Produto
+    Left = 640
+    Top = 390
+  end
+  object dtsItemUltimaNF: TDataSource
+    DataSet = dmMProvider.cdsItemUltimaNF
+    Left = 640
+    Top = 344
+  end
+  object dtsBarras: TDataSource
+    DataSet = dmMProvider.cdsBarras
+    Left = 640
+    Top = 481
+  end
+  object dtsTeclado_Balanca: TDataSource
+    DataSet = dmMProvider.cdsTeclado_Balanca
+    Left = 640
+    Top = 527
+  end
+  object dtsSetordeBalanca: TDataSource
+    DataSet = dmMProvider.cdsSetorBalanca
+    Left = 640
+    Top = 575
+  end
+  object dtsReceitaProduto: TDataSource
+    DataSet = dmMProvider.cdsReceitaProdutos
+    Left = 640
+    Top = 622
+  end
+  object dtsProdutos: TDataSource
+    DataSet = dmMProvider.cdsProdutos
+    Left = 133
+    Top = 435
+  end
+  object dtsConsultaAgenda: TDataSource
+    DataSet = dmMProvider.cdsConsultaAgenda
+    Left = 640
+    Top = 668
+  end
+  object dtsFretePedidovenda: TDataSource
+    DataSet = dmMProvider.cdsFretePedidoVenda
+    Left = 494
+    Top = 894
+  end
+  object dtsConfig_financeiro: TDataSource
+    DataSet = dmMProvider.cdsConfig_financeiro
+    Left = 640
+    Top = 713
+  end
+  object dtsDeslocamentoOS: TDataSource
+    DataSet = dmMProvider.cdsDeslocamentoOS
+    Left = 640
+    Top = 759
+  end
+  object dtsCST_PIS_ENT: TDataSource
+    DataSet = dmMProvider.cdsCST_PIS_ENT
+    Left = 37
+    Top = 941
+  end
+  object dtsCST_PIS_SAI: TDataSource
+    DataSet = dmMProvider.cdsCST_PIS_SAI
+    Left = 133
+    Top = 941
+  end
+  object dtsCST_COFINS_ENT: TDataSource
+    DataSet = dmMProvider.cdsCST_COFINS_ENT
+    Left = 253
+    Top = 941
+  end
+  object dtsCST_COFINS_SAI: TDataSource
+    DataSet = dmMProvider.cdsCST_COFINS_SAI
+    Left = 372
+    Top = 941
+  end
+  object dtsCtrlNotas: TDataSource
+    DataSet = dmMProvider.cdsCtrlNotas
+    Left = 494
+    Top = 941
+  end
+  object dtsTipoUtilCtrlNotas: TDataSource
+    DataSet = dmMProvider.cdsTipoUtilCtrlNotas
+    Left = 640
+    Top = 802
+  end
+  object dtsSetorCtrlNotas: TDataSource
+    DataSet = dmMProvider.cdsSetorCtrlNotas
+    Left = 640
+    Top = 847
+  end
+  object dtsRefFornecedor: TDataSource
+    DataSet = dmMProvider.cdsReferenciaFornecedor
+    Left = 640
+    Top = 893
+  end
+  object dtsCtrlModulos: TDataSource
+    DataSet = dmMProvider.cdsCtrlModulos
+    Left = 640
+    Top = 941
+  end
+  object dtsParamIntegraPDV: TDataSource
+    DataSet = dmMProvider.cdsParamIntegraPDV
+    Left = 38
+    Top = 988
+  end
+  object dtsSped_R0500: TDataSource
+    DataSet = dmMProvider.cdsSped_R0500
+    Left = 134
+    Top = 988
+  end
+  object dtsParticipantes: TDataSource
+    DataSet = dmMProvider.cdsParticipantes
+    Left = 253
+    Top = 988
+  end
+  object dtsRegimeTributario: TDataSource
+    DataSet = dmMProvider.cdsRegimeTributario
+    Left = 372
+    Top = 988
+  end
+  object dtsTipoLogradouro: TDataSource
+    DataSet = dmMProvider.cdsTipoLogradouro
+    Left = 494
+    Top = 988
+  end
+end

@@ -1,0 +1,831 @@
+unit modFuncionarios;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Actions, Vcl.ActnList,
+  Vcl.StdActns, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, Vcl.Grids,
+  Vcl.DBGrids, Vcl.ComCtrls, Vcl.Imaging.pngimage, Data.DB, Vcl.DBLookup,
+  ACBrBase, ACBrValidador;
+
+type
+  TfrmFuncionarios = class(TForm)
+    imgSair: TImage;
+    imgNovo: TImage;
+    imgSalvar: TImage;
+    lblF2: TLabel;
+    imgDesfazer: TImage;
+    lblF3: TLabel;
+    lblF4: TLabel;
+    imgExcluir: TImage;
+    lblF5: TLabel;
+    imgEditar: TImage;
+    lblF6: TLabel;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    pgcFuncionario: TPageControl;
+    tbsTabela: TTabSheet;
+    grdTabela: TDBGrid;
+    tdsCadastro: TTabSheet;
+    grpPesquisa: TGroupBox;
+    rdpOpcoesPesquisa: TRadioGroup;
+    grpConteudoPesquisa: TGroupBox;
+    impPesquisar: TImage;
+    edtConteudoPesquisa: TEdit;
+    ActionList1: TActionList;
+    WindowClose1: TWindowClose;
+    actIncluir: TAction;
+    actDesfazer: TAction;
+    actSalvar: TAction;
+    actEditar: TAction;
+    actExcluir: TAction;
+    grpCadastro: TGroupBox;
+    lblCodigo: TLabel;
+    edtCodigo: TDBEdit;
+    lblCadastro: TLabel;
+    lblNome: TLabel;
+    lblCPF: TLabel;
+    lblIdentidade: TLabel;
+    lblEndereco: TLabel;
+    lblNumero: TLabel;
+    lblCEP: TLabel;
+    lblBairro: TLabel;
+    lblEstado: TLabel;
+    lblCidade: TLabel;
+    lblDDD: TLabel;
+    lblTelefone: TLabel;
+    lblCelular: TLabel;
+    lblSenha: TLabel;
+    lblCargo: TLabel;
+    edtCadastro: TDBEdit;
+    edtNome: TDBEdit;
+    edtCPF: TDBEdit;
+    edtIdentidade: TDBEdit;
+    edtEndereco: TDBEdit;
+    edtNumero: TDBEdit;
+    edtCEP: TDBEdit;
+    edtBairro: TDBEdit;
+    edtDDD: TDBEdit;
+    edtTelefone: TDBEdit;
+    edtCelular: TDBEdit;
+    edtSenha: TDBEdit;
+    edtCargo: TDBEdit;
+    lkpCidade: TDBLookupComboBox;
+    lkpEstado: TDBLookupComboBox;
+    chkAtivo: TDBCheckBox;
+    procedure FormCreate(Sender: TObject);
+    procedure rdpOpcoesPesquisaClick(Sender: TObject);
+    procedure WindowClose1Execute(Sender: TObject);
+    procedure grdTabelaDblClick(Sender: TObject);
+    procedure grdTabelaDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdTabelaKeyPress(Sender: TObject; var Key: Char);
+    procedure actExcluirExecute(Sender: TObject);
+    procedure Tratar_Erro_Conexao(pE: exception);
+    procedure HabilitaDesabilitaControles(pOpcao:boolean);
+    procedure lblF5Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure actDesfazerExecute(Sender: TObject);
+    procedure actSalvarExecute(Sender: TObject);
+    procedure actEditarExecute(Sender: TObject);
+    procedure actIncluirExecute(Sender: TObject);
+    function AbrirTabelaFuncionario(pOpcao:smallint; pConteudo:string):boolean;
+    procedure edtConteudoPesquisaEnter(Sender: TObject);
+    procedure edtConteudoPesquisaExit(Sender: TObject);
+    procedure edtConteudoPesquisaKeyPress(Sender: TObject; var Key: Char);
+    procedure edtCPFKeyPress(Sender: TObject; var Key: Char);
+    procedure edtNomeEnter(Sender: TObject);
+    procedure edtCodigoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtNomeExit(Sender: TObject);
+    procedure edtNumeroExit(Sender: TObject);
+    procedure edtCPFExit(Sender: TObject);
+    function AbrirTabelaEstados(pOpcao:smallint; pConteudo:string):boolean;
+    function AbrirTabelaCidades(pOpcao:smallint; pConteudo:string):boolean;
+    procedure tdsCadastroShow(Sender: TObject);
+    procedure lkpEstadoExit(Sender: TObject);
+    procedure edtIdentidadeExit(Sender: TObject);
+    procedure edtEnderecoExit(Sender: TObject);
+    procedure edtBairroExit(Sender: TObject);
+    procedure edtCargoExit(Sender: TObject);
+  private
+    { Private declarations }
+    ACBrValidador1: TACBrValidador;
+    procedure LimparMSG_ERRO;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmFuncionarios: TfrmFuncionarios;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, dataMProvider, dataMSource, dataMSProcedure,
+  uConstantes_Padrao, uFuncoes;
+
+function TfrmFuncionarios.AbrirTabelaCidades(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsCidades.Close;
+  dmMProvider.cdsCidades.ProviderName := 'dspCidades';;
+  dmDBEXMaster.fdqCidades.SQL.Clear;
+  dmDBEXMaster.fdqCidades.SQL.Add('select cidade, nome, estado, codigo_municipio');
+  dmDBEXMaster.fdqCidades.SQL.Add('from cidades');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Cidades(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqCidades.SQL.Add(sWhere);
+  dmDBEXMaster.fdqCidades.SQL.Add('ORDER BY ESTADO, NOME');
+
+  try
+
+    dmMProvider.cdsCidades.Open;
+    dmMProvider.cdsCidades.ProviderName := '';
+
+    if dmMProvider.cdsCidades.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsCidades.IsEmpty;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+function TfrmFuncionarios.AbrirTabelaEstados(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsEstados.Close;
+  dmMProvider.cdsEstados.ProviderName := 'dspEstados';;
+  dmDBEXMaster.fdqEstados.SQL.Clear;
+  dmDBEXMaster.fdqEstados.SQL.Add('SELECT * FROM ESTADOS');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Estados(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqEstados.SQL.Add(sWhere);
+  dmDBEXMaster.fdqEstados.SQL.Add('ORDER BY NOME');
+
+  try
+
+    dmMProvider.cdsEstados.Open;
+    dmMProvider.cdsEstados.ProviderName := '';
+
+    if dmMProvider.cdsEstados.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsEstados.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+end;
+
+function TfrmFuncionarios.AbrirTabelaFuncionario(pOpcao: smallint;
+  pConteudo: string): boolean;
+var
+  sWhere:string;
+begin
+
+  dmMProvider.cdsFuncionarios.Close;
+  dmMProvider.cdsFuncionarios.ProviderName := 'dspFuncionarios';;
+  dmDBEXMaster.fdqFuncionarios.SQL.Clear;
+  dmDBEXMaster.fdqFuncionarios.SQL.Add('SELECT * FROM FUNCIONARIO');
+
+  sWhere := dmDBEXMaster.Montar_SQL_Pesquisa_Funcionario(pOpcao,pConteudo);
+
+  dmDBEXMaster.fdqFuncionarios.SQL.Add(sWhere);
+  dmDBEXMaster.fdqFuncionarios.SQL.Add('ORDER BY NOME');
+
+  try
+
+    dmMProvider.cdsFuncionarios.Open;
+
+    dmMProvider.cdsFuncionarios.ProviderName := '';
+
+    if dmMProvider.cdsFuncionarios.IsEmpty then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_PESQUISA + ' - ' + Trim(edtConteudoPesquisa.Text);
+      TocarSomAlerta(ord(SystemHand));
+
+    end;
+
+    Result := not dmMProvider.cdsFuncionarios.IsEmpty;
+
+   except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+procedure TfrmFuncionarios.actDesfazerExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsFuncionarios.Active then
+    if dmMProvider.cdsEstados.State in [dsEdit, dsInsert] then
+    begin
+
+      dmMProvider.cdsFuncionarios.Cancel;
+
+      pgcFuncionario.Pages[1].TabVisible  := false;
+
+      pgcFuncionario.ActivePageIndex      := 0;
+
+      edtConteudoPesquisa.Clear;
+      edtConteudoPesquisa.SetFocus;
+
+    end;
+
+  HabilitaDesabilitaControles(False);
+
+end;
+
+procedure TfrmFuncionarios.actEditarExecute(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFuncionarios.Active then
+  begin
+
+    if not (dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert]) then
+    begin
+
+      HabilitaDesabilitaControles(True);
+      pgcFuncionario.ActivePageIndex :=1;
+      edtNome.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFuncionarios.actExcluirExecute(Sender: TObject);
+begin
+
+  try
+
+    dmDBEXMaster.fdtMaster.StartTransaction;
+    dmMSProcedure.fdspFuncionarios.Params[0].Value    := 1;
+    dmMSProcedure.fdspFuncionarios.Params[1].Value    := dmMProvider.cdsFuncionariosFUNCIONARIO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[2].Value    := dmMProvider.cdsFuncionariosNOME.Value;
+    dmMSProcedure.fdspFuncionarios.Params[3].Value    := dmMProvider.cdsFuncionariosCPF.Value;
+    dmMSProcedure.fdspFuncionarios.Params[4].Value    := dmMProvider.cdsFuncionariosIDENTIDADE.Value;
+    dmMSProcedure.fdspFuncionarios.Params[5].Value    := dmMProvider.cdsFuncionariosENDERECO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[6].Value    := dmMProvider.cdsFuncionariosNUMERO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[7].Value    := dmMProvider.cdsFuncionariosCEP.Value;
+    dmMSProcedure.fdspFuncionarios.Params[8].Value    := dmMProvider.cdsFuncionariosBAIRRO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[9].Value    := dmMProvider.cdsFuncionariosCIDADE.Value;
+    dmMSProcedure.fdspFuncionarios.Params[10].Value   := dmMProvider.cdsFuncionariosESTADO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[11].Value   := dmMProvider.cdsFuncionariosDDD.Value;
+    dmMSProcedure.fdspFuncionarios.Params[12].Value   := dmMProvider.cdsFuncionariosTELEFONE.Value;
+    dmMSProcedure.fdspFuncionarios.Params[13].Value   := dmMProvider.cdsFuncionariosCELULAR.Value;
+    dmMSProcedure.fdspFuncionarios.Params[14].Value   := dmMProvider.cdsFuncionariosATIVO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[15].Value   := dmMProvider.cdsFuncionariosBARRAS.Value;
+    dmMSProcedure.fdspFuncionarios.Params[16].Value   := dmMProvider.cdsFuncionariosCARGO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[17].Value   := dmMProvider.cdsFuncionariosSENHA.Value;
+
+    dmMSProcedure.fdspFuncionarios.ExecProc;
+
+    dmMProvider.cdsFuncionarios.Delete;
+
+    dmDBEXMaster.fdtMaster.Commit;
+    dmDBEXMaster.fdcMaster.Close;;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+procedure TfrmFuncionarios.actIncluirExecute(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  try
+
+    edtConteudoPesquisa.Clear;
+
+    AbrirTabelaFuncionario(0,'-1');
+
+    AbrirTabelaEstados(2,'');
+    dmMProvider.cdsCidades.Close;
+
+    pgcFuncionario.Pages[1].TabVisible  := True;
+
+    HabilitaDesabilitaControles(True);
+
+    pgcFuncionario.ActivePageIndex      := 1;
+
+    dmMProvider.cdsFuncionarios.Append;
+
+    edtNome.SetFocus;
+
+  except
+    on E: exception do
+      Tratar_Erro_Conexao(E);
+
+  end;
+
+
+end;
+
+procedure TfrmFuncionarios.actSalvarExecute(Sender: TObject);
+begin
+
+  try
+
+    ActiveControl := nil;
+
+    dmDBEXMaster.fdtMaster.StartTransaction;
+    dmMSProcedure.fdspFuncionarios.Params[0].Value    := 0;
+    dmMSProcedure.fdspFuncionarios.Params[1].Value    := dmMProvider.cdsFuncionariosFUNCIONARIO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[2].Value    := dmMProvider.cdsFuncionariosNOME.Value;
+    dmMSProcedure.fdspFuncionarios.Params[3].Value    := dmMProvider.cdsFuncionariosCPF.Value;
+    dmMSProcedure.fdspFuncionarios.Params[4].Value    := dmMProvider.cdsFuncionariosIDENTIDADE.Value;
+    dmMSProcedure.fdspFuncionarios.Params[5].Value    := dmMProvider.cdsFuncionariosENDERECO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[6].Value    := dmMProvider.cdsFuncionariosNUMERO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[7].Value    := dmMProvider.cdsFuncionariosCEP.Value;
+    dmMSProcedure.fdspFuncionarios.Params[8].Value    := dmMProvider.cdsFuncionariosBAIRRO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[9].Value    := dmMProvider.cdsFuncionariosCIDADE.Value;
+    dmMSProcedure.fdspFuncionarios.Params[10].Value   := dmMProvider.cdsFuncionariosESTADO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[11].Value   := dmMProvider.cdsFuncionariosDDD.Value;
+    dmMSProcedure.fdspFuncionarios.Params[12].Value   := dmMProvider.cdsFuncionariosTELEFONE.Value;
+    dmMSProcedure.fdspFuncionarios.Params[13].Value   := dmMProvider.cdsFuncionariosCELULAR.Value;
+    dmMSProcedure.fdspFuncionarios.Params[14].Value   := dmMProvider.cdsFuncionariosATIVO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[15].Value   := dmMProvider.cdsFuncionariosBARRAS.Value;
+    dmMSProcedure.fdspFuncionarios.Params[16].Value   := dmMProvider.cdsFuncionariosCARGO.Value;
+    dmMSProcedure.fdspFuncionarios.Params[17].Value   := dmMProvider.cdsFuncionariosSENHA.Value;
+
+    dmMSProcedure.fdspFuncionarios.ExecProc;
+
+    dmMProvider.cdsFuncionarios.Post;
+
+    dmDBEXMaster.fdtMaster.Commit;
+    dmDBEXMaster.fdcMaster.Close;;
+
+  except
+    on E: exception do
+    begin
+
+      Tratar_Erro_Conexao(E);
+      dmDBEXMaster.fdtMaster.Rollback;
+
+    end;
+
+  end;
+
+  HabilitaDesabilitaControles(false);
+
+end;
+
+procedure TfrmFuncionarios.edtBairroExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFuncionariosBAIRRO.Value := RetirarAcentuacao(sender);
+
+end;
+
+procedure TfrmFuncionarios.edtCargoExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFuncionariosCARGO.Value := RetirarAcentuacao(sender);
+
+end;
+
+procedure TfrmFuncionarios.edtCodigoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  iDirecao: Integer;
+begin
+
+  // habilita movimentação dos campos com as setas acima/abaixo
+  iDirecao := -1;
+
+  case Key of
+
+    VK_DOWN:
+      iDirecao := 0; { Próximo }
+    VK_UP:
+      iDirecao := 1; { Anterior }
+
+  end;
+
+  if iDirecao <> -1 then
+  begin
+
+    Perform(WM_NEXTDLGCTL, iDirecao, 0);
+    Key := 0;
+
+  end;
+
+
+end;
+
+procedure TfrmFuncionarios.edtConteudoPesquisaEnter(Sender: TObject);
+begin
+
+   pgcFuncionario.Pages[1].TabVisible := false;
+
+   MudarCorEdit(Sender);
+
+
+end;
+
+procedure TfrmFuncionarios.edtConteudoPesquisaExit(Sender: TObject);
+begin
+
+  LimparMSG_ERRO;
+
+  if Length(Trim(edtConteudoPesquisa.Text)) > 0 then
+  begin
+
+    if rdpOpcoesPesquisa.ItemIndex = 2 then
+    begin
+
+      ACBrValidador1.TipoDocto  := docCPF;
+      ACBrValidador1.Documento  := edtConteudoPesquisa.Text;
+
+      if not ACBrValidador1.Validar then
+      begin
+
+        lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CPF_INVALIDO
+                      + edtConteudoPesquisa.Text;
+
+        TocarSomAlerta(ord(SystemHand));
+
+        edtConteudoPesquisa.SetFocus;
+
+      end;
+
+    end
+    else
+
+      if AbrirTabelaFuncionario(rdpOpcoesPesquisa.ItemIndex, edtConteudoPesquisa.Text) then
+      begin
+
+        AbrirTabelaCidades(-1,'');
+        grdTabela.SetFocus;
+
+      end;
+
+    edtConteudoPesquisa.Clear;
+
+  end;
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmFuncionarios.edtConteudoPesquisaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+
+end;
+
+procedure TfrmFuncionarios.edtCPFExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+  LimparMSG_ERRO;
+
+  if dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert] then
+  begin
+
+    ACBrValidador1.TipoDocto  := docCPF;
+    ACBrValidador1.Documento  := edtCPF.Text;
+
+    if not ACBrValidador1.Validar then
+    begin
+
+      lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_CPF_INVALIDO
+                      + dmMProvider.cdsFuncionariosCPF.Value;
+      edtCPF.SetFocus;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfrmFuncionarios.edtCPFKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if Key = #13 then
+  begin
+
+    Key := #0;
+    PostMessage(Handle, WM_KEYDOWN, VK_TAB, 1);
+
+  end
+  else if not (Key in['0'..'9',Chr(8)]) then
+    Key:= #0;
+
+end;
+
+procedure TfrmFuncionarios.edtEnderecoExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFuncionariosENDERECO.Value := RetirarAcentuacao(sender);
+
+end;
+
+procedure TfrmFuncionarios.edtIdentidadeExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmFuncionarios.edtNomeEnter(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmFuncionarios.edtNomeExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+  if dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert] then
+    dmMProvider.cdsFuncionariosNOME.Value := RetirarAcentuacao(sender);
+
+end;
+
+procedure TfrmFuncionarios.edtNumeroExit(Sender: TObject);
+begin
+
+  MudarCorEdit(Sender);
+
+end;
+
+procedure TfrmFuncionarios.FormCreate(Sender: TObject);
+begin
+
+  DesabilitarBotaoFecharForm(self.Handle);
+
+  Color                           := COR_PADRAO_TELAS;
+  Caption                         := ' ' + Application.Title + ' - ' + RetornarVersao(ParamStr(0),1) + 'xe';
+
+  dmDBEXMaster.sNomeUsuario       := ParamStr(1);
+  dmDBEXMaster.sSenha             := paramstr(2);
+  dmDBEXMaster.iIdUsuario         := StrToInt(ParamStr(3));
+  dmDBEXMaster.iIdFilial          := StrToInt(ParamStr(4));
+
+  pgcFuncionario.Pages[1].TabVisible  := false;
+
+  ACBrValidador1 := TACBrValidador.Create(self);
+
+
+end;
+
+procedure TfrmFuncionarios.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if key = VK_F5 then
+    lblF5Click(self);
+
+end;
+
+procedure TfrmFuncionarios.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if (UpperCase(key) = 'S') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    actExcluirExecute(self);
+
+  end
+  else   if (UpperCase(key) = 'N') and (lblMsg.Tag = -1) then
+  begin
+
+    Key         := #0;
+    lblMsg.Tag  := 0;
+    LimparMSG_ERRO;
+
+  end;
+
+end;
+
+procedure TfrmFuncionarios.grdTabelaDblClick(Sender: TObject);
+begin
+
+  if not dmMProvider.cdsFuncionarios.IsEmpty then
+  begin
+
+    pgcFuncionario.Pages[1].TabVisible  := True;
+    pgcFuncionario.ActivePageIndex      := 1;
+
+  end;
+
+end;
+
+procedure TfrmFuncionarios.grdTabelaDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+
+  if not dmMProvider.cdsFuncionarios.IsEmpty then
+  begin
+
+    if not odd(dmMProvider.cdsFuncionarios.RecNo) then
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := COR_ZEBRA_GRADE;
+
+    end
+    else
+    begin
+
+      grdTabela.Canvas.Font.Color   := clBlack;
+      grdTabela.Canvas.Brush.Color  := clWhite;
+
+    end;
+
+    grdTabela.Canvas.FillRect(Rect);
+    grdTabela.DefaultDrawDataCell(Rect, Column.Field, State);
+
+  end;
+
+end;
+
+procedure TfrmFuncionarios.grdTabelaKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if key = #13 then
+    grdTabelaDblClick(Self);
+
+end;
+
+procedure TfrmFuncionarios.HabilitaDesabilitaControles(pOpcao: boolean);
+begin
+
+  grpCadastro.Enabled := pOpcao;
+
+end;
+
+procedure TfrmFuncionarios.lblF5Click(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFuncionarios.Active then
+  begin
+
+    if not (dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert]) then
+    begin
+
+      LimparMSG_ERRO;
+
+      lblMsg.Tag      := -1;
+      lblMsg.Caption  := dmDBEXMaster.sNomeUsuario + MSG_CONFIRMA_EXCLUSAO;
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmFuncionarios.LimparMSG_ERRO;
+begin
+
+  lblMsg.Caption := '';
+  Application.ProcessMessages;
+
+end;
+
+procedure TfrmFuncionarios.lkpEstadoExit(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert] then
+  begin
+
+    if Length(Trim(dmMProvider.cdsFuncionariosESTADO.Value)) > 0 then
+      AbrirTabelaCidades(2,dmMProvider.cdsFuncionariosESTADO.Value);
+
+  end;
+end;
+
+procedure TfrmFuncionarios.rdpOpcoesPesquisaClick(Sender: TObject);
+begin
+
+  edtConteudoPesquisa.Clear;
+  edtConteudoPesquisa.SetFocus;
+
+end;
+
+procedure TfrmFuncionarios.tdsCadastroShow(Sender: TObject);
+begin
+
+  if dmMProvider.cdsFuncionarios.Active then
+  begin
+
+    if not (dmMProvider.cdsFuncionarios.IsEmpty) and not (dmMProvider.cdsFuncionarios.State in [dsEdit, dsInsert]) then
+    begin
+
+      AbrirTabelaEstados(2,dmMProvider.cdsFuncionariosESTADO.Value);
+      AbrirTabelaCidades(2,dmMProvider.cdsFuncionariosESTADO.Value);
+
+    end;
+
+  end;
+
+
+end;
+
+procedure TfrmFuncionarios.Tratar_Erro_Conexao(pE: exception);
+var
+  sChave_Extrang:string;
+begin
+
+  if Pos('Unable',pE.Message) > 0then
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + MSG_ERRO_CONEXAO_BANCO
+  else if Pos('FOREIGN',pE.Message) > 0then
+  begin
+
+    sChave_Extrang := Trim(Copy(pE.Message,pos('ON TABLE',Uppercase(pE.Message))+ 10,Length(pE.Message)));
+
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + MSG_ERRO_CHAVE_ESTRANGEIRA
+                      + Copy(sChave_Extrang,1,pos('"',sChave_Extrang)-1);
+
+  end
+  else
+    lblMsg.Caption := dmDBEXMaster.sNomeUsuario + ', ' + pE.Message;
+
+  TocarSomAlerta(ord(SystemHand));
+
+end;
+
+procedure TfrmFuncionarios.WindowClose1Execute(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.

@@ -1,0 +1,36 @@
+unit modEquipamentoAvulso;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls;
+
+type
+  TfrmModEquipamentoAvulso = class(TForm)
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpMensagem: TGroupBox;
+    lblMsg: TLabel;
+    grpInformacaoEquipamento: TGroupBox;
+    Label1: TLabel;
+    edtAparelho: TEdit;
+    Label2: TLabel;
+    edtModelo: TEdit;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmModEquipamentoAvulso: TfrmModEquipamentoAvulso;
+
+implementation
+
+{$R *.dfm}
+
+uses dataDBEXMaster, uFuncoes, uConstantes_Padrao;
+
+end.

@@ -1,0 +1,44 @@
+unit modParcelasPedido;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls;
+
+type
+  TfrmParcelasPedido = class(TForm)
+    imgConfirmar: TImage;
+    imgSair: TImage;
+    grpParcelas: TGroupBox;
+    procedure imgSairClick(Sender: TObject);
+    procedure imgConfirmarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmParcelasPedido: TfrmParcelasPedido;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmParcelasPedido.imgConfirmarClick(Sender: TObject);
+begin
+
+  ModalResult := mrOk;
+
+end;
+
+procedure TfrmParcelasPedido.imgSairClick(Sender: TObject);
+begin
+
+  Close;
+
+end;
+
+end.
